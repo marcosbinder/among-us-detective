@@ -95,6 +95,7 @@ export default defineNuxtConfig({
   sentry: {
     org: "atlesque-media-vof",
     project: "among-us-detective",
+    telemetry: false,
   },
 
   runtimeConfig: {
