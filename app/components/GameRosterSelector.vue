@@ -21,17 +21,20 @@
           {{ activeCount }} / 15 Playing ({{ 18 - activeCount }} Not In Game)
         </span>
 
-        <!-- ME: (Color) indicator badge -->
-        <div
-          class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-yellow-400/15 border border-yellow-400/40 text-yellow-300 cursor-pointer hover:bg-yellow-400/25 transition-colors"
-          title="This is your player. Double-click any bean below to change."
+        <!-- ME: (Color) indicator badge — clickable to open color picker -->
+        <button
+          class="relative flex items-center gap-1.5 px-2 py-0.5 rounded bg-yellow-400/15 border border-yellow-400/40 text-yellow-300 cursor-pointer hover:bg-yellow-400/30 hover:border-yellow-400/70 active:scale-95 transition-all group"
+          data-test="player-selector-btn"
+          title="Click to change your color"
+          @click.stop="isColorPickerOpen = !isColorPickerOpen"
         >
           <span class="text-[10px] font-black tracking-wider text-yellow-400">ME:</span>
           <div class="w-4 h-4 flex items-center justify-center">
             <CrewIcon :color="crewStore.playerColor" :is-player="true" class="w-full h-full" />
           </div>
           <span class="text-[11px] font-bold capitalize text-white">{{ crewStore.playerColor }}</span>
-        </div>
+          <span class="text-[9px] text-yellow-400/60 group-hover:text-yellow-400 transition-colors ml-0.5">▼</span>
+        </button>
       </div>
 
       <!-- Presets & Collapse State Control -->
@@ -71,6 +74,47 @@
       </div>
     </div>
 
+    <!-- Color Picker Popover (opens when ME badge is clicked) -->
+    <Teleport to="body">
+      <div
+        v-if="isColorPickerOpen"
+        class="fixed inset-0 z-50 select-none bg-transparent"
+        @click.stop="isColorPickerOpen = false"
+      >
+        <div
+          ref="colorPickerEl"
+          class="fixed bg-gray-900 border border-yellow-400/50 rounded-lg shadow-2xl p-3 w-[280px] text-left"
+          :style="colorPickerStyle"
+          @click.stop
+        >
+          <div class="text-[10px] font-bold uppercase tracking-wider text-yellow-400 mb-2">
+            Choose your color
+          </div>
+          <div class="grid grid-cols-5 gap-1.5">
+            <button
+              v-for="color in allColors"
+              :key="color"
+              type="button"
+              class="flex flex-col items-center justify-center p-1 rounded transition-all cursor-pointer"
+              :class="[
+                isPlayerColor(color)
+                  ? 'ring-2 ring-yellow-400 bg-yellow-400/20 scale-110 shadow-lg'
+                  : 'bg-gray-800/80 hover:bg-gray-700 border border-gray-700/60 hover:border-gray-500'
+              ]"
+              style="width: 48px; min-height: 54px;"
+              :title="`Set as ${color}`"
+              @click="pickColor(color)"
+            >
+              <div class="w-5 h-5 flex items-center justify-center pointer-events-none">
+                <CrewIcon :color="color" :is-player="isPlayerColor(color)" class="w-full h-full" />
+              </div>
+              <span class="text-[7px] font-bold capitalize text-gray-300 mt-0.5 leading-[8px] break-words w-full text-center">{{ color }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- 18 Colors: Compact Bean Character Row (collapsible) -->
     <div
       v-if="!isMinimized"
@@ -86,7 +130,7 @@
             : 'bg-gray-900/40 hover:bg-gray-900/70 border border-dashed border-gray-800 opacity-30 grayscale',
           isPlayerColor(color) ? 'ring-2 ring-yellow-400 !border-yellow-400 !opacity-100 !grayscale-0 shadow-md' : ''
         ]"
-        style="width: 38px; height: 44px;"
+        style="width: 56px; min-height: 58px;"
         :title="`${color} (${isMemberActive(color) ? 'Playing' : 'Not In Game'})${isPlayerColor(color) ? ' - You (Me - Cannot turn off)' : ''}. Click to toggle. Double click to set as Me.`"
         @click="toggleActive(color)"
         @contextmenu.prevent="setAsMyPlayer(color)"
@@ -117,6 +161,10 @@
             :class="isMemberActive(color) ? 'bg-emerald-500 shadow-[0_0_4px_#10b981]' : 'bg-gray-600'"
           />
         </div>
+
+        <span class="mt-0.5 w-full text-center text-[8px] font-bold capitalize leading-[9px] text-gray-300 break-words">
+          {{ color }}
+        </span>
       </div>
     </div>
   </div>
@@ -127,9 +175,32 @@ import allColors from '~/utils/playerColors.js'
 
 const crewStore = useCrewStore()
 const isMinimized = ref(false)
+const isColorPickerOpen = ref(false)
+const colorPickerEl = ref<HTMLElement | null>(null)
 
 const activeCount = computed(() => {
   return crewStore.crewMembers.filter(m => m.isActive).length
+})
+
+// Position the color picker below the ME badge
+const colorPickerStyle = computed(() => {
+  const btn = document.querySelector('[data-test="player-selector-btn"]')
+  if (!btn) return { top: '80px', left: '16px' }
+  const rect = btn.getBoundingClientRect()
+  const pickerWidth = 280
+  let left = rect.left
+  const top = rect.bottom + 6
+
+  // Prevent overflow right
+  if (left + pickerWidth > window.innerWidth - 8) {
+    left = window.innerWidth - pickerWidth - 8
+  }
+  if (left < 8) left = 8
+
+  return {
+    top: `${top}px`,
+    left: `${left}px`,
+  }
 })
 
 function isMemberActive(color: string) {
@@ -147,6 +218,11 @@ function toggleActive(color: string) {
 
 function setAsMyPlayer(color: string) {
   crewStore.setPlayerColor(color)
+}
+
+function pickColor(color: string) {
+  crewStore.setPlayerColor(color)
+  isColorPickerOpen.value = false
 }
 
 function setPreset15() {

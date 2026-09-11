@@ -85,6 +85,42 @@
             </span>
           </div>
 
+          <div class="mb-2 rounded-md border p-2"
+              :class="member.roleConfirmed
+              ? 'border-emerald-500/50 bg-emerald-500/10'
+              : member.role
+                ? 'border-yellow-500/50 bg-yellow-500/10'
+                : 'border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/60'"
+            data-test="role-confirmation"
+          >
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[10px] font-bold uppercase tracking-wider"
+                :class="member.roleConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-700 dark:text-yellow-400'"
+              >
+                {{ member.roleConfirmed ? 'Role hard clear active' : 'Set role status' }}
+              </span>
+              <span v-if="member.role" class="text-[10px] font-bold"
+                :class="member.roleConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-700 dark:text-yellow-400'"
+              >
+                {{ member.roleConfirmed ? 'ROLE HARD CLEAR' : 'ROLE NOT HARD CLEAR' }}
+              </span>
+            </div>
+            <button
+              v-if="member.role"
+              type="button"
+              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors text-center flex items-center justify-center gap-1"
+              :class="member.roleConfirmed
+                ? 'bg-rose-700 text-white hover:bg-rose-600 shadow-sm'
+                : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm'"
+              @click="toggleRoleConfirmed"
+            >
+              {{ member.roleConfirmed ? 'Unhard clear role' : '✓ Hard clear role' }}
+            </button>
+            <p v-else class="text-[10px] leading-tight text-gray-500 dark:text-gray-400">
+              Choose a role below, then confirm it here.
+            </p>
+          </div>
+
           <!-- Crew Roles (5) -->
           <div class="mb-2">
             <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">
@@ -129,26 +165,8 @@
             </div>
           </div>
 
-          <!-- Verify / Unverify Claim & Clear -->
-          <div class="pt-2 border-t border-gray-200 dark:border-gray-800 flex items-center gap-1.5">
-            <button
-              v-if="member.role"
-              type="button"
-              class="flex-1 py-1 px-1.5 text-[11px] font-bold rounded transition-colors text-center flex items-center justify-center gap-1"
-              :class="member.roleConfirmed
-                ? (isImpostorRole ? 'bg-rose-700 text-white hover:bg-rose-600' : 'bg-emerald-700 text-white hover:bg-emerald-600')
-                : 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-500/40 hover:bg-yellow-500/30'"
-              @click="toggleRoleConfirmed"
-            >
-              <span>{{ member.roleConfirmed ? '✓ Verified' : '? Unverified' }}</span>
-            </button>
-            <span
-              v-else
-              class="flex-1 text-[10px] text-gray-400 dark:text-gray-500 italic py-1 text-center"
-            >
-              Pick a role above
-            </span>
-
+          <!-- Clear role -->
+          <div class="pt-2 border-t border-gray-200 dark:border-gray-800 flex justify-end">
             <button
               v-if="member.role"
               type="button"

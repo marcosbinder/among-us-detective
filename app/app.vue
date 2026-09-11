@@ -21,10 +21,7 @@ const isAppInstallationPromptVisible = ref(false)
 let pwaInstallEvent: any = null
 
 onMounted(() => {
-  if (
-    !hasDarkModeBeenSetBefore.value &&
-    window.matchMedia?.('(prefers-color-scheme: dark)').matches === true
-  ) {
+  if (!hasDarkModeBeenSetBefore.value) {
     darkModeStore.setDarkMode(true)
   }
 
