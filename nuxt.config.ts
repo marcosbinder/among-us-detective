@@ -57,6 +57,10 @@ export default defineNuxtConfig({
         },
         { rel: "manifest", href: "/favicon/site.webmanifest" },
       ],
+      bodyAttrs: {
+        class: "bg-theme-gray-extra-dark",
+        style: "background-color: #101011; margin: 0;",
+      },
     },
   },
 
@@ -91,11 +95,12 @@ export default defineNuxtConfig({
     },
   },
 
-  // Sentry (DSN and runtime options are in sentry.client.config.ts)
+  // Sentry (only enabled in production to prevent dev startup delay)
   sentry: {
     org: "atlesque-media-vof",
     project: "among-us-detective",
     telemetry: false,
+    enabled: process.env.NODE_ENV === "production",
   },
 
   runtimeConfig: {
@@ -124,8 +129,6 @@ export default defineNuxtConfig({
     },
     optimizeDeps: {
       include: [
-        "@vue/devtools-core",
-        "@vue/devtools-kit",
         "pinia-plugin-persistedstate",
         "vuedraggable", // CJS
         "vue3-moveable",

@@ -1,12 +1,20 @@
 import allColors from "~/utils/playerColors.js";
 
+export type ColumnStatus = 'hard_clear' | 'trusted' | 'unknown' | 'suspicious' | 'impostor' | 'dead';
+
 export interface CrewMember {
+  id: string;
   color: string;
+  status: ColumnStatus;
+  role: string | null;
+  roleConfirmed: boolean;
+  isDead: boolean;
+  previousStatus: ColumnStatus;
+  mapPosition: { x: number; y: number } | null;
   playerName: string;
   isPlayer: boolean;
   isActive: boolean;
   isImposter: boolean;
-  isDead: boolean;
   isDoneWithTasks: boolean;
   totalMeetingsHeld: number;
   suspectedBy: string[];
@@ -16,13 +24,19 @@ export interface CrewMember {
 const DEFAULT_PLAYER_COLOR = "yellow";
 
 function createDefaultCrewMembers(): CrewMember[] {
-  return (allColors as string[]).map((colorName) => ({
+  return (allColors as string[]).map((colorName, idx) => ({
+    id: `player-${colorName}`,
     color: colorName,
+    status: 'unknown' as ColumnStatus,
+    role: null,
+    roleConfirmed: false,
+    isDead: false,
+    previousStatus: 'unknown' as ColumnStatus,
+    mapPosition: null,
     playerName: "",
     isPlayer: colorName === DEFAULT_PLAYER_COLOR,
-    isActive: false,
+    isActive: idx < 15,
     isImposter: false,
-    isDead: false,
     isDoneWithTasks: false,
     totalMeetingsHeld: 0,
     suspectedBy: [],
@@ -62,12 +76,35 @@ export const useCrewStore = defineStore("crew", () => {
     })
   );
 
-  const deadCrewMembers = computed(() =>
-    crewMembers.value.filter((m) => m.isDead)
+  const aliveCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => !m.isDead && m.status !== 'dead')
   );
 
-  const aliveCrewMembers = computed(() =>
-    crewMembers.value.filter((m) => !m.isDead)
+  // Canonical 6-column hierarchy getters (only for active in-game players, excluding ME)
+  const hardClearCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => m.isActive && m.color !== playerColor.value && m.status === 'hard_clear' && !m.isDead)
+  );
+
+  const trustedCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => m.isActive && m.color !== playerColor.value && m.status === 'trusted' && !m.isDead)
+  );
+
+  const unknownCrewMembers = computed(() =>
+    crewMembers.value.filter(
+      (m) => m.isActive && m.color !== playerColor.value && (m.status === 'unknown' || !m.status) && !m.isDead && m.status !== 'dead'
+    )
+  );
+
+  const suspiciousCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => m.isActive && m.color !== playerColor.value && m.status === 'suspicious' && !m.isDead)
+  );
+
+  const impostorCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => m.isActive && m.color !== playerColor.value && m.status === 'impostor' && !m.isDead)
+  );
+
+  const deadCrewMembers = computed(() =>
+    crewMembers.value.filter((m) => m.isActive && m.color !== playerColor.value && (m.isDead || m.status === 'dead'))
   );
 
   const crewMembersDoneWithTasks = computed(() =>
@@ -129,6 +166,7 @@ export const useCrewStore = defineStore("crew", () => {
       );
       return {
         ...defaultMember,
+        isActive: existing ? existing.isActive : defaultMember.isActive,
         playerName: existing?.playerName ?? "",
         isPlayer: defaultMember.color === playerColor.value,
       };
@@ -136,15 +174,232 @@ export const useCrewStore = defineStore("crew", () => {
   }
 
   function resetActiveCrew() {
-    crewMembers.value = crewMembers.value.map((m) => ({
-      ...m,
-      isDead: false,
-      isImposter: false,
-      suspectedBy: [],
-      protectedBy: [],
-      isDoneWithTasks: false,
-      totalMeetingsHeld: 0,
-    }));
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.isDead || m.status === 'dead') {
+        return {
+          ...m,
+          isDead: true,
+          status: 'dead' as ColumnStatus,
+          isDoneWithTasks: false,
+          totalMeetingsHeld: 0,
+        };
+      }
+      return {
+        ...m,
+        status: 'unknown' as ColumnStatus,
+        isDead: false,
+        isDoneWithTasks: false,
+        totalMeetingsHeld: 0,
+        suspectedBy: [],
+        protectedBy: [],
+      };
+    });
+  }
+
+  function setPlayerStatus(colorOrId: string, newStatus: ColumnStatus) {
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.color === colorOrId || m.id === colorOrId) {
+        let roleConfirmed = m.roleConfirmed;
+        const isImpostor = m.role && (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
+        // If crew role moved out of hard_clear, unverify!
+        if (!isImpostor && newStatus !== 'hard_clear' && m.roleConfirmed) {
+          roleConfirmed = false;
+        }
+        // If impostor role moved out of impostor, unverify!
+        if (isImpostor && newStatus !== 'impostor' && m.roleConfirmed) {
+          roleConfirmed = false;
+        }
+        if (newStatus === 'dead') {
+          return {
+            ...m,
+            previousStatus: m.status !== 'dead' ? m.status : m.previousStatus || 'unknown',
+            isDead: true,
+            status: 'dead' as ColumnStatus,
+            roleConfirmed,
+          };
+        } else {
+          return {
+            ...m,
+            isDead: false,
+            previousStatus: m.status !== 'dead' ? m.status : m.previousStatus,
+            status: newStatus,
+            roleConfirmed,
+          };
+        }
+      }
+      return m;
+    });
+  }
+
+  function togglePlayerDead(colorOrId: string) {
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.color === colorOrId || m.id === colorOrId) {
+        if (m.isDead || m.status === 'dead') {
+          // Manual toggle reversal strictly for error correction
+          const restoredStatus = (m.previousStatus && m.previousStatus !== 'dead')
+            ? m.previousStatus
+            : 'unknown';
+          return {
+            ...m,
+            isDead: false,
+            status: restoredStatus as ColumnStatus,
+          };
+        } else {
+          return {
+            ...m,
+            previousStatus: m.status,
+            isDead: true,
+            status: 'dead' as ColumnStatus,
+          };
+        }
+      }
+      return m;
+    });
+  }
+
+  function setColumnMembers(status: ColumnStatus, members: CrewMember[]) {
+    const memberColors = members.map((m) => m.color);
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (memberColors.includes(m.color)) {
+        let roleConfirmed = m.roleConfirmed;
+        const isImpostor = m.role && (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
+        // If crew role moved out of hard_clear, unverify!
+        if (!isImpostor && status !== 'hard_clear' && m.roleConfirmed) {
+          roleConfirmed = false;
+        }
+        // If impostor role moved out of impostor, unverify!
+        if (isImpostor && status !== 'impostor' && m.roleConfirmed) {
+          roleConfirmed = false;
+        }
+        if (status === 'dead') {
+          return {
+            ...m,
+            previousStatus: m.status !== 'dead' ? m.status : m.previousStatus || 'unknown',
+            isDead: true,
+            status: 'dead' as ColumnStatus,
+            roleConfirmed,
+          };
+        } else {
+          return {
+            ...m,
+            isDead: false,
+            previousStatus: m.status !== 'dead' ? m.status : m.previousStatus,
+            status: status,
+            roleConfirmed,
+          };
+        }
+      }
+      return m;
+    });
+  }
+
+  const CREW_ROLES = ['Detective', 'Judge', 'Scientist', 'Engineer', 'Noisemaker'] as const;
+  const IMPOSTOR_ROLES = ['Shapeshifter', 'Phantom', 'Viper'] as const;
+
+  function setPlayerRole(colorOrId: string, role: string | null, roleConfirmed = false) {
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.color === colorOrId || m.id === colorOrId) {
+        const updated = {
+          ...m,
+          role,
+          roleConfirmed,
+        };
+
+        if (role && (CREW_ROLES as readonly string[]).includes(role)) {
+          // Crew Trigger: Assigning a Crew role automatically moves the player to the "Trusted" column, unless already in "Hard Clear".
+          if (updated.status !== 'hard_clear' && !updated.isDead) {
+            updated.previousStatus = updated.status;
+            updated.status = 'trusted' as ColumnStatus;
+          }
+        } else if (role && (IMPOSTOR_ROLES as readonly string[]).includes(role)) {
+          // Impostor Trigger: Assigning an Impostor role automatically moves the player to the "Suspicious" column, unless already in "Impostor".
+          if (updated.status !== 'impostor' && !updated.isDead) {
+            updated.previousStatus = updated.status;
+            updated.status = 'suspicious' as ColumnStatus;
+          }
+        }
+
+        return updated;
+      }
+      return m;
+    });
+  }
+
+  function toggleRoleConfirmed(colorOrId: string) {
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.color === colorOrId || m.id === colorOrId) {
+        const newConfirmed = !m.roleConfirmed;
+        const updated = {
+          ...m,
+          roleConfirmed: newConfirmed,
+        };
+
+        if (newConfirmed) {
+          if (!updated.isDead) {
+            updated.previousStatus = updated.status;
+            const isImpostor = updated.role && (IMPOSTOR_ROLES as readonly string[]).includes(updated.role);
+            if (isImpostor) {
+              // Confirmed Impostor role moves to "impostor"!
+              updated.status = 'impostor' as ColumnStatus;
+            } else {
+              // Confirmed Crew role moves to "hard_clear"!
+              updated.status = 'hard_clear' as ColumnStatus;
+            }
+          }
+        } else {
+          // If reverted to unverified:
+          if (!updated.isDead) {
+            const isImpostor = updated.role && (IMPOSTOR_ROLES as readonly string[]).includes(updated.role);
+            if (isImpostor) {
+              if (updated.status === 'impostor') {
+                updated.status = 'suspicious' as ColumnStatus;
+              }
+            } else {
+              if (updated.status === 'hard_clear') {
+                updated.status = (updated.previousStatus && updated.previousStatus !== 'hard_clear')
+                  ? updated.previousStatus
+                  : 'trusted' as ColumnStatus;
+              }
+            }
+          }
+        }
+
+        return updated;
+      }
+      return m;
+    });
+  }
+
+  function togglePlayerActive(colorOrId: string) {
+    crewMembers.value = crewMembers.value.map((m) => {
+      if (m.color === colorOrId || m.id === colorOrId) {
+        // Prevent disabling ME (the user's own player is always active)
+        if (m.color === playerColor.value && m.isActive) {
+          return m;
+        }
+        const newActive = !m.isActive;
+        return {
+          ...m,
+          isActive: newActive,
+          // When turning back on, ALWAYS reset to 'unknown'
+          status: newActive ? ('unknown' as ColumnStatus) : m.status,
+        };
+      }
+      return m;
+    });
+  }
+
+  function setPresetPlayerCount(count: number) {
+    crewMembers.value = crewMembers.value.map((m, idx) => {
+      // ME is always active!
+      const isActive = m.color === playerColor.value || idx < count;
+      return {
+        ...m,
+        isActive,
+        // If reactivated or newly active without status, set to 'unknown'
+        status: isActive && !m.isActive ? ('unknown' as ColumnStatus) : (isActive && (!m.status || m.status === 'unknown') ? 'unknown' as ColumnStatus : m.status),
+      };
+    });
   }
 
   function setPlayerColor(color: string) {
@@ -152,6 +407,7 @@ export const useCrewStore = defineStore("crew", () => {
     crewMembers.value = crewMembers.value.map((m) => ({
       ...m,
       isPlayer: m.color === color,
+      isActive: m.color === color ? true : m.isActive,
     }));
   }
 
@@ -490,7 +746,18 @@ export const useCrewStore = defineStore("crew", () => {
     setMemberAsInactive,
     removeProtectedFromProtector,
     removeSuspectFromAccuser,
-    setAllMembersAsUnknown,
+    hardClearCrewMembers,
+    trustedCrewMembers,
+    unknownCrewMembers,
+    suspiciousCrewMembers,
+    impostorCrewMembers,
+    setPlayerStatus,
+    togglePlayerDead,
+    setColumnMembers,
+    setPlayerRole,
+    toggleRoleConfirmed,
+    togglePlayerActive,
+    setPresetPlayerCount,
     setCrewMemberPlayerName,
     resetAllPlayerNames,
   };

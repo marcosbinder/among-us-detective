@@ -1,0 +1,89 @@
+<template>
+  <div class="relative inline-flex items-center justify-center role-icon-wrapper" :class="sizeClass">
+    <!-- Official role PNG image -->
+    <img
+      v-if="imageSrc"
+      :src="imageSrc"
+      :alt="role || 'Role'"
+      class="object-contain w-full h-full select-none pointer-events-none drop-shadow-sm"
+      draggable="false"
+    />
+
+    <!-- Empty / unassigned role placeholder -->
+    <svg
+      v-else
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      class="w-full h-full text-gray-400 dark:text-gray-500 opacity-40"
+    >
+      <circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/>
+      <path d="M12 9v6M9 12h6"/>
+    </svg>
+
+    <!-- Yellow '?' badge overlay when roleConfirmed is false -->
+    <span
+      v-if="showBadge && role && !confirmed"
+      class="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 bg-yellow-400 text-black font-black text-[10px] rounded-full border border-black shadow pointer-events-none z-10"
+      title="Unverified Claim"
+    >
+      ?
+    </span>
+
+    <!-- Green '✓' badge overlay when roleConfirmed is true -->
+    <span
+      v-else-if="showBadge && role && confirmed"
+      class="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 bg-emerald-500 text-white font-black text-[10px] rounded-full border border-black shadow pointer-events-none z-10"
+      title="Verified Claim"
+    >
+      ✓
+    </span>
+  </div>
+</template>
+
+<script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    role?: string | null
+    confirmed?: boolean
+    size?: 'sm' | 'md' | 'lg'
+    showBadge?: boolean
+  }>(),
+  {
+    role: null,
+    confirmed: false,
+    size: 'md',
+    showBadge: true,
+  }
+)
+
+const roleImages: Record<string, string> = {
+  detective: '/images/roles/detective.png',
+  judge: '/images/roles/judge.png',
+  scientist: '/images/roles/scientist.png',
+  engineer: '/images/roles/engineer.png',
+  noisemaker: '/images/roles/noisemaker.png',
+  shapeshifter: '/images/roles/shapeshifter.png',
+  phantom: '/images/roles/phantom.png',
+  viper: '/images/roles/viper.png',
+}
+
+const imageSrc = computed(() => {
+  if (!props.role) return null
+  return roleImages[props.role.toLowerCase()] || null
+})
+
+const sizeClass = computed(() => {
+  if (props.size === 'sm') return 'w-5 h-5'
+  if (props.size === 'lg') return 'w-8 h-8'
+  return 'w-6 h-6'
+})
+</script>
+
+<style scoped>
+.role-icon-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+</style>

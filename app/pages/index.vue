@@ -1,76 +1,42 @@
 <template>
   <div class="flex flex-col p-2 lg:p-8" :class="{ 'dark-mode': isDarkMode }">
-    <div class="flex flex-col-reverse justify-between mb-2 lg:flex-row">
-      <div class="justify-between hidden lg:flex lg:flex-col">
+    <!-- Header Action Controls -->
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <div class="flex items-center gap-2">
         <PlayerSelector
           :current-color="crewStore.playerColor"
           :is-picker-open="isPlayerPickerOpen"
-          class="h-12 mb-2"
+          class="h-10"
           @color-changed="handleChangePlayerColor"
           @picker-toggle="handleTogglePlayerPicker"
         />
         <button
-          class="flex items-center justify-center w-full h-12 button"
+          class="h-10 px-4 button"
           data-test="tasks-btn"
           @click="isTasksModalOpen = true"
         >
           Tasks
         </button>
-      </div>
-      <div class="flex justify-center flex-1">
         <button
-          class="py-1 rounded-r-none button-sm lg:ml-2"
+          class="h-10 px-4 button"
           data-test="notes-btn"
           @click="toggleNotesModal"
         >
           Notes
         </button>
-        <div class="flex flex-row flex-1 max-w-xl min-h-12">
-          <CrewPool
-            :crew-members="crewStore.inactiveCrewMembers"
-            :show-color-names="settingsStore.showColorNames"
-            :show-player-names="settingsStore.showPlayerNames"
-            class="flex-1 border lg:mb-0 pool--inactive"
-            @changed="value => handleCrewChanged({ type: 'inactive', value })"
-            @removed="member => handleMemberRemoved({ list: 'inactive', member })"
-          />
-          <button
-            :disabled="crewStore.inactiveCrewMembers.length <= 0"
-            class="rounded-l-none lg:mr-2 button-sm"
-            data-test="activate-all-btn"
-            @click="crewStore.setAllMembersAsUnknown()"
-          >
-            <span class="icon-arrow-down2" />
-          </button>
-        </div>
       </div>
-      <div class="flex justify-between mb-2 lg:mb-0 lg:flex-col">
+
+      <div class="flex items-center gap-2">
         <button
-          class="h-12 mr-2 lg:w-full button button-success"
+          class="h-10 px-4 button button-success font-bold"
           :disabled="crewStore.activeCrewMembers.length <= 0"
           data-test="new-round-btn"
           @click="initNewRound"
         >
           New round
         </button>
-        <div class="flex lg:hidden">
-          <PlayerSelector
-            class="mr-2"
-            :current-color="crewStore.playerColor"
-            :is-picker-open="isPlayerPickerOpen"
-            @color-changed="handleChangePlayerColor"
-            @picker-toggle="handleTogglePlayerPicker"
-          />
-          <button
-            class="py-1 mr-2 button-sm"
-            data-test="tasks-btn-mobile"
-            @click="isTasksModalOpen = true"
-          >
-            Tasks
-          </button>
-        </div>
         <button
-          class="h-12 lg:w-full button button-warning"
+          class="h-10 px-4 button button-warning font-bold"
           :disabled="crewStore.activeCrewMembers.length <= 0"
           data-test="new-game-btn"
           @click="initNewGame"
@@ -79,24 +45,24 @@
         </button>
       </div>
     </div>
+
+    <!-- Match Lobby & Roster Selector (18 Colors, Glowing LEDs, Presets) -->
+    <GameRosterSelector />
+
+    <!-- 6 Strict Deduction Hierarchy Columns -->
     <CrewTracker
       :player-color="crewStore.playerColor"
-      :innocent="crewStore.crewMembersProtectedByPlayer"
-      :unknown="crewStore.unknownCrewMembersForPlayer"
-      :suspect="crewStore.crewMembersSuspectedByPlayer"
+      :hard-clear="crewStore.hardClearCrewMembers"
+      :trusted="crewStore.trustedCrewMembers"
+      :unknown="crewStore.unknownCrewMembers"
+      :suspicious="crewStore.suspiciousCrewMembers"
+      :impostor="crewStore.impostorCrewMembers"
       :dead="crewStore.deadCrewMembers"
       :show-color-names="settingsStore.showColorNames"
       :show-player-names="settingsStore.showPlayerNames"
       class="mb-2 lg:mb-4"
       @changed="handleCrewChanged"
       @removed="handleMemberRemoved"
-    />
-    <CrewStats
-      v-show="crewStore.activeCrewMembers.length > 0"
-      :crew-members="crewStore.activeCrewMembers"
-      :show-color-names="settingsStore.showColorNames"
-      :show-player-names="settingsStore.showPlayerNames"
-      class="mb-2"
     />
     <div class="fixed bottom-0 left-0 right-0 z-20 flex justify-end px-2 py-1">
       <button class="mr-2 button-sm" data-test="settings-btn" @click="toggleSettingsModal">
@@ -127,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CrewMember } from '~/app/stores/crew'
+import type { CrewMember } from '~/stores/crew'
 
 const crewStore = useCrewStore()
 const settingsStore = useSettingsStore()
@@ -191,49 +157,15 @@ function handleChangePlayerColor(selectedColor: string) {
 }
 
 function handleCrewChanged({ type, value }: { type: string; value: CrewMember[] }) {
-  if (type === 'inactive') {
+  if (['hard_clear', 'trusted', 'unknown', 'suspicious', 'impostor', 'dead'].includes(type)) {
+    crewStore.setColumnMembers(type as any, value)
+  } else if (type === 'inactive') {
     crewStore.setInactiveCrewMembers(value)
-  } else if (type === 'innocent') {
-    const newMember = value.find(
-      m => !crewStore.crewMembersProtectedByPlayer.some(p => p.color === m.color),
-    )
-    if (newMember) {
-      gtag('event', `marked_as_innocent_${newMember.color}`, { event_category: 'player_stats' })
-    }
-    crewStore.setProtectedCrewMembers(value)
-  } else if (type === 'unknown') {
-    crewStore.setUnknownCrewMembers(value)
-  } else if (type === 'suspect') {
-    const newMember = value.find(
-      m => !crewStore.crewMembersSuspectedByPlayer.some(s => s.color === m.color),
-    )
-    if (newMember) {
-      gtag('event', `marked_as_suspect_${newMember.color}`, { event_category: 'player_stats' })
-    }
-    crewStore.setSuspectedCrewMembers(value)
-  } else if (type === 'dead') {
-    const newMember = value.find(
-      m => !crewStore.deadCrewMembers.some(d => d.color === m.color),
-    )
-    if (newMember) {
-      gtag('event', `marked_as_dead_${newMember.color}`, { event_category: 'global_stats' })
-    }
-    crewStore.setDeadCrewMembers(value)
   }
 }
 
 function handleMemberRemoved({ list, member }: { list: string; member: CrewMember }) {
-  if (list === 'inactive') {
-    crewStore.setMemberAsUnknown(member)
-  } else if (list === 'innocent') {
-    crewStore.setMemberAsUnknown(member)
-  } else if (list === 'unknown') {
-    crewStore.setMemberAsInactive(member)
-  } else if (list === 'suspect') {
-    crewStore.setMemberAsUnknown(member)
-  } else if (list === 'dead') {
-    crewStore.setMemberAsUnknown(member)
-  }
+  crewStore.togglePlayerDead(member.color)
 }
 
 function handleTogglePlayerPicker(isOpen: boolean) {

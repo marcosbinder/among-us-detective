@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CrewMember } from '~/app/stores/crew';
+import type { CrewMember } from '~/stores/crew';
 
 const props = defineProps<{
   crewMembers: CrewMember[]
