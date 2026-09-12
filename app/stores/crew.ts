@@ -283,8 +283,13 @@ export const useCrewStore = defineStore("crew", () => {
         const isImpostor = m.role && (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
         const isCrewRole = m.role && (CREW_ROLES as readonly string[]).includes(m.role);
 
-        // The Impostor column is an explicit confirmation point for role claims.
-        if (status === 'impostor') {
+        // Hard Clear and Impostor are explicit confirmation points for matching role claims.
+        if (status === 'hard_clear' && isImpostor) {
+          role = null;
+          roleConfirmed = false;
+        } else if (status === 'hard_clear' && isCrewRole) {
+          roleConfirmed = true;
+        } else if (status === 'impostor') {
           if (isCrewRole) {
             role = null;
             roleConfirmed = false;
@@ -343,6 +348,13 @@ export const useCrewStore = defineStore("crew", () => {
       if (m.color === colorOrId || m.id === colorOrId) {
         const isCrewRole = role && (CREW_ROLES as readonly string[]).includes(role);
         const isImpostorRole = role && (IMPOSTOR_ROLES as readonly string[]).includes(role);
+        if (isImpostorRole && m.status === 'hard_clear') {
+          return {
+            ...m,
+            role: null,
+            roleConfirmed: false,
+          };
+        }
         const isRoleConfirmedByColumn = !m.isDead && (
           (isCrewRole && m.status === 'hard_clear') ||
           (isImpostorRole && m.status === 'impostor')

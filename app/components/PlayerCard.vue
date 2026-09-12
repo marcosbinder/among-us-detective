@@ -173,8 +173,11 @@
                 v-for="r in impostorRoles"
                 :key="r"
                 type="button"
+                :disabled="member.status === 'hard_clear'"
                 class="flex flex-col items-center justify-center p-1 text-[10px] rounded border transition-colors text-center"
-                :class="member.role === r
+                :class="member.status === 'hard_clear'
+                  ? 'bg-gray-200 dark:bg-gray-800 text-gray-400 border-transparent cursor-not-allowed opacity-60'
+                  : member.role === r
                   ? 'bg-rose-600 text-white border-rose-500 font-bold shadow-sm'
                   : 'bg-gray-100 dark:bg-gray-800 hover:bg-rose-500/20 text-gray-700 dark:text-gray-300 border-transparent'"
                 @click="selectRole(r)"

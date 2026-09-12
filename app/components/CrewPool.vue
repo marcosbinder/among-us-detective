@@ -4,7 +4,8 @@
       v-model="crewMembersInPool"
       group="crewMembers"
       item-key="color"
-      class="flex flex-wrap content-start gap-1.5 p-1.5 min-h-[100px] w-full"
+      class="flex flex-wrap content-start gap-1.5 p-1.5 w-full"
+      :class="{ 'min-h-[100px]': crewMembers.length === 0 }"
     >
       <template #item="{ element: member }">
         <PlayerCard

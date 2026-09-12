@@ -6,6 +6,7 @@ export const useSettingsStore = defineStore(
     const showTasksCheckbox = ref(true);
     const showMeetingsCount = ref(true);
     const showPlayerNames = ref(false);
+    const showMapColorNames = ref(false);
     const settingsModalOpenState = ref(false);
     const resetNotesOnNewGame = ref(true);
     const showRoundNotes = ref(true);
@@ -26,6 +27,9 @@ export const useSettingsStore = defineStore(
     }
     function setShowPlayerNames(value: boolean) {
       showPlayerNames.value = value;
+    }
+    function setShowMapColorNames(value: boolean) {
+      showMapColorNames.value = value;
     }
     function setSettingsModalOpenState(value: boolean) {
       settingsModalOpenState.value = value;
@@ -49,6 +53,7 @@ export const useSettingsStore = defineStore(
       showTasksCheckbox,
       showMeetingsCount,
       showPlayerNames,
+      showMapColorNames,
       settingsModalOpenState,
       resetNotesOnNewGame,
       showRoundNotes,
@@ -59,6 +64,7 @@ export const useSettingsStore = defineStore(
       setShowTasksCheckbox,
       setShowMeetingsCount,
       setShowPlayerNames,
+      setShowMapColorNames,
       setSettingsModalOpenState,
       setResetNotesOnNewGame,
       setShowRoundNotes,

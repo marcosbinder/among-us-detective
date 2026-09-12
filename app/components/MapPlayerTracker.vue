@@ -15,7 +15,7 @@
         >
           <CrewIcon
             :color="item.member.color"
-            :show-color-name="true"
+            :show-color-name="showMapColorNames"
             :highlight-color-name="highlightColorNames"
             :show-player-name="showPlayerNames"
             :is-imposter="item.member.isImposter"
@@ -43,7 +43,7 @@ import Moveable from "vue3-moveable";
 const crewStore = useCrewStore();
 const settingsStore = useSettingsStore();
 const { activeCrewMembers } = storeToRefs(crewStore);
-const { highlightColorNames, showPlayerNames } = storeToRefs(settingsStore);
+const { highlightColorNames, showPlayerNames, showMapColorNames } = storeToRefs(settingsStore);
 
 const targetRefs = ref<Record<string, HTMLElement | null>>({});
 
@@ -103,6 +103,9 @@ const resetPositions = () => {
   width: 4vw;
   min-width: 2em;
   max-width: 2.5em;
+}
+
+.map-player-tracker--crew-icon > svg {
   filter: drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)
     drop-shadow(0 0 1px white) drop-shadow(0 0 1px white);
 }

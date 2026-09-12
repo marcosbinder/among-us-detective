@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS_STATE = JSON.stringify({
   showTasksCheckbox: true,
   showMeetingsCount: true,
   showPlayerNames: false,
+  showMapColorNames: false,
   settingsModalOpenState: false,
   resetNotesOnNewGame: true,
   showRoundNotes: true,

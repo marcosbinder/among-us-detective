@@ -13,7 +13,7 @@
   >
     <span
       v-if="showColorName"
-      class="absolute -top-4 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded text-[9px] font-bold capitalize leading-3"
+      class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded text-[9px] font-bold capitalize leading-3"
       :class="highlightColorName
         ? 'bg-white text-black px-1 py-0.5 ring-1 ring-gray-400 shadow-sm'
         : 'bg-transparent text-white px-0'"

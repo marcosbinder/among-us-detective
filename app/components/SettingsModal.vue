@@ -184,6 +184,17 @@
                 @changed="settingsStore.setIsImproveMapContrastEnabled"
               />
             </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-map-color-names"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show color names</span>
+              <Checkbox
+                :is-checked="settingsStore.showMapColorNames"
+                @changed="settingsStore.setShowMapColorNames"
+              />
+            </div>
           </div>
         </template>
       </template>
