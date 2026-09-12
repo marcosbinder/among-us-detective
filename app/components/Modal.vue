@@ -15,7 +15,7 @@
       </div>
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" />&#8203;
       <div
-        :class="[isDarkMode ? 'bg-gray-200 text-black' : 'bg-white']"
+        :class="[isDarkMode ? 'bg-gray-900 text-gray-100 border border-gray-700/80 shadow-2xl' : 'bg-white']"
         class="inline-block w-full px-6 overflow-hidden text-left align-bottom transition-all transform rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
         role="dialog"
         aria-modal="true"
@@ -40,7 +40,7 @@
         </div>
         <div class="sm:flex sm:items-start">
           <div class="w-full my-6 sm:my-0">
-            <h1 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+            <h1 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100" id="modal-headline">
               <slot name="title" />
             </h1>
             <div class="pb-4 modal-body">

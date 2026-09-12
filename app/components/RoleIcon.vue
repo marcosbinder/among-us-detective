@@ -31,10 +31,11 @@
       ?
     </span>
 
-    <!-- Green '✓' badge overlay when roleConfirmed is true -->
+    <!-- Verified badge uses red for impostor roles and green for crew roles -->
     <span
       v-else-if="showBadge && role && confirmed"
-      class="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 bg-emerald-500 text-white font-black text-[10px] rounded-full border border-black shadow pointer-events-none z-10"
+      class="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-white font-black text-[10px] rounded-full border border-black shadow pointer-events-none z-10"
+      :class="isImpostorRole ? 'bg-rose-600' : 'bg-emerald-500'"
       title="Verified Claim"
     >
       ✓
@@ -73,6 +74,10 @@ const imageSrc = computed(() => {
   if (!props.role) return null
   return roleImages[props.role.toLowerCase()] || null
 })
+
+const isImpostorRole = computed(() =>
+  ['shapeshifter', 'phantom', 'viper'].includes((props.role || '').toLowerCase())
+)
 
 const sizeClass = computed(() => {
   if (props.size === 'sm') return 'w-5 h-5'

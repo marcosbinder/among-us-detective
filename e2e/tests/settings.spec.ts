@@ -38,14 +38,12 @@ test.describe("App settings", () => {
     expect(newText).not.toBe(initialText);
   });
 
-  test("Dark mode toggle applies dark-mode class to the page", async ({
-    page,
-  }) => {
+  test("Dark mode is enabled by default and can be toggled off", async ({ page }) => {
+    await expect(page.locator(".dark-mode").first()).toBeVisible();
     await openSettings(page);
     await page.click("[data-test='setting-theme-btn']");
     await closeModal(page);
-    // The root div in Home.vue adds class 'dark-mode' when isDarkMode is true
-    await expect(page.locator(".dark-mode").first()).toBeVisible();
+    await expect(page.locator(".dark-mode").first()).not.toBeVisible();
   });
 
   test("Show Imposter checkbox — toggling hides/shows the column in crew stats", async ({

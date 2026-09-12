@@ -2,43 +2,39 @@
   <div class="flex flex-col p-2 lg:p-8" :class="{ 'dark-mode': isDarkMode }">
     <!-- Header Action Controls -->
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-      <div class="flex items-center gap-2">
-        <PlayerSelector
-          :current-color="crewStore.playerColor"
-          :is-picker-open="isPlayerPickerOpen"
-          class="h-10"
-          @color-changed="handleChangePlayerColor"
-          @picker-toggle="handleTogglePlayerPicker"
-        />
+      <div class="flex items-center gap-1.5">
         <button
-          class="h-10 px-4 button"
+          class="h-9 px-3 text-sm button"
           data-test="tasks-btn"
           @click="isTasksModalOpen = true"
         >
-          Tasks
+          <span class="icon-list mr-1 text-xs opacity-70" />Tasks
         </button>
         <button
-          class="h-10 px-4 button"
+          class="h-9 px-3 text-sm button"
           data-test="notes-btn"
+          title="Open notes (N)"
           @click="toggleNotesModal"
         >
-          Notes
+          <span class="icon-pencil mr-1 text-xs opacity-70" />Notes
         </button>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <button
-          class="h-10 px-4 button button-success font-bold"
+          class="h-9 px-3 text-sm button button-success font-bold"
           :disabled="crewStore.activeCrewMembers.length <= 0"
           data-test="new-round-btn"
+          title="Reset unconfirmed deductions, keep dead players"
           @click="initNewRound"
         >
           New round
         </button>
         <button
-          class="h-10 px-4 button button-warning font-bold"
+          class="h-9 px-3 text-sm button button-warning font-bold"
           :disabled="crewStore.activeCrewMembers.length <= 0"
           data-test="new-game-btn"
+          title="Full reset — new lobby, same players"
           @click="initNewGame"
         >
           New game
@@ -64,15 +60,39 @@
       @changed="handleCrewChanged"
       @removed="handleMemberRemoved"
     />
-    <div class="fixed bottom-0 left-0 right-0 z-20 flex justify-end px-2 py-1">
-      <button class="mr-2 button-sm" data-test="settings-btn" @click="toggleSettingsModal">
+
+    <CrewStats
+      :crew-members="crewStore.activeCrewMembers"
+      :show-color-names="settingsStore.showColorNames"
+      :show-player-names="settingsStore.showPlayerNames"
+      class="mb-4"
+    />
+
+    <!-- Bottom Footer Toolbar -->
+    <div class="fixed bottom-0 left-0 right-0 z-20 flex justify-end items-center px-3 py-1.5 bg-black/60 backdrop-blur-sm border-t border-gray-800/50">
+      <button
+        class="mr-2 px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+        data-test="settings-btn"
+        @click="toggleSettingsModal"
+      >
         Settings
       </button>
-      <button class="mr-2 button-sm" data-test="help-btn" @click="toggleHelpModal">
+      <button
+        class="mr-2 px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+        data-test="help-btn"
+        @click="toggleHelpModal"
+      >
         Help
       </button>
-      <button class="button-sm" data-test="about-btn" @click="toggleAboutModal">About</button>
+      <button
+        class="px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+        data-test="about-btn"
+        @click="toggleAboutModal"
+      >
+        About
+      </button>
     </div>
+
     <div class="relative">
       <Maps />
     </div>
@@ -103,7 +123,6 @@ const { gtag } = useGtag()
 
 const { isDarkMode } = storeToRefs(useDarkModeStore())
 
-const isPlayerPickerOpen = ref(false)
 const isHelpModalOpen = ref(false)
 const isAboutModalOpen = ref(false)
 const isTasksModalOpen = ref(false)
@@ -150,12 +169,6 @@ function initNewRound() {
   gtag('event', 'init_new_round', { event_category: 'global_stats' })
 }
 
-function handleChangePlayerColor(selectedColor: string) {
-  crewStore.setPlayerColor(selectedColor)
-  initNewGame()
-  gtag('event', `change_player_color_${selectedColor}`, { event_category: 'player_stats' })
-}
-
 function handleCrewChanged({ type, value }: { type: string; value: CrewMember[] }) {
   if (['hard_clear', 'trusted', 'unknown', 'suspicious', 'impostor', 'dead'].includes(type)) {
     crewStore.setColumnMembers(type as any, value)
@@ -166,10 +179,6 @@ function handleCrewChanged({ type, value }: { type: string; value: CrewMember[] 
 
 function handleMemberRemoved({ list, member }: { list: string; member: CrewMember }) {
   crewStore.togglePlayerDead(member.color)
-}
-
-function handleTogglePlayerPicker(isOpen: boolean) {
-  isPlayerPickerOpen.value = isOpen
 }
 
 function toggleHelpModal() {

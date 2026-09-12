@@ -175,6 +175,7 @@ export const useCrewStore = defineStore("crew", () => {
 
   function resetActiveCrew() {
     crewMembers.value = crewMembers.value.map((m) => {
+      // Dead players stay dead across rounds
       if (m.isDead || m.status === 'dead') {
         return {
           ...m,
@@ -184,6 +185,20 @@ export const useCrewStore = defineStore("crew", () => {
           totalMeetingsHeld: 0,
         };
       }
+      // Confirmed deductions persist across rounds
+      if (m.roleConfirmed && m.role) {
+        const isImpostor = (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
+        return {
+          ...m,
+          status: (isImpostor ? 'impostor' : 'hard_clear') as ColumnStatus,
+          isDoneWithTasks: false,
+          totalMeetingsHeld: 0,
+          suspectedBy: [],
+          protectedBy: [],
+          mapPosition: null,
+        };
+      }
+      // Unconfirmed deductions reset to unknown
       return {
         ...m,
         status: 'unknown' as ColumnStatus,
@@ -192,6 +207,7 @@ export const useCrewStore = defineStore("crew", () => {
         totalMeetingsHeld: 0,
         suspectedBy: [],
         protectedBy: [],
+        mapPosition: null,
       };
     });
   }
@@ -202,11 +218,11 @@ export const useCrewStore = defineStore("crew", () => {
         let roleConfirmed = m.roleConfirmed;
         const isImpostor = m.role && (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
         // If crew role moved out of hard_clear, unverify!
-        if (!isImpostor && newStatus !== 'hard_clear' && m.roleConfirmed) {
+        if (newStatus !== 'dead' && !isImpostor && newStatus !== 'hard_clear' && m.roleConfirmed) {
           roleConfirmed = false;
         }
         // If impostor role moved out of impostor, unverify!
-        if (isImpostor && newStatus !== 'impostor' && m.roleConfirmed) {
+        if (newStatus !== 'dead' && isImpostor && newStatus !== 'impostor' && m.roleConfirmed) {
           roleConfirmed = false;
         }
         if (newStatus === 'dead') {
@@ -243,6 +259,7 @@ export const useCrewStore = defineStore("crew", () => {
             ...m,
             isDead: false,
             status: restoredStatus as ColumnStatus,
+            roleConfirmed: false,
           };
         } else {
           return {
@@ -262,13 +279,25 @@ export const useCrewStore = defineStore("crew", () => {
     crewMembers.value = crewMembers.value.map((m) => {
       if (memberColors.includes(m.color)) {
         let roleConfirmed = m.roleConfirmed;
+        let role = m.role;
         const isImpostor = m.role && (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
+        const isCrewRole = m.role && (CREW_ROLES as readonly string[]).includes(m.role);
+
+        // The Impostor column is an explicit confirmation point for role claims.
+        if (status === 'impostor') {
+          if (isCrewRole) {
+            role = null;
+            roleConfirmed = false;
+          } else if (isImpostor) {
+            roleConfirmed = true;
+          }
+        }
         // If crew role moved out of hard_clear, unverify!
-        if (!isImpostor && status !== 'hard_clear' && m.roleConfirmed) {
+        if (status !== 'dead' && !isImpostor && status !== 'hard_clear' && roleConfirmed) {
           roleConfirmed = false;
         }
         // If impostor role moved out of impostor, unverify!
-        if (isImpostor && status !== 'impostor' && m.roleConfirmed) {
+        if (status !== 'dead' && isImpostor && status !== 'impostor' && roleConfirmed) {
           roleConfirmed = false;
         }
         if (status === 'dead') {
@@ -277,6 +306,7 @@ export const useCrewStore = defineStore("crew", () => {
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus || 'unknown',
             isDead: true,
             status: 'dead' as ColumnStatus,
+            role,
             roleConfirmed,
           };
         } else {
@@ -285,6 +315,7 @@ export const useCrewStore = defineStore("crew", () => {
             isDead: false,
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus,
             status: status,
+            role,
             roleConfirmed,
           };
         }
@@ -304,20 +335,6 @@ export const useCrewStore = defineStore("crew", () => {
           role,
           roleConfirmed,
         };
-
-        if (role && (CREW_ROLES as readonly string[]).includes(role)) {
-          // Crew Trigger: Assigning a Crew role automatically moves the player to the "Trusted" column, unless already in "Hard Clear".
-          if (updated.status !== 'hard_clear' && !updated.isDead) {
-            updated.previousStatus = updated.status;
-            updated.status = 'trusted' as ColumnStatus;
-          }
-        } else if (role && (IMPOSTOR_ROLES as readonly string[]).includes(role)) {
-          // Impostor Trigger: Assigning an Impostor role automatically moves the player to the "Suspicious" column, unless already in "Impostor".
-          if (updated.status !== 'impostor' && !updated.isDead) {
-            updated.previousStatus = updated.status;
-            updated.status = 'suspicious' as ColumnStatus;
-          }
-        }
 
         return updated;
       }

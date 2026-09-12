@@ -59,6 +59,7 @@
         <button
           v-if="!isMinimized"
           class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold transition-colors"
+          data-test="activate-all-btn"
           title="All 18 players"
           @click="selectAll"
         >

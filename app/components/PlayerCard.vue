@@ -24,6 +24,13 @@
         :show-player-name="false"
         class="w-full h-full"
       />
+      <span
+        v-if="member.roleConfirmed"
+        class="absolute -top-1 -right-2 px-1 py-px rounded text-white text-[7px] font-black tracking-wide shadow"
+        :class="isImpostorRole ? 'bg-rose-600' : 'bg-emerald-600'"
+      >
+        VERIFIED
+      </span>
     </div>
 
     <!-- Bottom/Corner: Role Icon with '?' / '✓' badge (larger & clearer) -->
@@ -48,6 +55,8 @@
       <div
         v-if="isCurrentMenuOpen"
         class="fixed inset-0 z-50 select-none bg-transparent"
+        :class="{ 'dark-mode': isDarkMode }"
+        style="background-color: transparent"
         @click.stop="closeMenu"
         @contextmenu.prevent.stop="closeMenu"
       >
@@ -87,7 +96,9 @@
 
           <div class="mb-2 rounded-md border p-2"
               :class="member.roleConfirmed
-              ? 'border-emerald-500/50 bg-emerald-500/10'
+              ? isImpostorRole
+                ? 'border-rose-500/50 bg-rose-500/10'
+                : 'border-emerald-500/50 bg-emerald-500/10'
               : member.role
                 ? 'border-yellow-500/50 bg-yellow-500/10'
                 : 'border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800/60'"
@@ -95,14 +106,18 @@
           >
             <div class="flex items-center justify-between gap-2 mb-1">
               <span class="text-[10px] font-bold uppercase tracking-wider"
-                :class="member.roleConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-700 dark:text-yellow-400'"
+                :class="member.roleConfirmed
+                  ? isImpostorRole ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-yellow-700 dark:text-yellow-400'"
               >
-                {{ member.roleConfirmed ? 'Role hard clear active' : 'Set role status' }}
+                {{ member.roleConfirmed ? 'Role verified' : 'Confirm this role' }}
               </span>
               <span v-if="member.role" class="text-[10px] font-bold"
-                :class="member.roleConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-700 dark:text-yellow-400'"
+                :class="member.roleConfirmed
+                  ? isImpostorRole ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-yellow-700 dark:text-yellow-400'"
               >
-                {{ member.roleConfirmed ? 'ROLE HARD CLEAR' : 'ROLE NOT HARD CLEAR' }}
+                {{ member.roleConfirmed ? 'VERIFIED' : 'CLAIMED' }}
               </span>
             </div>
             <button
@@ -110,11 +125,15 @@
               type="button"
               class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors text-center flex items-center justify-center gap-1"
               :class="member.roleConfirmed
-                ? 'bg-rose-700 text-white hover:bg-rose-600 shadow-sm'
-                : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm'"
+                ? isImpostorRole
+                  ? 'bg-rose-700 text-white hover:bg-rose-600 shadow-sm'
+                  : 'bg-emerald-700 text-white hover:bg-emerald-600 shadow-sm'
+                : isImpostorRole
+                  ? 'bg-rose-600 text-white hover:bg-rose-500 shadow-sm'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm'"
               @click="toggleRoleConfirmed"
             >
-              {{ member.roleConfirmed ? 'Unhard clear role' : '✓ Hard clear role' }}
+              {{ member.roleConfirmed ? 'Undo verification' : isImpostorRole ? '✓ Confirm impostor' : '✓ Confirm role' }}
             </button>
             <p v-else class="text-[10px] leading-tight text-gray-500 dark:text-gray-400">
               Choose a role below, then confirm it here.
@@ -206,6 +225,7 @@ const emit = defineEmits<{
 }>()
 
 const crewStore = useCrewStore()
+const { isDarkMode } = storeToRefs(useDarkModeStore())
 
 const isCurrentMenuOpen = computed(() => activeMenuColor.value === props.member.color)
 

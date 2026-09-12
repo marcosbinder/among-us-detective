@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS_STATE = JSON.stringify({
 });
 
 const DEFAULT_DARKMODE_STATE = JSON.stringify({
-  isDarkMode: false,
+  isDarkMode: true,
   hasDarkModeBeenSetBefore: false,
 });
 

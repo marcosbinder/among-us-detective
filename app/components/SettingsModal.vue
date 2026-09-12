@@ -5,154 +5,189 @@
         isEditingPlayerNames ? "Player names" : "Settings"
       }}</template>
       <template #body>
+        <!-- Player Names Editor Sub-View -->
         <template v-if="isEditingPlayerNames">
-          <div class="flex justify-between my-4">
+          <div class="flex justify-between items-center my-3">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Edit player nicknames</span>
             <button
-              class="button-sm button-danger"
+              class="px-2.5 py-1 text-xs font-bold rounded bg-red-500/15 text-red-500 hover:bg-red-500/25 border border-red-500/30 transition-colors"
               @click="crewStore.resetAllPlayerNames()"
             >
               Reset all
             </button>
           </div>
-          <table class="w-full table-auto settings-list">
-            <tbody>
-              <tr v-for="(color, index) in playerColors" :key="index">
-                <td>
-                  <div class="flex items-center">
-                    <CrewIcon :color="color" class="mr-2" />
-                    <span class="capitalize">{{ color }}</span>
-                  </div>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    class="p-2 mb-0 text-xs"
-                    :placeholder="color"
-                    :value="getPlayerName(color)"
-                    @input="
-                      (e: Event) =>
-                        crewStore.setCrewMemberPlayerName({
-                          color,
-                          playerName: (e.target as HTMLInputElement).value,
-                        })
-                    "
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+            <div
+              v-for="(color, index) in playerColors"
+              :key="index"
+              class="flex items-center gap-2 px-2 py-1.5 rounded bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60"
+            >
+              <CrewIcon :color="color" class="w-5 h-5 shrink-0" />
+              <span class="text-xs font-medium capitalize text-gray-600 dark:text-gray-400 w-14 shrink-0">{{ color }}</span>
+              <input
+                type="text"
+                class="flex-1 px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                :placeholder="color"
+                :value="getPlayerName(color)"
+                @input="
+                  (e: Event) =>
+                    crewStore.setCrewMemberPlayerName({
+                      color,
+                      playerName: (e.target as HTMLInputElement).value,
+                    })
+                "
+              />
+            </div>
+          </div>
         </template>
+
+        <!-- Main Settings -->
         <template v-else>
-          <table class="w-full table-fixed settings-list">
-            <tbody>
-              <tr data-test="setting-show-players-as">
-                <td>Show players as:</td>
-                <td>
-                  <button
-                    class="button-sm"
-                    data-test="setting-show-players-as-btn"
-                    @click="toggleColorNames"
-                  >
-                    {{ settingsStore.showColorNames ? "Color names" : "Icons" }}
-                  </button>
-                </td>
-              </tr>
-              <tr data-test="setting-theme">
-                <td>Interface theme:</td>
-                <td>
-                  <button
-                    class="button-sm"
-                    data-test="setting-theme-btn"
-                    @click="toggleDarkMode"
-                  >
-                    {{ darkModeStore.isDarkMode ? "Dark" : "Light" }}
-                  </button>
-                </td>
-              </tr>
-              <tr data-test="setting-show-imposter">
-                <td>Show Imposter checkbox:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.showImposterCheckbox"
-                    @changed="settingsStore.setShowImposterCheckbox"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-show-tasks">
-                <td>Show Tasks checkbox:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.showTasksCheckbox"
-                    @changed="settingsStore.setShowTasksCheckbox"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-show-meetings">
-                <td>Show Meetings count:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.showMeetingsCount"
-                    @changed="settingsStore.setShowMeetingsCount"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-show-player-names">
-                <td>Show player names:</td>
-                <td>
-                  <div class="flex">
-                    <Checkbox
-                      :is-checked="settingsStore.showPlayerNames"
-                      @changed="settingsStore.setShowPlayerNames"
-                    />
-                    <button
-                      v-if="settingsStore.showPlayerNames"
-                      class="button-sm"
-                      data-test="edit-player-names-btn"
-                      @click="isEditingPlayerNames = true"
-                    >
-                      Edit names
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr data-test="setting-reset-notes">
-                <td>Reset notes each game:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.resetNotesOnNewGame"
-                    @changed="settingsStore.setResetNotesOnNewGame"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-show-round-notes">
-                <td>Show round notes:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.showRoundNotes"
-                    @changed="settingsStore.setShowRoundNotes"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-track-own-color">
-                <td>Can track own color:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.canTrackOwnColor"
-                    @changed="settingsStore.setCanTrackOwnColor"
-                  />
-                </td>
-              </tr>
-              <tr data-test="setting-improve-map-contrast">
-                <td>Improve map contrast:</td>
-                <td>
-                  <Checkbox
-                    :is-checked="settingsStore.isImproveMapContrastEnabled"
-                    @changed="settingsStore.setIsImproveMapContrastEnabled"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="space-y-2 mt-2">
+            <!-- Display -->
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1">Display</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-players-as"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show players as</span>
+              <button
+                class="px-2.5 py-1 text-xs font-bold rounded bg-blue-500/15 text-blue-500 hover:bg-blue-500/25 border border-blue-500/30 transition-colors"
+                data-test="setting-show-players-as-btn"
+                @click="toggleColorNames"
+              >
+                {{ settingsStore.showColorNames ? "Color names" : "Icons" }}
+              </button>
+            </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-theme"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Interface theme</span>
+              <button
+                class="px-2.5 py-1 text-xs font-bold rounded transition-colors"
+                :class="darkModeStore.isDarkMode
+                  ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 border border-indigo-500/40'
+                  : 'bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 border border-yellow-500/40'"
+                data-test="setting-theme-btn"
+                @click="toggleDarkMode"
+              >
+                {{ darkModeStore.isDarkMode ? "🌙 Dark" : "☀️ Light" }}
+              </button>
+            </div>
+
+            <!-- Tracking -->
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Tracking</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-imposter"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show Imposter checkbox</span>
+              <Checkbox
+                :is-checked="settingsStore.showImposterCheckbox"
+                @changed="settingsStore.setShowImposterCheckbox"
+              />
+            </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-tasks"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show Tasks checkbox</span>
+              <Checkbox
+                :is-checked="settingsStore.showTasksCheckbox"
+                @changed="settingsStore.setShowTasksCheckbox"
+              />
+            </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-meetings"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show Meetings count</span>
+              <Checkbox
+                :is-checked="settingsStore.showMeetingsCount"
+                @changed="settingsStore.setShowMeetingsCount"
+              />
+            </div>
+
+            <!-- Players -->
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Players</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-player-names"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show player names</span>
+              <div class="flex items-center gap-2">
+                <Checkbox
+                  :is-checked="settingsStore.showPlayerNames"
+                  @changed="settingsStore.setShowPlayerNames"
+                />
+                <button
+                  v-if="settingsStore.showPlayerNames"
+                  class="px-2 py-0.5 text-[11px] font-bold rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  data-test="edit-player-names-btn"
+                  @click="isEditingPlayerNames = true"
+                >
+                  Edit names
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-track-own-color"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Can track own color</span>
+              <Checkbox
+                :is-checked="settingsStore.canTrackOwnColor"
+                @changed="settingsStore.setCanTrackOwnColor"
+              />
+            </div>
+
+            <!-- Notes -->
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Notes</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-reset-notes"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Reset notes each game</span>
+              <Checkbox
+                :is-checked="settingsStore.resetNotesOnNewGame"
+                @changed="settingsStore.setResetNotesOnNewGame"
+              />
+            </div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-show-round-notes"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Show round notes</span>
+              <Checkbox
+                :is-checked="settingsStore.showRoundNotes"
+                @changed="settingsStore.setShowRoundNotes"
+              />
+            </div>
+
+            <!-- Map -->
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Map</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-improve-map-contrast"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Improve map contrast</span>
+              <Checkbox
+                :is-checked="settingsStore.isImproveMapContrastEnabled"
+                @changed="settingsStore.setIsImproveMapContrastEnabled"
+              />
+            </div>
+          </div>
         </template>
       </template>
     </Modal>
@@ -199,16 +234,3 @@ function toggleDarkMode() {
   });
 }
 </script>
-
-<style lang="scss">
-.settings-list {
-  td {
-    @apply pr-2 py-1;
-  }
-  .crew-icon svg {
-    position: relative;
-    max-height: 100%;
-    top: -5px;
-  }
-}
-</style>

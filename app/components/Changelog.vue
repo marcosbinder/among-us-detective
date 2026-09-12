@@ -1,13 +1,13 @@
 <template>
   <section class="changelog">
-    <div class="p-2 overflow-y-scroll bg-gray-100 rounded max-h-64">
+    <div class="p-2 overflow-y-scroll rounded max-h-64 bg-gray-100 dark:bg-gray-800/60 text-gray-800 dark:text-gray-200">
       <div
         v-for="(item, index) in changelog"
         :key="index"
-        class="mb-4 text-sm leading-5 text-theme-gray-dark"
+        class="mb-4 text-sm leading-5"
       >
-        <span class="text-xs font-bold">{{ item.date }}</span>
-        <ul v-if="(item.changes || []).length > 0" class="pl-4 list-disc">
+        <span class="text-xs font-bold text-gray-900 dark:text-gray-100">{{ item.date }}</span>
+        <ul v-if="(item.changes || []).length > 0" class="pl-4 list-disc text-gray-700 dark:text-gray-300">
           <li v-for="(change, i) in item.changes" :key="i" v-html="change" />
         </ul>
       </div>
@@ -22,6 +22,19 @@ interface ChangelogItem {
 }
 
 const changelog: ChangelogItem[] = [
+  {
+    date: '2026-09-11',
+    changes: [
+      'Modernized deduction board into a 6-column split-screen layout: Hard Clear, Trusted, Unknown, Suspicious, Impostor, Dead',
+      'Added Match Lobby Roster with 18 official Among Us bean colors, status LEDs, and quick presets (10/15/18 players)',
+      'Added compact role popover with official role icons (Detective, Judge, Scientist, Engineer, Noisemaker, Shapeshifter, Phantom, Viper) and claim verification badges',
+      'Streamlined header controls — removed redundant player selector, modernized action buttons',
+      'New Round now preserves confirmed deductions and dead players across rounds',
+      'Updated About modal with proper attribution and modern styling',
+      'Overhauled Settings modal from table layout to modern card-based design',
+      'Full dark mode support across all modals and components',
+    ],
+  },
   { date: '2025-05-20', changes: ['Added new map: The Fungle'] },
   { date: '2025-05-16', changes: ['Enabled tracking your own color by default, to avoid confusion why yellow is missing'] },
   { date: '2021-07-19', changes: ['Add new Clean Vent task'] },
