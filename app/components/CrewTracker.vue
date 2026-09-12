@@ -12,7 +12,7 @@
           <CrewPool
             class="pool--hard_clear"
             :crew-members="hardClearList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'hard_clear', value })"
             @removed="member => emit('removed', { list: 'hard_clear', member })"
@@ -30,7 +30,7 @@
           <CrewPool
             class="pool--trusted"
             :crew-members="trustedList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'trusted', value })"
             @removed="member => emit('removed', { list: 'trusted', member })"
@@ -51,7 +51,7 @@
           <CrewPool
             class="pool--unknown"
             :crew-members="unknownList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'unknown', value })"
             @removed="member => emit('removed', { list: 'unknown', member })"
@@ -69,7 +69,7 @@
           <CrewPool
             class="pool--dead"
             :crew-members="deadList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'dead', value })"
             @removed="member => emit('removed', { list: 'dead', member })"
@@ -90,7 +90,7 @@
           <CrewPool
             class="pool--impostor"
             :crew-members="impostorList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'impostor', value })"
             @removed="member => emit('removed', { list: 'impostor', member })"
@@ -108,7 +108,7 @@
           <CrewPool
             class="pool--suspicious"
             :crew-members="suspiciousList"
-            :show-color-names="showColorNames"
+            :highlight-color-names="highlightColorNames"
             :show-player-names="showPlayerNames"
             @changed="value => emit('changed', { type: 'suspicious', value })"
             @removed="member => emit('removed', { list: 'suspicious', member })"
@@ -130,7 +130,7 @@ const props = defineProps<{
   suspicious: CrewMember[]
   impostor: CrewMember[]
   dead: CrewMember[]
-  showColorNames?: boolean
+  highlightColorNames?: boolean
   showPlayerNames?: boolean
 }>()
 
@@ -139,37 +139,33 @@ const emit = defineEmits<{
   removed: [payload: { list: string; member: CrewMember }]
 }>()
 
-function sortByColor(arr: CrewMember[]) {
-  return [...arr].sort((a, b) => (a.color > b.color ? 1 : a.color < b.color ? -1 : 0))
-}
-
 const hardClearList = computed({
-  get: () => sortByColor(props.hardClear),
+  get: () => props.hardClear,
   set: (value: CrewMember[]) => emit('changed', { type: 'hard_clear', value }),
 })
 
 const trustedList = computed({
-  get: () => sortByColor(props.trusted),
+  get: () => props.trusted,
   set: (value: CrewMember[]) => emit('changed', { type: 'trusted', value }),
 })
 
 const unknownList = computed({
-  get: () => sortByColor(props.unknown),
+  get: () => props.unknown,
   set: (value: CrewMember[]) => emit('changed', { type: 'unknown', value }),
 })
 
 const suspiciousList = computed({
-  get: () => sortByColor(props.suspicious),
+  get: () => props.suspicious,
   set: (value: CrewMember[]) => emit('changed', { type: 'suspicious', value }),
 })
 
 const impostorList = computed({
-  get: () => sortByColor(props.impostor),
+  get: () => props.impostor,
   set: (value: CrewMember[]) => emit('changed', { type: 'impostor', value }),
 })
 
 const deadList = computed({
-  get: () => sortByColor(props.dead),
+  get: () => props.dead,
   set: (value: CrewMember[]) => emit('changed', { type: 'dead', value }),
 })
 </script>

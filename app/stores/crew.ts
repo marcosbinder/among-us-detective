@@ -276,7 +276,7 @@ export const useCrewStore = defineStore("crew", () => {
 
   function setColumnMembers(status: ColumnStatus, members: CrewMember[]) {
     const memberColors = members.map((m) => m.color);
-    crewMembers.value = crewMembers.value.map((m) => {
+    const updatedMembers = crewMembers.value.map((m) => {
       if (memberColors.includes(m.color)) {
         let roleConfirmed = m.roleConfirmed;
         let role = m.role;
@@ -322,6 +322,17 @@ export const useCrewStore = defineStore("crew", () => {
       }
       return m;
     });
+
+    // Preserve the order emitted by drag-and-drop within this column.
+    const orderedMembers = new Map(members.map((member) => [member.color, memberColors.indexOf(member.color)]));
+    const orderedColumnMembers = updatedMembers
+      .filter((member) => orderedMembers.has(member.color))
+      .sort((a, b) => (orderedMembers.get(a.color) ?? 0) - (orderedMembers.get(b.color) ?? 0));
+    let columnIndex = 0;
+    crewMembers.value = updatedMembers.map((member) => {
+      if (!orderedMembers.has(member.color)) return member;
+      return orderedColumnMembers[columnIndex++];
+    });
   }
 
   const CREW_ROLES = ['Detective', 'Judge', 'Scientist', 'Engineer', 'Noisemaker'] as const;
@@ -330,10 +341,17 @@ export const useCrewStore = defineStore("crew", () => {
   function setPlayerRole(colorOrId: string, role: string | null, roleConfirmed = false) {
     crewMembers.value = crewMembers.value.map((m) => {
       if (m.color === colorOrId || m.id === colorOrId) {
+        const isCrewRole = role && (CREW_ROLES as readonly string[]).includes(role);
+        const isImpostorRole = role && (IMPOSTOR_ROLES as readonly string[]).includes(role);
+        const isRoleConfirmedByColumn = !m.isDead && (
+          (isCrewRole && m.status === 'hard_clear') ||
+          (isImpostorRole && m.status === 'impostor')
+        );
+
         const updated = {
           ...m,
           role,
-          roleConfirmed,
+          roleConfirmed: roleConfirmed || isRoleConfirmedByColumn,
         };
 
         return updated;

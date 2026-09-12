@@ -35,6 +35,12 @@
           <span class="text-[11px] font-bold capitalize text-white">{{ crewStore.playerColor }}</span>
           <span class="text-[9px] text-yellow-400/60 group-hover:text-yellow-400 transition-colors ml-0.5">▼</span>
         </button>
+        <span
+          class="inline max-w-[92px] text-[8px] sm:max-w-none sm:text-[9px] font-semibold leading-tight text-gray-400 dark:text-gray-500"
+          title="Right-click a player bean to set it as Me"
+        >
+          Right click to set as Me
+        </span>
       </div>
 
       <!-- Presets & Collapse State Control -->
@@ -96,6 +102,7 @@
               v-for="color in allColors"
               :key="color"
               type="button"
+              :data-test="`player-color-${color}`"
               class="flex flex-col items-center justify-center p-1 rounded transition-all cursor-pointer"
               :class="[
                 isPlayerColor(color)
@@ -119,7 +126,7 @@
     <!-- 18 Colors: Compact Bean Character Row (collapsible) -->
     <div
       v-if="!isMinimized"
-      class="flex flex-wrap items-center justify-center sm:justify-between gap-1.5 pt-2 mt-1.5 border-t border-gray-800"
+      class="flex flex-wrap items-center justify-center gap-1.5 pt-2 mt-1.5 border-t border-gray-800"
     >
       <div
         v-for="color in allColors"

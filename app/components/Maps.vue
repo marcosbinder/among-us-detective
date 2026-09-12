@@ -19,7 +19,7 @@
       </button>
       <div
         v-show="isMapVisible"
-        class="flex self-start p-1 mt-2 rounded md:rounded-l-none bg-theme-blue-dark md:mt-0"
+        class="flex self-start p-1 mt-2 rounded md:rounded-l-none bg-blue-900 dark:bg-gray-900 md:mt-0"
       >
         <MapSelector :selected-map="mapsStore.selectedMap" @map-selected="selectMap" />
       </div>
@@ -84,6 +84,7 @@ const { gtag } = useGtag()
 
 const isMapVisible = ref(false)
 const areSensorsVisible = ref(false)
+let keyupListener: ((e: KeyboardEvent) => void) | null = null
 
 function selectMap(newMap: string) {
   mapsStore.setSelectedMap(newMap)
@@ -91,7 +92,7 @@ function selectMap(newMap: string) {
 }
 
 onMounted(() => {
-  document.addEventListener('keyup', (e: KeyboardEvent) => {
+  keyupListener = (e: KeyboardEvent) => {
     if (
       e.code === 'KeyM' &&
       !notesStore.areNotesOpen &&
@@ -99,7 +100,15 @@ onMounted(() => {
     ) {
       isMapVisible.value = !isMapVisible.value
     }
-  })
+  }
+  document.addEventListener('keyup', keyupListener)
+})
+
+onUnmounted(() => {
+  if (keyupListener) {
+    document.removeEventListener('keyup', keyupListener)
+    keyupListener = null
+  }
 })
 </script>
 

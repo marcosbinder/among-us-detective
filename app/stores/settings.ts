@@ -1,7 +1,7 @@
 export const useSettingsStore = defineStore(
   "settings",
   () => {
-    const showColorNames = ref(false);
+    const highlightColorNames = ref(false);
     const showImposterCheckbox = ref(true);
     const showTasksCheckbox = ref(true);
     const showMeetingsCount = ref(true);
@@ -12,8 +12,8 @@ export const useSettingsStore = defineStore(
     const canTrackOwnColor = ref(true);
     const isImproveMapContrastEnabled = ref(true);
 
-    function setShowColorNames(value: boolean) {
-      showColorNames.value = value;
+    function setHighlightColorNames(value: boolean) {
+      highlightColorNames.value = value;
     }
     function setShowImposterCheckbox(value: boolean) {
       showImposterCheckbox.value = value;
@@ -44,7 +44,7 @@ export const useSettingsStore = defineStore(
     }
 
     return {
-      showColorNames,
+      highlightColorNames,
       showImposterCheckbox,
       showTasksCheckbox,
       showMeetingsCount,
@@ -54,7 +54,7 @@ export const useSettingsStore = defineStore(
       showRoundNotes,
       canTrackOwnColor,
       isImproveMapContrastEnabled,
-      setShowColorNames,
+      setHighlightColorNames,
       setShowImposterCheckbox,
       setShowTasksCheckbox,
       setShowMeetingsCount,

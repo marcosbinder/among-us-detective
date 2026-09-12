@@ -1,7 +1,7 @@
 import { expect, test } from "../fixtures/base";
 import { openHelp } from "../helpers/modals";
 
-const TOTAL_STEPS = 17;
+const TOTAL_STEPS = 14;
 
 test.describe("Help guide", () => {
   test("Help modal opens when Help button is clicked", async ({ page }) => {

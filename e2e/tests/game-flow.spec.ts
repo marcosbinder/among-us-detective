@@ -35,20 +35,20 @@ test.describe("Game flow — starting rounds and games", () => {
       unknownColumn.locator("[data-test^='crew-member-']").first()
     ).toBeVisible();
 
-    // Innocent and suspect columns should be empty (tracking cleared)
+    // Trusted and suspicious columns should be empty (tracking cleared)
     await expect(
       page
-        .locator("[data-test='crew-column-innocent']")
+        .locator("[data-test='crew-column-trusted']")
         .locator("[data-test^='crew-member-']")
     ).toHaveCount(0);
     await expect(
       page
-        .locator("[data-test='crew-column-suspect']")
+        .locator("[data-test='crew-column-suspicious']")
         .locator("[data-test^='crew-member-']")
     ).toHaveCount(0);
   });
 
-  test("New game resets active crew back to inactive pool", async ({
+  test("New game keeps active crew in Unknown", async ({
     page,
   }) => {
     await activateAllCrew(page);
@@ -61,7 +61,7 @@ test.describe("Game flow — starting rounds and games", () => {
 
     await expect(
       unknownColumn.locator("[data-test^='crew-member-']").first()
-    ).not.toBeVisible();
+    ).toBeVisible();
   });
 
   test("New game resets task checkboxes", async ({ page }) => {

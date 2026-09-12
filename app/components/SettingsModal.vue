@@ -49,20 +49,6 @@
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
-              data-test="setting-show-players-as"
-            >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show players as</span>
-              <button
-                class="px-2.5 py-1 text-xs font-bold rounded bg-blue-500/15 text-blue-500 hover:bg-blue-500/25 border border-blue-500/30 transition-colors"
-                data-test="setting-show-players-as-btn"
-                @click="toggleColorNames"
-              >
-                {{ settingsStore.showColorNames ? "Color names" : "Icons" }}
-              </button>
-            </div>
-
-            <div
-              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-theme"
             >
               <span class="text-sm text-gray-700 dark:text-gray-300">Interface theme</span>
@@ -116,6 +102,17 @@
 
             <!-- Players -->
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Players</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-highlight-color-names"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">Highlight color names</span>
+              <Checkbox
+                :is-checked="settingsStore.highlightColorNames"
+                @changed="settingsStore.setHighlightColorNames"
+              />
+            </div>
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
@@ -216,14 +213,6 @@ function handleCloseEvent() {
   } else {
     emit("close");
   }
-}
-
-function toggleColorNames() {
-  const newValue = !settingsStore.showColorNames;
-  settingsStore.setShowColorNames(newValue);
-  gtag("event", newValue ? "show_color_names" : "hide_color_names", {
-    event_category: "global_stats",
-  });
 }
 
 function toggleDarkMode() {

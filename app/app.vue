@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'dark-mode': isDarkMode }" class="h-auto min-h-full">
+  <div class="h-auto min-h-full">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -16,6 +16,12 @@
 <script setup lang="ts">
 const darkModeStore = useDarkModeStore()
 const { isDarkMode, hasDarkModeBeenSetBefore } = storeToRefs(darkModeStore)
+
+useHead({
+  htmlAttrs: {
+    class: computed(() => (isDarkMode.value ? 'dark-mode' : '')),
+  },
+})
 
 const isAppInstallationPromptVisible = ref(false)
 let pwaInstallEvent: any = null

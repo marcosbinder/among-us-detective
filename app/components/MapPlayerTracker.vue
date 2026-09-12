@@ -15,7 +15,8 @@
         >
           <CrewIcon
             :color="item.member.color"
-            :show-color-name="showColorNames"
+            :show-color-name="true"
+            :highlight-color-name="highlightColorNames"
             :show-player-name="showPlayerNames"
             :is-imposter="item.member.isImposter"
             :is-player="item.member.isPlayer"
@@ -42,7 +43,7 @@ import Moveable from "vue3-moveable";
 const crewStore = useCrewStore();
 const settingsStore = useSettingsStore();
 const { activeCrewMembers } = storeToRefs(crewStore);
-const { showColorNames, showPlayerNames } = storeToRefs(settingsStore);
+const { highlightColorNames, showPlayerNames } = storeToRefs(settingsStore);
 
 const targetRefs = ref<Record<string, HTMLElement | null>>({});
 

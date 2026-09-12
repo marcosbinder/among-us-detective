@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col" data-test="notes-container">
     <div v-show="showRoundNotes" class="my-2 round-notes-wrapper">
-      <span class="text-sm text-theme-red">{{ speechError }}</span>
+      <span class="text-sm text-red-500">{{ speechError }}</span>
       <div class="flex justify-between">
         <div class="flex items-center justify-center">
           <label
             for="round-notes"
-            class="block mr-1 text-sm font-medium leading-5 text-gray-700"
+            class="block mr-1 text-sm font-medium leading-5 text-gray-700 dark:text-gray-300"
           >
             This round
           </label>
@@ -23,7 +23,7 @@
             <span class="icon-mic" />
           </button>
         </div>
-        <span class="text-xs leading-5 text-gray-500">Cleared each round</span>
+        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">Cleared each round</span>
       </div>
       <div class="relative mt-1 rounded-md">
         <textarea
@@ -32,6 +32,7 @@
           v-model="roundNotes"
           placeholder="e.g. Red saw me do medbay"
           rows="5"
+          class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
     </div>
@@ -40,7 +41,7 @@
         <div class="flex items-center justify-center">
           <label
             for="game-notes"
-            class="block text-sm font-medium leading-5 text-gray-700"
+            class="block text-sm font-medium leading-5 text-gray-700 dark:text-gray-300"
           >
             <template v-if="resetNotesOnNewGame">This game</template>
             <template v-else>General</template>
@@ -58,7 +59,7 @@
             <span class="icon-mic" />
           </button>
         </div>
-        <span class="text-xs leading-5 text-gray-500">
+        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">
           <template v-if="resetNotesOnNewGame">Cleared each game</template>
           <template v-else>Never cleared</template>
         </span>
@@ -70,6 +71,7 @@
           v-model="gameNotes"
           placeholder="e.g. Orange and cyan are a group"
           rows="5"
+          class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
     </div>
@@ -84,12 +86,7 @@ import allColors from "~/utils/playerColors.js";
 declare const webkitSpeechRecognition: any;
 declare const webkitSpeechGrammarList: any;
 
-const props = defineProps<{ round?: string; game?: string }>();
-const emit = defineEmits<{
-  roundNotesChanged: [value: string];
-  gameNotesChanged: [value: string];
-}>();
-
+const notesStore = useNotesStore();
 const settingsStore = useSettingsStore();
 const { resetNotesOnNewGame, showRoundNotes } = storeToRefs(settingsStore);
 
@@ -109,17 +106,17 @@ const isSpeechRecognitionSupported = computed(
 );
 
 const roundNotes = computed({
-  get: () => props.round ?? "",
+  get: () => notesStore.roundNotes,
   set: (value: string) => {
-    emit("roundNotesChanged", value);
+    notesStore.setRoundNotes(value);
     roundNotesHighlighter?.handleInput();
   },
 });
 
 const gameNotes = computed({
-  get: () => props.game ?? "",
+  get: () => notesStore.gameNotes,
   set: (value: string) => {
-    emit("gameNotesChanged", value);
+    notesStore.setGameNotes(value);
     gameNotesHighlighter?.handleInput();
   },
 });
@@ -183,10 +180,10 @@ function initSpeechRecording() {
     }
     const sanitized = finalTranscript.replace(/newline|new line|enter/gi, "\n");
     if (lastRecordedType.value === "roundNotes") {
-      emit("roundNotesChanged", (props.round ?? "") + sanitized);
+      notesStore.setRoundNotes(notesStore.roundNotes + sanitized);
       roundNotesHighlighter?.handleInput();
     } else {
-      emit("gameNotesChanged", (props.game ?? "") + sanitized);
+      notesStore.setGameNotes(notesStore.gameNotes + sanitized);
       gameNotesHighlighter?.handleInput();
     }
   };

@@ -10,7 +10,7 @@
         <PlayerCard
           :key="member.color"
           :member="member"
-          :show-color-names="showColorNames === true"
+          :highlight-color-names="highlightColorNames === true"
           :show-player-names="showPlayerNames === true"
           :is-player="member.isPlayer"
           :data-test="`crew-member-${member.color}`"
@@ -27,7 +27,7 @@ import type { CrewMember } from '~/stores/crew';
 
 const props = defineProps<{
   crewMembers: CrewMember[]
-  showColorNames?: boolean
+  highlightColorNames?: boolean
   showPlayerNames?: boolean
 }>()
 

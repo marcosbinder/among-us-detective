@@ -1,21 +1,32 @@
 <template>
   <div
-    class="player-card relative flex flex-col items-center justify-center p-1 rounded transition-all select-none cursor-grab active:cursor-grabbing group"
+    class="player-card relative flex flex-col items-center justify-start gap-0 p-1 rounded transition-[height] duration-200 select-none cursor-grab active:cursor-grabbing group"
     :class="[
       isPlayer ? 'ring-2 ring-yellow-400 bg-yellow-400/10 shadow' : 'shadow-sm',
       member.isDead
         ? 'bg-neutral-900/80 border border-red-900/40 opacity-70'
-        : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+        : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500',
+      member.role ? 'h-[100px]' : 'h-[64px]'
     ]"
-    style="width: 58px; height: 68px;"
+    style="width: 64px;"
+    :aria-label="`${member.playerName || member.color}${member.role ? `, ${member.role}, ${member.roleConfirmed ? 'verified' : 'claimed'}` : ''}`"
     :title="`${member.playerName || member.color}${member.role ? ' (' + member.role + (member.roleConfirmed ? ' - Verified' : ' - Claimed') + ')' : ''}. Click for options.`"
     @click.stop="openMenu"
     @contextmenu.prevent="openMenu"
     @dblclick.prevent="emit('dblclick', member)"
     @dragstart="closeMenu"
   >
+    <span
+      class="w-full shrink-0 text-[9px] font-bold capitalize text-center truncate leading-3 rounded"
+      :class="highlightColorNames
+        ? 'h-4 px-1 py-0.5 leading-3 bg-white text-black ring-1 ring-gray-400 shadow-sm'
+        : 'h-3 text-white bg-transparent'"
+    >
+      {{ member.color }}
+    </span>
+
     <!-- Avatar Character Bean -->
-    <div class="relative w-9 h-9 flex items-center justify-center pointer-events-none">
+    <div class="relative w-9 h-9 shrink-0 flex items-center justify-center pointer-events-none">
       <CrewIcon
         :color="member.color"
         :is-dead="member.isDead"
@@ -24,39 +35,29 @@
         :show-player-name="false"
         class="w-full h-full"
       />
-      <span
-        v-if="member.roleConfirmed"
-        class="absolute -top-1 -right-2 px-1 py-px rounded text-white text-[7px] font-black tracking-wide shadow"
-        :class="isImpostorRole ? 'bg-rose-600' : 'bg-emerald-600'"
-      >
-        VERIFIED
-      </span>
     </div>
 
-    <!-- Bottom/Corner: Role Icon with '?' / '✓' badge (larger & clearer) -->
-    <div class="h-5 flex items-center justify-center mt-0.5">
-      <RoleIcon
+    <!-- Reveal the role below the stable name and bean without moving either one. -->
+    <Transition name="role-reveal">
+      <div
         v-if="member.role"
-        :role="member.role"
-        :confirmed="member.roleConfirmed"
-        size="md"
-        class="w-5 h-5"
-      />
-      <span
-        v-else
-        class="text-[9px] font-bold capitalize text-gray-500 dark:text-gray-400 truncate max-w-[50px] leading-none"
+        :key="member.role"
+        class="flex h-6 flex-col items-center justify-center mt-2.5 min-w-0 max-w-full"
       >
-        {{ member.color }}
-      </span>
-    </div>
+        <RoleIcon
+          :role="member.role"
+          :confirmed="member.roleConfirmed"
+          size="md"
+          class="w-5 h-5"
+        />
+      </div>
+    </Transition>
 
     <!-- Compact Floating Popover Menu (Teleported to body, anchored beside clicked card) -->
     <Teleport to="body">
       <div
         v-if="isCurrentMenuOpen"
         class="fixed inset-0 z-50 select-none bg-transparent"
-        :class="{ 'dark-mode': isDarkMode }"
-        style="background-color: transparent"
         @click.stop="closeMenu"
         @contextmenu.prevent.stop="closeMenu"
       >
@@ -215,7 +216,7 @@ import type { CrewMember } from '~/stores/crew'
 
 const props = defineProps<{
   member: CrewMember
-  showColorNames?: boolean
+  highlightColorNames?: boolean
   showPlayerNames?: boolean
   isPlayer?: boolean
 }>()
@@ -225,7 +226,6 @@ const emit = defineEmits<{
 }>()
 
 const crewStore = useCrewStore()
-const { isDarkMode } = storeToRefs(useDarkModeStore())
 
 const isCurrentMenuOpen = computed(() => activeMenuColor.value === props.member.color)
 
@@ -343,5 +343,16 @@ function setAsMyPlayer() {
 .player-card {
   position: relative;
   flex-shrink: 0;
+}
+
+.role-reveal-enter-active,
+.role-reveal-leave-active {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.role-reveal-enter-from,
+.role-reveal-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 </style>

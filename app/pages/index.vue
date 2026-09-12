@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col p-2 lg:p-8" :class="{ 'dark-mode': isDarkMode }">
+  <div class="flex flex-col p-2 pb-12 lg:p-8 lg:pb-14">
     <!-- Header Action Controls -->
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
       <div class="flex items-center gap-1.5">
@@ -54,7 +54,7 @@
       :suspicious="crewStore.suspiciousCrewMembers"
       :impostor="crewStore.impostorCrewMembers"
       :dead="crewStore.deadCrewMembers"
-      :show-color-names="settingsStore.showColorNames"
+      :highlight-color-names="settingsStore.highlightColorNames"
       :show-player-names="settingsStore.showPlayerNames"
       class="mb-2 lg:mb-4"
       @changed="handleCrewChanged"
@@ -63,7 +63,7 @@
 
     <CrewStats
       :crew-members="crewStore.activeCrewMembers"
-      :show-color-names="settingsStore.showColorNames"
+      :highlight-color-names="settingsStore.highlightColorNames"
       :show-player-names="settingsStore.showPlayerNames"
       class="mb-4"
     />
@@ -98,10 +98,6 @@
     </div>
     <NotesModal
       v-if="isNotesModalOpen"
-      :round="roundNotes"
-      :game="gameNotes"
-      @round-notes-changed="value => (roundNotes = value)"
-      @game-notes-changed="value => (gameNotes = value)"
       @close="toggleNotesModal"
     />
     <HelpModal v-if="isHelpModalOpen" @close="toggleHelpModal" />
@@ -121,13 +117,9 @@ const notesStore = useNotesStore()
 const tasksStore = useTasksStore()
 const { gtag } = useGtag()
 
-const { isDarkMode } = storeToRefs(useDarkModeStore())
-
 const isHelpModalOpen = ref(false)
 const isAboutModalOpen = ref(false)
 const isTasksModalOpen = ref(false)
-const roundNotes = ref('')
-const gameNotes = ref('')
 
 const isNotesModalOpen = computed({
   get: () => notesStore.areNotesOpen,
@@ -139,33 +131,43 @@ const isSettingsModalOpen = computed({
   set: (value: boolean) => settingsStore.setSettingsModalOpenState(value),
 })
 
+let keyupListener: ((e: KeyboardEvent) => void) | null = null
+
 onMounted(() => {
   initNewGame()
   if (JSON.parse(localStorage.getItem('returningPlayer') ?? 'false') !== true) {
     isHelpModalOpen.value = true
     localStorage.setItem('returningPlayer', JSON.stringify(true))
   }
-  document.addEventListener('keyup', (e: KeyboardEvent) => {
+  keyupListener = (e: KeyboardEvent) => {
     if (e.code === 'KeyN' && !isNotesModalOpen.value && !isSettingsModalOpen.value) {
       isNotesModalOpen.value = true
     } else if (e.code === 'Escape' && isNotesModalOpen.value) {
       isNotesModalOpen.value = false
     }
-  })
+  }
+  document.addEventListener('keyup', keyupListener)
+})
+
+onUnmounted(() => {
+  if (keyupListener) {
+    document.removeEventListener('keyup', keyupListener)
+    keyupListener = null
+  }
 })
 
 function initNewGame() {
   crewStore.resetAllCrew()
   tasksStore.resetAllTasks()
-  if (settingsStore.resetNotesOnNewGame) gameNotes.value = ''
-  roundNotes.value = ''
+  if (settingsStore.resetNotesOnNewGame) notesStore.clearGameNotes()
+  notesStore.clearRoundNotes()
   gtag('event', 'init_new_game', { event_category: 'global_stats' })
 }
 
 function initNewRound() {
   crewStore.resetActiveCrew()
   tasksStore.resetAllTasks()
-  roundNotes.value = ''
+  notesStore.clearRoundNotes()
   gtag('event', 'init_new_round', { event_category: 'global_stats' })
 }
 

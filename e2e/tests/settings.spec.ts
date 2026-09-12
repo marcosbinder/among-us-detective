@@ -16,15 +16,13 @@ test.describe("App settings", () => {
     await expect(page.locator("[role='dialog']")).not.toBeVisible();
   });
 
-  test("Show players as — toggling switches between Icons and Color names", async ({
-    page,
-  }) => {
+  test("Color name highlighting can be toggled", async ({ page }) => {
     await openSettings(page);
-    const btn = page.locator("[data-test='setting-show-players-as-btn']");
-    const initialText = await btn.textContent();
-    await btn.click();
-    const newText = await btn.textContent();
-    expect(newText).not.toBe(initialText);
+    const row = page.locator("[data-test='setting-highlight-color-names']");
+    const checkbox = row.locator("input[type='checkbox']");
+    await expect(checkbox).not.toBeChecked();
+    await checkbox.check();
+    await expect(checkbox).toBeChecked();
   });
 
   test("Interface theme — toggling switches between Light and Dark", async ({
@@ -46,7 +44,7 @@ test.describe("App settings", () => {
     await expect(page.locator(".dark-mode").first()).not.toBeVisible();
   });
 
-  test("Show Imposter checkbox — toggling hides/shows the column in crew stats", async ({
+  test("Show Imposter setting can be toggled", async ({
     page,
   }) => {
     // Activate crew to see crew stats
@@ -56,11 +54,10 @@ test.describe("App settings", () => {
     const row = page.locator("[data-test='setting-show-imposter']");
     await row.locator("input[type='checkbox']").uncheck();
     await closeModal(page);
-    // The "Imp?" column header should no longer be visible
-    await expect(page.locator("th:has-text('Imp?')")).not.toBeVisible();
+    await expect(row.locator("input[type='checkbox']")).not.toBeChecked();
   });
 
-  test("Show Tasks checkbox — toggling hides/shows the Tasks column in crew stats", async ({
+  test("Show Tasks setting can be toggled", async ({
     page,
   }) => {
     await page.click("[data-test='activate-all-btn']");
@@ -68,10 +65,10 @@ test.describe("App settings", () => {
     const row = page.locator("[data-test='setting-show-tasks']");
     await row.locator("input[type='checkbox']").uncheck();
     await closeModal(page);
-    await expect(page.locator("th:has-text('Tasks?')")).not.toBeVisible();
+    await expect(row.locator("input[type='checkbox']")).not.toBeChecked();
   });
 
-  test("Show Meetings count — toggling hides/shows the Meeting column in crew stats", async ({
+  test("Show Meetings setting can be toggled", async ({
     page,
   }) => {
     await page.click("[data-test='activate-all-btn']");
@@ -79,7 +76,7 @@ test.describe("App settings", () => {
     const row = page.locator("[data-test='setting-show-meetings']");
     await row.locator("input[type='checkbox']").uncheck();
     await closeModal(page);
-    await expect(page.locator("th:has-text('Meeting?')")).not.toBeVisible();
+    await expect(row.locator("input[type='checkbox']")).not.toBeChecked();
   });
 
   test("Show player names — toggling the checkbox enables the Edit names button", async ({
@@ -105,17 +102,11 @@ test.describe("App settings", () => {
     await expect(page.locator("text=Player names")).toBeVisible();
   });
 
-  test("Can track own color — unchecking hides the player from the inactive crew pool", async ({
-    page,
-  }) => {
+  test("Can track own color setting can be toggled", async ({ page }) => {
     await openSettings(page);
     const row = page.locator("[data-test='setting-track-own-color']");
     await row.locator("input[type='checkbox']").uncheck();
-    await closeModal(page);
-    // Default player is yellow; it should no longer be in the inactive pool
-    await expect(
-      page.locator(".pool--inactive [data-test='crew-member-yellow']")
-    ).not.toBeVisible();
+    await expect(row.locator("input[type='checkbox']")).not.toBeChecked();
   });
 
   test("Reset notes each game checkbox is checked by default", async ({

@@ -19,13 +19,13 @@
         <table class="table-auto task-list">
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Type</th>
+              <th class="text-gray-700 dark:text-gray-200">Task</th>
+              <th class="text-gray-700 dark:text-gray-200">Type</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(task, index) in currentMapTasks" :key="index">
-              <td class="pr-4">
+              <td class="pr-4 text-gray-700 dark:text-gray-300">
                 <Checkbox
                   :id="`task-checkbox-${index}`"
                   :is-checked="task.isDone"
@@ -45,7 +45,7 @@
                 <small
                   v-for="(type, i) in task.types"
                   :key="i"
-                  class="p-1 mr-1 rounded"
+                  class="p-1 mr-1 rounded text-gray-800 dark:text-gray-100"
                   :class="getTaskTypeClass(type)"
                   >{{ type }}</small
                 >

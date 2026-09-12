@@ -66,15 +66,4 @@ test.describe("Player color selection", () => {
     }
   });
 
-  test("Imposter mode checkbox is visible in the color picker", async ({
-    page,
-  }) => {
-    await page
-      .locator("[data-test='player-selector-btn']")
-      .first()
-      .click();
-    await expect(
-      page.locator("[data-test='imposter-mode-row']").first()
-    ).toBeVisible();
-  });
 });

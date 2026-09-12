@@ -1,7 +1,7 @@
 import { test as base, Page } from "@playwright/test";
 
 const DEFAULT_SETTINGS_STATE = JSON.stringify({
-  showColorNames: false,
+  highlightColorNames: false,
   showImposterCheckbox: true,
   showTasksCheckbox: true,
   showMeetingsCount: true,

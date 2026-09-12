@@ -1,29 +1,28 @@
 <template>
-  <div>
-    <table
-      class="w-full overflow-hidden divide-y divide-gray-200 rounded shadow table-auto crew-stats lg:table-fixed"
-    >
-      <thead>
+  <div class="crew-stats overflow-x-auto" data-test="crew-stats">
+    <table class="w-full overflow-hidden divide-y divide-gray-200 dark:divide-gray-700 rounded shadow table-auto lg:table-fixed">
+      <thead class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
         <tr>
           <th>Color</th>
           <th v-if="showImposterCheckbox">Imp?</th>
           <th v-if="showTasksCheckbox">Tasks?</th>
           <th v-if="showMeetingsCount">Meeting?</th>
-          <th colspan="3">Innocent</th>
+          <th colspan="3">Protected / Innocent</th>
           <th colspan="3">Suspect</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
+      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
         <tr
           v-for="member in sortedCrewMembers"
           :key="member.color"
-          :class="{ 'is-dead': member.isDead }"
+          :class="member.isDead ? 'is-dead bg-gray-800 text-gray-200' : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200'"
         >
           <td>
             <div class="flex flex-col-reverse items-center py-1 lg:flex-row justify-evenly">
               <CrewIcon
                 :color="member.color"
-                :show-color-name="showColorNames"
+                :show-color-name="true"
+                :highlight-color-name="highlightColorNames"
                 :show-player-name="showPlayerNames"
                 :is-imposter="member.isImposter"
                 :is-player="member.isPlayer"
@@ -32,14 +31,16 @@
               <div v-show="!member.isDead" class="flex lg:flex-col">
                 <span
                   v-show="member.suspectedBy.length > 0"
-                  class="px-1"
-                  :class="getSuspectCounterClass(member.suspectedBy.length)"
-                >{{ member.suspectedBy.length }}</span>
+                  class="px-1 font-bold text-player-red"
+                >
+                  {{ member.suspectedBy.length }}
+                </span>
                 <span
                   v-show="member.protectedBy.length > 0"
-                  class="px-1"
-                  :class="getProtectedCounterClass(member.protectedBy.length)"
-                >{{ member.protectedBy.length }}</span>
+                  class="px-1 font-bold text-player-green"
+                >
+                  {{ member.protectedBy.length }}
+                </span>
               </div>
             </div>
           </td>
@@ -70,7 +71,7 @@
           <td colspan="3">
             <CrewPool
               :crew-members="crewStore.getAllMembersProtectedBy(member)"
-              :show-color-names="showColorNames"
+              :highlight-color-names="highlightColorNames"
               :show-player-names="showPlayerNames"
               class="td-min-height"
               @changed="value => crewStore.linkInnocentsWithProtector({ innocents: value, protector: member })"
@@ -80,7 +81,7 @@
           <td class="relative" colspan="3">
             <CrewPool
               :crew-members="crewStore.getAllMembersSuspectedBy(member)"
-              :show-color-names="showColorNames"
+              :highlight-color-names="highlightColorNames"
               :show-player-names="showPlayerNames"
               class="td-min-height"
               @changed="value => crewStore.linkSuspectsWithAccuser({ suspects: value, accuser: member })"
@@ -94,11 +95,11 @@
 </template>
 
 <script setup lang="ts">
-import type { CrewMember } from '~/stores/crew';
+import type { CrewMember } from '~/stores/crew'
 
 const props = defineProps<{
   crewMembers: CrewMember[]
-  showColorNames?: boolean
+  highlightColorNames?: boolean
   showPlayerNames?: boolean
 }>()
 
@@ -111,14 +112,6 @@ const sortedCrewMembers = computed(() =>
     .sort((a, b) => (a.color > b.color ? 1 : a.color < b.color ? -1 : 0))
     .sort((a, b) => (a.isDead && !b.isDead ? 1 : !a.isDead && b.isDead ? -1 : 0)),
 )
-
-function getSuspectCounterClass(count: number) {
-  return count >= 1 ? 'font-bold text-player-red' : 'text-theme-gray-light'
-}
-
-function getProtectedCounterClass(count: number) {
-  return count >= 1 ? 'font-bold text-player-green' : 'text-theme-gray-light'
-}
 </script>
 
 <style lang="scss" scoped>
@@ -132,20 +125,15 @@ table {
   thead {
     th {
       @apply py-1 px-3;
+
       &:not(:last-of-type) {
-        @apply border-r;
+        @apply border-r border-gray-300 dark:border-gray-700;
       }
     }
   }
 
-  tr {
-    &.is-dead {
-      @apply bg-theme-gray-dark text-theme-gray-extra-light;
-    }
-  }
-
   td:not(:last-of-type) {
-    @apply border-r;
+    @apply border-r border-gray-200 dark:border-gray-700;
   }
 }
 </style>
