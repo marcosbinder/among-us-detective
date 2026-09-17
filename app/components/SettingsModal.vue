@@ -64,6 +64,63 @@
               </button>
             </div>
 
+            <div
+              class="flex flex-col gap-1.5 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-board-zoom"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Board zoom</span>
+                  <span class="text-[11px] text-gray-500 dark:text-gray-400">Card & bean scale</span>
+                </div>
+                <div class="flex items-center gap-1 bg-gray-200/70 dark:bg-gray-900/70 p-0.5 rounded border border-gray-300 dark:border-gray-700">
+                  <button
+                    class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
+                    :class="settingsStore.boardZoom === 'compact'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                    data-test="zoom-btn-compact"
+                    @click="settingsStore.setBoardZoom('compact')"
+                  >
+                    Small
+                  </button>
+                  <button
+                    class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
+                    :class="settingsStore.boardZoom === 'normal'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                    data-test="zoom-btn-normal"
+                    @click="settingsStore.setBoardZoom('normal')"
+                  >
+                    Normal
+                  </button>
+                  <button
+                    class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
+                    :class="settingsStore.boardZoom === 'large'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                    data-test="zoom-btn-large"
+                    @click="settingsStore.setBoardZoom('large')"
+                  >
+                    Large
+                  </button>
+                  <button
+                    class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
+                    :class="settingsStore.boardZoom === 'extra-large'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+                    data-test="zoom-btn-xl"
+                    @click="settingsStore.setBoardZoom('extra-large')"
+                  >
+                    Extra Large
+                  </button>
+                </div>
+              </div>
+              <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">
+                💡 Use Board Zoom here instead of browser zoom to keep the deduction columns from squishing.
+              </p>
+            </div>
+
             <!-- Tracking -->
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Tracking</div>
 

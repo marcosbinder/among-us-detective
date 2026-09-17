@@ -6,6 +6,7 @@ export default defineNuxtConfig({
 
   devServer: {
     port: 8071,
+    host: "0.0.0.0",
   },
 
   compatibilityDate: "2024-11-01",
@@ -79,9 +80,12 @@ export default defineNuxtConfig({
   // Global CSS
   css: ["~/assets/scss/styles.scss"],
 
-  // Google Analytics
+  spaLoadingTemplate: './spa-loading-template.html',
+
+  // Google Analytics (only enabled in production to prevent local dev network delays)
   gtag: {
     id: "G-F1ZVM4FLC6",
+    enabled: process.env.NODE_ENV === "production",
   },
 
   // PWA

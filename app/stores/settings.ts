@@ -12,6 +12,11 @@ export const useSettingsStore = defineStore(
     const showRoundNotes = ref(true);
     const canTrackOwnColor = ref(true);
     const isImproveMapContrastEnabled = ref(true);
+    const boardZoom = ref<'compact' | 'normal' | 'large' | 'extra-large'>('normal');
+
+    function setBoardZoom(value: 'compact' | 'normal' | 'large' | 'extra-large') {
+      boardZoom.value = value;
+    }
 
     function setHighlightColorNames(value: boolean) {
       highlightColorNames.value = value;
@@ -59,6 +64,7 @@ export const useSettingsStore = defineStore(
       showRoundNotes,
       canTrackOwnColor,
       isImproveMapContrastEnabled,
+      boardZoom,
       setHighlightColorNames,
       setShowImposterCheckbox,
       setShowTasksCheckbox,
@@ -70,6 +76,7 @@ export const useSettingsStore = defineStore(
       setShowRoundNotes,
       setCanTrackOwnColor,
       setIsImproveMapContrastEnabled,
+      setBoardZoom,
     };
   },
   { persist: true }

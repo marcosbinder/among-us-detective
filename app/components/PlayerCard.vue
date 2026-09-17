@@ -1,38 +1,44 @@
 <template>
   <div
-    class="player-card relative flex flex-col items-center justify-start gap-0 p-1 rounded transition-[height] duration-200 select-none cursor-grab active:cursor-grabbing group"
+    class="player-card relative flex flex-col items-center justify-start gap-0 p-0.5 sm:p-1 rounded transition-all duration-200 select-none cursor-grab active:cursor-grabbing group"
     :class="[
       isPlayer ? 'ring-2 ring-yellow-400 bg-yellow-400/10 shadow' : 'shadow-sm',
       member.isDead
         ? 'bg-neutral-900/80 border border-red-900/40 opacity-70'
         : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500',
-      member.role ? 'h-[100px]' : 'h-[64px]'
+      cardSizeClasses
     ]"
-    style="width: 64px;"
     :aria-label="`${member.playerName || member.color}${member.role ? `, ${member.role}, ${member.roleConfirmed ? 'verified' : 'claimed'}` : ''}`"
     :title="`${member.playerName || member.color}${member.role ? ' (' + member.role + (member.roleConfirmed ? ' - Verified' : ' - Claimed') + ')' : ''}. Click for options.`"
-    @click.stop="openMenu"
+    @touchstart.passive="handleTouchStart"
+    @touchmove.passive="handleTouchMove"
+    @click.stop="handleCardClick"
     @contextmenu.prevent="openMenu"
     @dblclick.prevent="emit('dblclick', member)"
     @dragstart="closeMenu"
   >
     <span
-      class="w-full shrink-0 text-[9px] font-bold capitalize text-center truncate leading-3 rounded"
+      class="w-full shrink-0 text-[8px] sm:text-[9px] font-bold capitalize text-center truncate leading-3 rounded mb-0.5"
       :class="highlightColorNames
-        ? 'h-4 px-1 py-0.5 leading-3 bg-white text-black ring-1 ring-gray-400 shadow-sm'
+        ? 'h-3.5 sm:h-4 px-0.5 sm:px-1 py-0.5 leading-3 bg-white text-black ring-1 ring-gray-400 shadow-sm'
         : 'h-3 text-white bg-transparent'"
     >
       {{ member.color }}
     </span>
 
     <!-- Avatar Character Bean -->
-    <div class="relative w-9 h-9 shrink-0 flex items-center justify-center pointer-events-none">
+    <div
+      class="relative shrink-0 flex items-center justify-center pointer-events-none"
+      :class="beanSizeClasses"
+    >
       <CrewIcon
         :color="member.color"
         :is-dead="member.isDead"
         :is-player="member.isPlayer"
         :player-name="member.playerName"
         :show-player-name="false"
+        :auto-width="true"
+        :auto-height="true"
         class="w-full h-full"
       />
     </div>
@@ -42,14 +48,20 @@
       <div
         v-if="member.role"
         :key="member.role"
-        class="flex h-6 flex-col items-center justify-center mt-2.5 min-w-0 max-w-full"
+        class="flex flex-col items-center justify-center mt-0.5 sm:mt-1 min-w-0 max-w-full"
       >
         <RoleIcon
           :role="member.role"
           :confirmed="member.roleConfirmed"
-          size="md"
-          class="w-5 h-5"
+          size="sm"
+          class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"
         />
+        <span
+          class="w-full text-[8px] sm:text-[9px] font-bold capitalize text-center truncate leading-tight mt-0.5"
+          :class="isImpostorRole ? 'text-rose-500 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'"
+        >
+          {{ member.role }}
+        </span>
       </div>
     </Transition>
 
@@ -229,6 +241,41 @@ const emit = defineEmits<{
 }>()
 
 const crewStore = useCrewStore()
+const settingsStore = useSettingsStore()
+
+const cardSizeClasses = computed(() => {
+  const zoom = settingsStore.boardZoom || 'normal'
+  if (zoom === 'compact') {
+    return [
+      'w-[42px] sm:w-[48px] md:w-[52px]',
+      'h-auto pb-1 sm:pb-1'
+    ]
+  }
+  if (zoom === 'large') {
+    return [
+      'w-[58px] sm:w-[66px] md:w-[74px]',
+      'h-auto pb-1.5 sm:pb-2'
+    ]
+  }
+  if (zoom === 'extra-large') {
+    return [
+      'w-[66px] sm:w-[76px] md:w-[84px]',
+      'h-auto pb-2 sm:pb-2.5'
+    ]
+  }
+  return [
+    'w-[50px] sm:w-[58px] md:w-[64px]',
+    'h-auto pb-1 sm:pb-1.5'
+  ]
+})
+
+const beanSizeClasses = computed(() => {
+  const zoom = settingsStore.boardZoom || 'normal'
+  if (zoom === 'compact') return 'w-7 h-7 sm:w-8 sm:h-8'
+  if (zoom === 'large') return 'w-9 h-9 sm:w-10 sm:h-10'
+  if (zoom === 'extra-large') return 'w-11 h-11 sm:w-12 sm:h-12'
+  return 'w-8 h-8 sm:w-9 sm:h-9'
+})
 
 const isCurrentMenuOpen = computed(() => activeMenuColor.value === props.member.color)
 
@@ -279,29 +326,73 @@ onBeforeUnmount(() => {
   cleanupListeners()
 })
 
+let touchStartX = 0
+let touchStartY = 0
+let isTouchDragging = false
+
+function handleTouchStart(e: TouchEvent) {
+  if (e.touches.length > 0) {
+    touchStartX = e.touches[0].clientX
+    touchStartY = e.touches[0].clientY
+    isTouchDragging = false
+  }
+}
+
+function handleTouchMove(e: TouchEvent) {
+  if (e.touches.length > 0) {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX)
+    const dy = Math.abs(e.touches[0].clientY - touchStartY)
+    if (dx > 8 || dy > 8) {
+      isTouchDragging = true
+      closeMenu()
+    }
+  }
+}
+
+function handleCardClick(e: MouseEvent) {
+  if (isTouchDragging) {
+    isTouchDragging = false
+    return
+  }
+  openMenu(e)
+}
+
 function openMenu(event?: MouseEvent) {
   if (event) {
     const target = (event.currentTarget as HTMLElement) || (event.target as HTMLElement)
     if (target && target.getBoundingClientRect) {
       const rect = target.getBoundingClientRect()
       const popoverWidth = 215
-      const popoverHeight = 220
+      const popoverHeight = 300
 
-      // Position immediately to the right of the card
-      let left = rect.right + 6
-      let top = rect.top
+      let left: number
+      let top: number
 
-      // If overflows viewport right, position to the left of the card
-      if (left + popoverWidth > window.innerWidth - 8) {
-        left = rect.left - popoverWidth - 6
-      }
-      if (left < 8) {
-        left = 8
-      }
+      if (window.innerWidth < 640) {
+        // Mobile / split-screen: center popover relative to card or screen, clamped
+        left = Math.max(8, Math.min(rect.left - (popoverWidth - rect.width) / 2, window.innerWidth - popoverWidth - 8))
+        if (rect.bottom + popoverHeight + 8 <= window.innerHeight) {
+          top = rect.bottom + 4
+        } else {
+          top = Math.max(8, rect.top - popoverHeight - 4)
+        }
+      } else {
+        // Desktop: anchor to right of card
+        left = rect.right + 6
+        top = rect.top
 
-      // If overflows viewport bottom, adjust upward
-      if (top + popoverHeight > window.innerHeight - 8) {
-        top = Math.max(8, window.innerHeight - popoverHeight - 8)
+        // If overflows viewport right, position to the left of the card
+        if (left + popoverWidth > window.innerWidth - 8) {
+          left = rect.left - popoverWidth - 6
+        }
+        if (left < 8) {
+          left = 8
+        }
+
+        // If overflows viewport bottom, adjust upward
+        if (top + popoverHeight > window.innerHeight - 8) {
+          top = Math.max(8, window.innerHeight - popoverHeight - 8)
+        }
       }
 
       menuPosition.value = { top, left }

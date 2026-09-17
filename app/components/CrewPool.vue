@@ -1,11 +1,14 @@
 <template>
-  <div class="flex w-full h-full crewpool" data-test="crew-pool">
+  <div class="flex w-full h-full crewpool flex-1" data-test="crew-pool">
     <Draggable
       v-model="crewMembersInPool"
       group="crewMembers"
       item-key="color"
-      class="flex flex-wrap content-start gap-1.5 p-1.5 w-full"
-      :class="{ 'min-h-[100px]': crewMembers.length === 0 }"
+      :delay="140"
+      :delay-on-touch-only="true"
+      :touch-start-threshold="6"
+      class="flex flex-wrap content-start items-start gap-1 sm:gap-1.5 p-1 sm:p-1.5 w-full flex-1"
+      :class="{ 'min-h-[64px] sm:min-h-[85px]': crewMembers.length === 0 }"
     >
       <template #item="{ element: member }">
         <PlayerCard

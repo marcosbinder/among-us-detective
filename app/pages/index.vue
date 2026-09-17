@@ -45,6 +45,36 @@
     <!-- Match Lobby & Roster Selector (18 Colors, Glowing LEDs, Presets) -->
     <GameRosterSelector />
 
+    <!-- Browser Zoom Notice Banner -->
+    <div
+      v-if="isBrowserZoomed && !isZoomNoticeDismissed"
+      class="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-2 shadow-sm transition-all"
+      data-test="zoom-warning-banner"
+    >
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-sm shrink-0">⚠️</span>
+        <div class="leading-tight text-[11px] sm:text-xs">
+          <span>Browser zoom detected. If columns feel cramped, use built-in <strong>Board Zoom</strong> in </span>
+          <button
+            type="button"
+            class="underline font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500"
+            @click="openSettingsForZoom"
+          >
+            Settings
+          </button>
+          <span> for the cleanest fit.</span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="shrink-0 p-1 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 rounded text-xs font-bold leading-none"
+        title="Dismiss notice"
+        @click="dismissZoomNotice"
+      >
+        ✕
+      </button>
+    </div>
+
     <!-- 6 Strict Deduction Hierarchy Columns -->
     <CrewTracker
       :player-color="crewStore.playerColor"
@@ -131,7 +161,30 @@ const isSettingsModalOpen = computed({
   set: (value: boolean) => settingsStore.setSettingsModalOpenState(value),
 })
 
+const isBrowserZoomed = ref(false)
+const isZoomNoticeDismissed = ref(false)
+
+function checkBrowserZoom() {
+  if (typeof window === 'undefined') return
+  const dpr = window.devicePixelRatio || 1
+  const vpScale = window.visualViewport?.scale || 1
+  // Trigger warning if browser zoom or viewport pinch scale is active
+  isBrowserZoomed.value = vpScale > 1.05 || dpr >= 1.2
+}
+
+function dismissZoomNotice() {
+  isZoomNoticeDismissed.value = true
+  try {
+    sessionStorage.setItem('dismissed_zoom_notice', 'true')
+  } catch {}
+}
+
+function openSettingsForZoom() {
+  settingsStore.setSettingsModalOpenState(true)
+}
+
 let keyupListener: ((e: KeyboardEvent) => void) | null = null
+let zoomListener: (() => void) | null = null
 
 onMounted(() => {
   initNewGame()
@@ -139,6 +192,17 @@ onMounted(() => {
     isHelpModalOpen.value = true
     localStorage.setItem('returningPlayer', JSON.stringify(true))
   }
+  try {
+    isZoomNoticeDismissed.value = sessionStorage.getItem('dismissed_zoom_notice') === 'true'
+  } catch {}
+
+  checkBrowserZoom()
+  zoomListener = checkBrowserZoom
+  window.addEventListener('resize', zoomListener)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', zoomListener)
+  }
+
   keyupListener = (e: KeyboardEvent) => {
     if (e.code === 'KeyN' && !isNotesModalOpen.value && !isSettingsModalOpen.value) {
       isNotesModalOpen.value = true
@@ -153,6 +217,13 @@ onUnmounted(() => {
   if (keyupListener) {
     document.removeEventListener('keyup', keyupListener)
     keyupListener = null
+  }
+  if (zoomListener) {
+    window.removeEventListener('resize', zoomListener)
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', zoomListener)
+    }
+    zoomListener = null
   }
 })
 
