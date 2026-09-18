@@ -41,6 +41,14 @@
         :auto-height="true"
         class="w-full h-full"
       />
+      <!-- Died in Round badge -->
+      <span
+        v-if="member.isDead && member.diedInRound"
+        class="absolute -top-1.5 -right-2 z-30 px-1.5 py-0.5 bg-red-600 text-white text-[8px] sm:text-[9px] font-black rounded-md border border-white/80 shadow-md leading-none select-none"
+        :title="`Died in Round ${member.diedInRound}`"
+      >
+        R{{ member.diedInRound }}
+      </span>
     </div>
 
     <!-- Reveal the role below the stable name and bean without moving either one. -->
@@ -64,6 +72,15 @@
         </span>
       </div>
     </Transition>
+
+    <!-- History evolution indicator (if viewing past round and current live status differs) -->
+    <span
+      v-if="roundsStore.isViewingHistory && liveStatusDifference"
+      class="w-full text-[7px] font-bold text-center truncate leading-none mt-0.5 px-0.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+      :title="`Current status in Live game: ${liveStatusDifference}`"
+    >
+      Now: {{ liveStatusDifference }}
+    </span>
 
     <!-- Compact Floating Popover Menu (Teleported to body, anchored beside clicked card) -->
     <Teleport to="body">
@@ -200,16 +217,31 @@
             </div>
           </div>
 
-          <!-- Clear role -->
-          <div class="pt-2 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+          <!-- Bottom actions: Clear role & Mark as dead / Revive -->
+          <div class="pt-2 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-1.5">
+            <div v-if="member.role" class="flex justify-end">
+              <button
+                type="button"
+                class="px-2 py-0.5 text-[11px] text-gray-400 hover:text-red-500 rounded hover:bg-red-500/10 transition-colors"
+                title="Clear role"
+                @click="clearRole"
+              >
+                ✕ Clear role
+              </button>
+            </div>
+
             <button
-              v-if="member.role"
               type="button"
-              class="px-2 py-1 text-[11px] text-gray-400 hover:text-red-500 rounded hover:bg-red-500/10 transition-colors"
-              title="Clear role"
-              @click="clearRole"
+              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors flex items-center justify-center gap-1"
+              :class="member.isDead
+                ? 'bg-red-500/20 text-red-500 dark:text-red-400 hover:bg-red-500/30 border border-red-500/40'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white border border-gray-300 dark:border-gray-700'"
+              @click="handleToggleDead"
             >
-              ✕ Clear
+              <span>{{ member.isDead ? 'Revive player' : 'Mark as dead' }}</span>
+              <span v-if="member.isDead && member.diedInRound" class="text-[9px] opacity-80 ml-1">
+                (Died R{{ member.diedInRound }})
+              </span>
             </button>
           </div>
         </div>
@@ -242,6 +274,25 @@ const emit = defineEmits<{
 
 const crewStore = useCrewStore()
 const settingsStore = useSettingsStore()
+const roundsStore = useRoundsStore()
+
+const liveStatusDifference = computed(() => {
+  if (!roundsStore.isViewingHistory) return null
+  const liveMember = crewStore.crewMembers.find((m) => m.color === props.member.color)
+  if (!liveMember) return null
+  if (liveMember.status !== props.member.status) {
+    const statusMap: Record<string, string> = {
+      hard_clear: 'Hard Clear',
+      trusted: 'Trusted',
+      unknown: 'Unknown',
+      suspicious: 'Suspicious',
+      impostor: 'Impostor',
+      dead: 'Dead',
+    }
+    return statusMap[liveMember.status] || liveMember.status
+  }
+  return null
+})
 
 const cardSizeClasses = computed(() => {
   const zoom = settingsStore.boardZoom || 'normal'
@@ -429,6 +480,11 @@ function toggleRoleConfirmed() {
 
 function setAsMyPlayer() {
   crewStore.setPlayerColor(props.member.color)
+  closeMenu()
+}
+
+function handleToggleDead() {
+  crewStore.togglePlayerDead(props.member.color)
   closeMenu()
 }
 </script>

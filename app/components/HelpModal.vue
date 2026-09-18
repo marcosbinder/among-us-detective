@@ -101,57 +101,100 @@ const currentStepIndex = ref(0);
 const steps: Step[] = [
   {
     description:
-      "<b>Match roster:</b> Click a bean to toggle whether that player is active. Double-click or right-click a bean to set it as <b>ME</b>, or click the ME badge to choose your color.",
+      "<b>Match roster:</b> Click a bean in the top roster to toggle active players. Use presets (10, 12, 15) and click the <b>ME</b> badge to set your player color.",
+    media: {
+      type: "video",
+      webm: "changing-player-color.webm",
+      mp4: "changing-player-color.mp4",
+    },
   },
   {
     description:
-      "<b>Deduction board:</b> Use the six columns to organize players: <b>Hard Clear</b>, <b>Trusted</b>, <b>Unknown</b>, <b>Suspicious</b>, <b>Impostor</b>, and <b>Dead</b>.",
-  },
-  {
-    description: "<b>Drag and drop:</b> Drag player beans between columns to classify them as the game develops.",
-  },
-  {
-    description: "<b>Role assignment:</b> Click a player bean to open the role popover with Crew and Impostor roles.",
-  },
-  {
-    description:
-      "<b>Verification:</b> A yellow <b>?</b> means CLAIMED. Confirmed Crew roles show a green <b>check</b>; confirmed Impostor roles show a red <b>check</b>.",
+      "<b>Deduction board:</b> Organize players across six columns: <b>Hard Clear</b>, <b>Trusted</b>, <b>Unknown</b>, <b>Suspicious</b>, <b>Impostor</b>, and <b>Dead</b>.",
+    media: {
+      type: "image",
+      webp: "innocent-suspect-count.webp",
+      png: "innocent-suspect-count.png",
+    },
   },
   {
     description:
-      "<b>Role states:</b> Assigning a role records a claim. Confirming a Crew role moves the player to Hard Clear; confirming an Impostor role moves them to Impostor.",
+      "<b>Drag & drop:</b> Drag player cards between columns to classify them as your deductions develop.",
+    media: {
+      type: "video",
+      webm: "marking-as-innocent.webm",
+      mp4: "marking-as-innocent.mp4",
+    },
   },
   {
     description:
-      "<b>Dead players:</b> Drag a player to Dead or double-click a bean. Verified roles remain verified while dead; moving the player back to a living column clears verification.",
+      "<b>Role assignment:</b> Click a player card to open the popover menu. Assign official Crew roles (Detective, Judge, Scientist, Engineer, Noisemaker) or Impostor roles (Shapeshifter, Phantom, Viper).",
   },
   {
     description:
-      "<b>New round:</b> Dead players and verified deductions are preserved. Unverified deductions reset to Unknown.",
+      "<b>Claimed vs. Verified:</b> A yellow <b>?</b> badge means CLAIMED. Verified roles display a green or red <b>check</b> badge. Confirming a Crew role moves them to Hard Clear; confirming an Impostor role moves them to Impostor.",
   },
   {
     description:
-      "<b>New game:</b> Reset the game state while keeping the lobby roster and player names.",
+      "<b>Dead players:</b> Double-click a card or open the card popover and tap <b>💀 Mark as Dead</b>. Dead players display the round they died in (e.g. <b>R1</b>) and remain dead in all future rounds.",
+    media: {
+      type: "video",
+      webm: "marking-as-dead.webm",
+      mp4: "marking-as-dead.mp4",
+    },
   },
   {
     description:
-      "<b>Notes:</b> Click Notes or press <b>N</b>. Round notes clear each round; game notes follow the setting for new games.",
+      "<b>New round & Snapshots:</b> When a meeting ends, click <b>New round</b>. The current round is archived into a permanent snapshot, and the board advances into Round 2 with all your current deductions preserved!",
+    media: {
+      type: "video",
+      webm: "new-round.webm",
+      mp4: "new-round.mp4",
+    },
   },
   {
     description:
-      "<b>Map:</b> Click Show map or press <b>M</b>, then drag beans onto the map to track locations.",
+      "<b>Timeline navigation:</b> Click <b>R1</b>, <b>R2</b>, etc., in the header to inspect past round theories. Cards display an evolution tag (e.g. <b>Now: Hard Clear</b>) to easily spot contradictions!",
   },
   {
     description:
-      "<b>Tasks:</b> Open Tasks to track fake tasks for the selected map and reset them when needed.",
+      "<b>New match:</b> When a game concludes, click <b>New match</b>. This clears round history and resets deductions to Unknown, while keeping your active lobby roster intact.",
+    media: {
+      type: "video",
+      webm: "new-game.webm",
+      mp4: "new-game.mp4",
+    },
   },
   {
     description:
-      "<b>Keyboard shortcuts:</b> <b>N</b> toggles Notes, <b>M</b> toggles the map, and <b>Escape</b> closes Notes.",
+      "<b>Dual notes:</b> Press <b>N</b> to open Notes. Round notes save with each round snapshot, while Match notes persist across the entire game. Multi-language speech-to-text is supported!",
+    media: {
+      type: "video",
+      webm: "taking-notes.webm",
+      mp4: "taking-notes.mp4",
+    },
   },
   {
     description:
-      "<b>Settings, Help, and About:</b> Use the bottom toolbar to customize the app, reopen this guide, or view app information.",
+      "<b>Interactive maps:</b> Press <b>M</b> or click Show map, then drag player beans onto rooms to track sightings and kills. Players who died in earlier rounds are automatically hidden.",
+    media: {
+      type: "video",
+      webm: "tracking-on-map.webm",
+      mp4: "tracking-on-map.mp4",
+    },
+  },
+  {
+    description:
+      "<b>Tasks reference:</b> Click <b>Tasks Reference</b> in the bottom bar to review tasks by room, with warnings for visual tasks and common tasks.",
+    media: {
+      type: "video",
+      webm: "tasks.webm",
+      mp4: "tasks.mp4",
+    },
+  },
+  {
+    description:
+      "<b>Keyboard shortcuts:</b> <b>N</b> = Notes, <b>M</b> = Map, <b>Escape</b> = Close modals. Customize your experience (Board Zoom, theme, languages) in <b>Settings</b>.",
   },
 ];
 

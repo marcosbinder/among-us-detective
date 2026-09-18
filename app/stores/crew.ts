@@ -9,6 +9,7 @@ export interface CrewMember {
   role: string | null;
   roleConfirmed: boolean;
   isDead: boolean;
+  diedInRound?: number;
   previousStatus: ColumnStatus;
   mapPosition: { x: number; y: number } | null;
   playerName: string;
@@ -31,6 +32,7 @@ function createDefaultCrewMembers(): CrewMember[] {
     role: null,
     roleConfirmed: false,
     isDead: false,
+    diedInRound: undefined,
     previousStatus: 'unknown' as ColumnStatus,
     mapPosition: null,
     playerName: "",
@@ -169,50 +171,36 @@ export const useCrewStore = defineStore("crew", () => {
         isActive: existing ? existing.isActive : defaultMember.isActive,
         playerName: existing?.playerName ?? "",
         isPlayer: defaultMember.color === playerColor.value,
+        diedInRound: undefined,
       };
     });
   }
 
   function resetActiveCrew() {
+    const roundsStore = useRoundsStore();
     crewMembers.value = crewMembers.value.map((m) => {
-      // Dead players stay dead across rounds
+      // In a new round, dead players stay dead with their recorded diedInRound
       if (m.isDead || m.status === 'dead') {
         return {
           ...m,
           isDead: true,
           status: 'dead' as ColumnStatus,
-          isDoneWithTasks: false,
-          totalMeetingsHeld: 0,
-        };
-      }
-      // Confirmed deductions persist across rounds
-      if (m.roleConfirmed && m.role) {
-        const isImpostor = (IMPOSTOR_ROLES as readonly string[]).includes(m.role);
-        return {
-          ...m,
-          status: (isImpostor ? 'impostor' : 'hard_clear') as ColumnStatus,
-          isDoneWithTasks: false,
-          totalMeetingsHeld: 0,
-          suspectedBy: [],
-          protectedBy: [],
+          diedInRound: m.diedInRound || (roundsStore.currentRoundNumber - 1) || 1,
           mapPosition: null,
+          totalMeetingsHeld: m.totalMeetingsHeld + 1,
         };
       }
-      // Unconfirmed deductions reset to unknown
+      // All deductions, roles, and claims persist seamlessly into the next round
       return {
         ...m,
-        status: 'unknown' as ColumnStatus,
-        isDead: false,
-        isDoneWithTasks: false,
-        totalMeetingsHeld: 0,
-        suspectedBy: [],
-        protectedBy: [],
         mapPosition: null,
+        totalMeetingsHeld: m.totalMeetingsHeld + 1,
       };
     });
   }
 
   function setPlayerStatus(colorOrId: string, newStatus: ColumnStatus) {
+    const roundsStore = useRoundsStore();
     crewMembers.value = crewMembers.value.map((m) => {
       if (m.color === colorOrId || m.id === colorOrId) {
         let roleConfirmed = m.roleConfirmed;
@@ -230,6 +218,7 @@ export const useCrewStore = defineStore("crew", () => {
             ...m,
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus || 'unknown',
             isDead: true,
+            diedInRound: m.diedInRound || roundsStore.currentRoundNumber,
             status: 'dead' as ColumnStatus,
             roleConfirmed,
           };
@@ -237,6 +226,7 @@ export const useCrewStore = defineStore("crew", () => {
           return {
             ...m,
             isDead: false,
+            diedInRound: undefined,
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus,
             status: newStatus,
             roleConfirmed,
@@ -248,6 +238,7 @@ export const useCrewStore = defineStore("crew", () => {
   }
 
   function togglePlayerDead(colorOrId: string) {
+    const roundsStore = useRoundsStore();
     crewMembers.value = crewMembers.value.map((m) => {
       if (m.color === colorOrId || m.id === colorOrId) {
         if (m.isDead || m.status === 'dead') {
@@ -258,6 +249,7 @@ export const useCrewStore = defineStore("crew", () => {
           return {
             ...m,
             isDead: false,
+            diedInRound: undefined,
             status: restoredStatus as ColumnStatus,
             roleConfirmed: false,
           };
@@ -266,6 +258,7 @@ export const useCrewStore = defineStore("crew", () => {
             ...m,
             previousStatus: m.status,
             isDead: true,
+            diedInRound: roundsStore.currentRoundNumber,
             status: 'dead' as ColumnStatus,
           };
         }
@@ -306,10 +299,12 @@ export const useCrewStore = defineStore("crew", () => {
           roleConfirmed = false;
         }
         if (status === 'dead') {
+          const roundsStore = useRoundsStore();
           return {
             ...m,
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus || 'unknown',
             isDead: true,
+            diedInRound: m.diedInRound || roundsStore.currentRoundNumber,
             status: 'dead' as ColumnStatus,
             role,
             roleConfirmed,
@@ -318,6 +313,7 @@ export const useCrewStore = defineStore("crew", () => {
           return {
             ...m,
             isDead: false,
+            diedInRound: undefined,
             previousStatus: m.status !== 'dead' ? m.status : m.previousStatus,
             status: status,
             role,

@@ -1,14 +1,20 @@
 <template>
   <section class="relative map-player-tracker">
-    <button
-      v-if="activeCrewMembers.length > 0"
-      class="absolute right-0 button-sm"
-      @click="resetPositions"
-    >
-      Reset positions
-    </button>
+    <div class="flex justify-between items-center mb-1">
+      <div v-if="roundsStore.isViewingHistory" class="text-xs text-amber-500 font-semibold">
+        🕒 Round {{ roundsStore.viewingRoundNumber }} Map Snapshot (Read-Only)
+      </div>
+      <div v-else />
+      <button
+        v-if="trackedCrewMembers.length > 0 && !roundsStore.isViewingHistory"
+        class="button-sm"
+        @click="resetPositions"
+      >
+        Reset positions
+      </button>
+    </div>
     <div class="container">
-      <template v-for="(item, index) in moveableItems" :key="item.member.color">
+      <template v-for="item in moveableItems" :key="item.member.color">
         <div
           :ref="(el) => setTargetRef(el, item.member.color)"
           class="inline-flex moveable-target"
@@ -26,7 +32,7 @@
           />
         </div>
         <Moveable
-          v-if="item.target"
+          v-if="item.target && !roundsStore.isViewingHistory"
           :key="`${item.member.color}-moveable`"
           :target="item.target"
           v-bind="moveableOptions"
@@ -41,20 +47,58 @@
 import Moveable from "vue3-moveable";
 
 const crewStore = useCrewStore();
+const roundsStore = useRoundsStore();
 const settingsStore = useSettingsStore();
-const { activeCrewMembers } = storeToRefs(crewStore);
 const { highlightColorNames, showPlayerNames, showMapColorNames } = storeToRefs(settingsStore);
 
 const targetRefs = ref<Record<string, HTMLElement | null>>({});
 
+// Hide players who died in rounds prior to the currently displayed round
+const trackedCrewMembers = computed(() => {
+  if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
+    const snap = roundsStore.activeSnapshot;
+    return snap.crewMembers.filter(
+      (m) => m.isActive && (!m.isDead || m.diedInRound === snap.roundNumber)
+    );
+  }
+  return crewStore.activeCrewMembers.filter(
+    (m) => !m.isDead || (m.diedInRound != null && m.diedInRound === roundsStore.currentRoundNumber)
+  );
+});
+
 const moveableItems = computed(() =>
-  activeCrewMembers.value.map((member) => ({
+  trackedCrewMembers.value.map((member) => ({
     member,
     target: targetRefs.value[member.color] ?? null,
   }))
 );
 
-watch(activeCrewMembers, (members) => {
+function getMemberTransform(color: string): string {
+  if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
+    return roundsStore.activeSnapshot.mapPositions?.[color] || "";
+  }
+  return roundsStore.currentMapPositions[color] || "";
+}
+
+function applyAllTransforms() {
+  nextTick(() => {
+    Object.keys(targetRefs.value).forEach((color) => {
+      const el = targetRefs.value[color];
+      if (el) {
+        el.style.transform = getMemberTransform(color);
+      }
+    });
+  });
+}
+
+watch(
+  () => [roundsStore.viewingRoundNumber, roundsStore.currentRoundNumber],
+  () => {
+    applyAllTransforms();
+  }
+);
+
+watch(trackedCrewMembers, (members) => {
   const activeColors = new Set(members.map((member) => member.color));
 
   Object.keys(targetRefs.value).forEach((color) => {
@@ -62,6 +106,7 @@ watch(activeCrewMembers, (members) => {
       delete targetRefs.value[color];
     }
   });
+  applyAllTransforms();
 });
 
 const moveableOptions = { draggable: true };
@@ -71,7 +116,11 @@ const setTargetRef = (
   color: string
 ) => {
   const element = el instanceof Element ? el : el?.$el;
-  targetRefs.value[color] = element instanceof HTMLElement ? element : null;
+  const htmlEl = element instanceof HTMLElement ? element : null;
+  targetRefs.value[color] = htmlEl;
+  if (htmlEl) {
+    htmlEl.style.transform = getMemberTransform(color);
+  }
 };
 
 const handleDrag = ({
@@ -81,13 +130,21 @@ const handleDrag = ({
   target: HTMLElement | SVGElement;
   transform: string;
 }) => {
+  if (roundsStore.isViewingHistory) return;
   target.style.transform = transform;
+  const color = Object.keys(targetRefs.value).find(
+    (c) => targetRefs.value[c] === target
+  );
+  if (color) {
+    roundsStore.setMapPosition(color, transform);
+  }
 };
 
 const resetPositions = () => {
+  if (roundsStore.isViewingHistory) return;
+  roundsStore.clearMapPositions();
   moveableItems.value.forEach((item) => {
     const target = item.target;
-
     if (target) {
       target.style.transform = "";
     }

@@ -228,6 +228,26 @@
               />
             </div>
 
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-speech-language"
+            >
+              <div class="flex flex-col">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Voice speech language</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">Microphone dictation in Notes</span>
+              </div>
+              <select
+                :value="settingsStore.speechLanguage"
+                class="px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                @change="(e: Event) => settingsStore.setSpeechLanguage((e.target as HTMLSelectElement).value as any)"
+              >
+                <option value="auto">Auto (Browser)</option>
+                <option value="pt-BR">Português (Brasil)</option>
+                <option value="en-US">English (US)</option>
+                <option value="es-ES">Español</option>
+              </select>
+            </div>
+
             <!-- Map -->
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Map</div>
 

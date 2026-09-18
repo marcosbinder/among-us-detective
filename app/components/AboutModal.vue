@@ -53,10 +53,10 @@
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
             <div class="space-y-0.5">
               <span class="block">
-                Original project by <a href="https://atlesque.dev" class="text-blue-500 hover:underline font-medium">Atlesque</a>
+                Original project by <a href="https://atlesque.dev" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline font-medium">Atlesque</a>
               </span>
               <span class="block">
-                Modernized & enhanced by <span class="font-medium text-gray-700 dark:text-gray-300">Marcos Binder</span>
+                Modernized & enhanced by <a href="https://github.com/marcosbinder" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 hover:underline font-medium">Marcos Binder</a>
               </span>
             </div>
             <div class="flex flex-col items-end gap-1.5">

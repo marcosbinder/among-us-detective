@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+declare const process: any;
+
 export default defineNuxtConfig({
   devtools: {
     enabled: false,

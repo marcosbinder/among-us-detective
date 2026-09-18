@@ -13,9 +13,14 @@ export const useSettingsStore = defineStore(
     const canTrackOwnColor = ref(true);
     const isImproveMapContrastEnabled = ref(true);
     const boardZoom = ref<'compact' | 'normal' | 'large' | 'extra-large'>('normal');
+    const speechLanguage = ref<'auto' | 'pt-BR' | 'en-US' | 'es-ES'>('auto');
 
     function setBoardZoom(value: 'compact' | 'normal' | 'large' | 'extra-large') {
       boardZoom.value = value;
+    }
+
+    function setSpeechLanguage(value: 'auto' | 'pt-BR' | 'en-US' | 'es-ES') {
+      speechLanguage.value = value;
     }
 
     function setHighlightColorNames(value: boolean) {
@@ -65,6 +70,7 @@ export const useSettingsStore = defineStore(
       canTrackOwnColor,
       isImproveMapContrastEnabled,
       boardZoom,
+      speechLanguage,
       setHighlightColorNames,
       setShowImposterCheckbox,
       setShowTasksCheckbox,
@@ -77,6 +83,7 @@ export const useSettingsStore = defineStore(
       setCanTrackOwnColor,
       setIsImproveMapContrastEnabled,
       setBoardZoom,
+      setSpeechLanguage,
     };
   },
   { persist: true }

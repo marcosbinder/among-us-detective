@@ -1,5 +1,18 @@
 <template>
   <div class="flex flex-col" data-test="notes-container">
+    <div
+      v-if="roundsStore.isViewingHistory"
+      class="p-2 mb-2 bg-amber-500/10 border border-amber-500/30 rounded text-amber-500 text-xs font-semibold flex items-center justify-between"
+    >
+      <span>🕒 Archived notes from Round {{ roundsStore.viewingRoundNumber }} (Read-Only)</span>
+      <button
+        class="text-[11px] underline hover:text-amber-400 font-bold"
+        @click="roundsStore.setViewingRound(null)"
+      >
+        Return to Live
+      </button>
+    </div>
+
     <div v-show="showRoundNotes" class="my-2 round-notes-wrapper">
       <span class="text-sm text-red-500">{{ speechError }}</span>
       <div class="flex justify-between">
@@ -8,10 +21,13 @@
             for="round-notes"
             class="block mr-1 text-sm font-medium leading-5 text-gray-700 dark:text-gray-300"
           >
-            This round
+            <template v-if="roundsStore.isViewingHistory">
+              Round {{ roundsStore.viewingRoundNumber }} Notes
+            </template>
+            <template v-else>This round</template>
           </label>
           <button
-            v-if="isSpeechRecognitionSupported"
+            v-if="isSpeechRecognitionSupported && !roundsStore.isViewingHistory"
             class="relative flex items-center justify-center w-8 h-8 record-round-button"
             :class="{
               'text-player-green': isRecordingRoundNotes,
@@ -23,16 +39,21 @@
             <span class="icon-mic" />
           </button>
         </div>
-        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">Cleared each round</span>
+        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+          <template v-if="roundsStore.isViewingHistory">Snapshot (read-only)</template>
+          <template v-else>Cleared each round</template>
+        </span>
       </div>
       <div class="relative mt-1 rounded-md">
         <textarea
           id="round-notes"
           ref="roundNotesEl"
-          v-model="roundNotes"
+          v-model="displayRoundNotes"
+          :readonly="roundsStore.isViewingHistory"
           placeholder="e.g. Red saw me do medbay"
           rows="5"
           class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          :class="{ 'opacity-80 bg-gray-50 dark:bg-gray-900 cursor-not-allowed': roundsStore.isViewingHistory }"
         />
       </div>
     </div>
@@ -87,6 +108,7 @@ declare const webkitSpeechRecognition: any;
 declare const webkitSpeechGrammarList: any;
 
 const notesStore = useNotesStore();
+const roundsStore = useRoundsStore();
 const settingsStore = useSettingsStore();
 const { resetNotesOnNewGame, showRoundNotes } = storeToRefs(settingsStore);
 
@@ -105,9 +127,15 @@ const isSpeechRecognitionSupported = computed(
   () => typeof webkitSpeechRecognition !== "undefined"
 );
 
-const roundNotes = computed({
-  get: () => notesStore.roundNotes,
+const displayRoundNotes = computed({
+  get: () => {
+    if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
+      return roundsStore.activeSnapshot.roundNotes || "";
+    }
+    return notesStore.roundNotes;
+  },
   set: (value: string) => {
+    if (roundsStore.isViewingHistory) return;
     notesStore.setRoundNotes(value);
     roundNotesHighlighter?.handleInput();
   },
@@ -120,6 +148,33 @@ const gameNotes = computed({
     gameNotesHighlighter?.handleInput();
   },
 });
+
+function getEffectiveSpeechLanguage(): string {
+  if (settingsStore.speechLanguage === "auto") {
+    return typeof navigator !== "undefined" && navigator.language
+      ? navigator.language
+      : "en-US";
+  }
+  return settingsStore.speechLanguage;
+}
+
+watch(
+  () => settingsStore.speechLanguage,
+  () => {
+    if (speechRecognition) {
+      speechRecognition.lang = getEffectiveSpeechLanguage();
+    }
+  }
+);
+
+watch(
+  () => roundsStore.viewingRoundNumber,
+  () => {
+    nextTick(() => {
+      roundNotesHighlighter?.handleInput();
+    });
+  }
+);
 
 onMounted(() => {
   const playerHighlightColors = (allColors as string[]).map((color) => ({
@@ -146,7 +201,7 @@ function initSpeechRecording() {
   speechRecognition.continuous = true;
   speechRecognition.interimResults = true;
   speechRecognition.maxAlternatives = 1;
-  speechRecognition.lang = "en-US";
+  speechRecognition.lang = getEffectiveSpeechLanguage();
 
   if (
     typeof webkitSpeechGrammarList !== "undefined" &&
