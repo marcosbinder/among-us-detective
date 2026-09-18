@@ -4,7 +4,10 @@
       v-if="roundsStore.isViewingHistory"
       class="p-2 mb-2 bg-amber-500/10 border border-amber-500/30 rounded text-amber-500 text-xs font-semibold flex items-center justify-between"
     >
-      <span>🕒 Archived notes from Round {{ roundsStore.viewingRoundNumber }} (Read-Only)</span>
+      <span class="flex items-center gap-1">
+        <AppIcon name="clock" class="w-3.5 h-3.5 shrink-0" />
+        <span>Archived notes from Round {{ roundsStore.viewingRoundNumber }} (Read-Only)</span>
+      </span>
       <button
         class="text-[11px] underline hover:text-amber-400 font-bold"
         @click="roundsStore.setViewingRound(null)"

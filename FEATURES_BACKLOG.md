@@ -252,4 +252,26 @@ On mobile and split-screen, double-clicking to mark a player dead is unreliable 
 - Viewport safe area padding for notched mobile displays.
 
 ---
+
+## Feature 16: Modernize & Improve Disclaimer (`app/pages/disclaimer.vue`)
+### 🎯 Purpose & User Story
+- Replace outdated 2020 text on `/disclaimer` with a modern, authoritative, and reassuring explanation.
+- Detail 100% compliance with Innersloth's Companion & Modding policy:
+  - This is an external digital companion notepad.
+  - Zero memory reading, zero injection, zero file manipulation.
+  - Safe and legal for standard online play.
+- Implement responsive dark mode card UI with clear typographic hierarchy and return button.
+
+---
+
+## Feature 17: Help Modal & Tutorial Video/Visual Walkthrough Overhaul (`app/components/HelpModal.vue`)
+### 🎯 Purpose & User Story
+- Update `HelpModal.vue` and media assets with re-recorded video demonstrations reflecting v2.0 improvements.
+- Step-by-step guidance for players:
+  - Setting up the 18-player roster and picking your color.
+  - How to log claims and roles during discussions.
+  - Explaining the vital difference between **"Next Round (Meeting ended)"** (saving snapshot of current meeting) and **"New Match (Reset game)"** (starting a brand new game).
+  - How to drop room pins on interactive maps.
+
+---
 *Maintained by Marcos Binder for Among Us Detective.*

@@ -1,31 +1,18 @@
 <template>
-  <div class="flex flex-col p-2 pb-12 lg:p-8 lg:pb-14">
+  <div class="flex flex-col p-2 pb-20 sm:pb-24 lg:p-8 lg:pb-24">
     <!-- Header Action Controls -->
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-      <!-- Left: Notes -->
-      <div class="flex items-center gap-1.5">
-        <button
-          class="h-9 px-3 text-sm button font-medium flex items-center gap-1.5"
-          data-test="notes-btn"
-          title="Open notes (N)"
-          @click="toggleNotesModal"
-        >
-          <span class="icon-pencil text-xs opacity-80" />
-          <span>Notes</span>
-          <kbd class="hidden sm:inline-block text-[10px] px-1.5 py-0.2 rounded bg-black/20 text-gray-300 font-mono border border-white/10">N</kbd>
-        </button>
-      </div>
-
-      <!-- Center: Round Timeline Selector -->
-      <div class="flex items-center gap-1 bg-gray-200/80 dark:bg-gray-900/80 p-1 rounded-lg border border-gray-300 dark:border-gray-800 shadow-inner overflow-x-auto max-w-full">
-        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1.5 shrink-0">
-          Round
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+      <!-- Left: Round Timeline Selector -->
+      <div class="flex items-center gap-1 bg-gray-200/80 dark:bg-gray-900/80 p-1 rounded-lg border border-gray-300 dark:border-gray-800 shadow-inner overflow-x-auto min-w-0 max-w-full">
+        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1.5 shrink-0 flex items-center gap-1">
+          <AppIcon name="clock" class="w-3.5 h-3.5 shrink-0" />
+          <span class="hidden md:inline">Timeline</span>
         </span>
         <button
           v-for="s in roundsStore.roundHistory"
           :key="s.roundNumber"
           type="button"
-          class="px-2 py-0.5 text-xs font-bold rounded transition-colors shrink-0"
+          class="px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-bold rounded-md transition-colors shrink-0"
           :class="roundsStore.viewingRoundNumber === s.roundNumber
             ? 'bg-indigo-600 text-white shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-300/50 dark:hover:bg-gray-800'"
@@ -36,39 +23,62 @@
 
         <button
           type="button"
-          class="px-2.5 py-0.5 text-xs font-bold rounded transition-colors flex items-center gap-1 shrink-0"
+          class="px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-bold rounded-md transition-colors flex items-center gap-1 shrink-0"
           :class="!roundsStore.isViewingHistory
             ? 'bg-emerald-600 text-white shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:text-emerald-500 hover:bg-gray-300/50 dark:hover:bg-gray-800'"
           @click="roundsStore.setViewingRound(null)"
         >
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>R{{ roundsStore.currentRoundNumber }} (Live)</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <span>R{{ roundsStore.currentRoundNumber }}</span>
+          <span class="text-[10px] opacity-80 hidden sm:inline">(Live)</span>
         </button>
       </div>
 
-      <!-- Right: Round / Match Controls -->
-      <div class="flex items-center gap-1.5">
+      <!-- Right: Meeting / Match Controls -->
+      <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+        <!-- Next Round Button (Primary Action for End of Meeting) -->
         <button
-          class="h-9 px-3 text-sm button button-success font-bold flex items-center gap-1.5 shadow-sm"
-          :disabled="crewStore.activeCrewMembers.length <= 0 || roundsStore.isViewingHistory"
+          class="h-9 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm flex-1 sm:flex-initial justify-center"
+          :class="crewStore.activeCrewMembers.length > 0 && !roundsStore.isViewingHistory && !roundsStore.isMaxRoundsReached
+            ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 shadow-emerald-950/30'
+            : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
+          :disabled="crewStore.activeCrewMembers.length <= 0 || roundsStore.isViewingHistory || roundsStore.isMaxRoundsReached"
           data-test="new-round-btn"
-          title="Meeting complete — archive round snapshot and advance to next round"
+          :title="roundsStore.isMaxRoundsReached ? 'Maximum rounds reached (10 rounds)' : 'Meeting concluded — archive round snapshot and advance to next meeting'"
           @click="initNewRound"
         >
-          <span>New round</span>
+          <AppIcon name="bell" class="w-4 h-4 shrink-0" />
+          <div class="flex flex-col text-left leading-none">
+            <div class="flex items-center gap-1">
+              <span>Next Round</span>
+              <span v-if="roundsStore.isMaxRoundsReached" class="text-[9px] text-amber-300 font-semibold">(Max R10)</span>
+            </div>
+            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">Meeting ended</span>
+          </div>
         </button>
+
+        <div class="h-6 w-px bg-gray-700/60 hidden sm:block" />
+
+        <!-- New Match Button (Destructive / Full Reset Action) -->
         <button
-          class="h-9 px-3 text-sm button button-warning font-bold flex items-center gap-1.5 shadow-sm"
+          class="h-9 px-2.5 sm:px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 justify-center"
+          :class="crewStore.activeCrewMembers.length > 0
+            ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/40'
+            : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
           :disabled="crewStore.activeCrewMembers.length <= 0"
           data-test="new-game-btn"
-          title="Full reset — reset match, keep selected lobby roster and player names"
+          title="Game concluded — reset deduction board for a new game (preserves lobby roster)"
           @click="initNewMatch"
         >
-          <span>New match</span>
+          <AppIcon name="refresh" class="w-3.5 h-3.5 shrink-0" />
+          <div class="flex flex-col text-left leading-none">
+            <span>New Match</span>
+            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">Reset game</span>
+          </div>
         </button>
       </div>
-    </div>
+    </header>
 
     <!-- Match Lobby & Roster Selector (18 Colors, Glowing LEDs, Presets) -->
     <GameRosterSelector />
@@ -80,7 +90,7 @@
       data-test="zoom-warning-banner"
     >
       <div class="flex items-center gap-2 min-w-0">
-        <span class="text-sm shrink-0">⚠️</span>
+        <AppIcon name="alert" class="w-4 h-4 text-amber-500 shrink-0" />
         <div class="leading-tight text-[11px] sm:text-xs">
           <span>Browser zoom detected. If columns feel cramped, use built-in <strong>Board Zoom</strong> in </span>
           <button
@@ -95,11 +105,11 @@
       </div>
       <button
         type="button"
-        class="shrink-0 p-1 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 rounded text-xs font-bold leading-none"
+        class="shrink-0 p-1 text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 rounded text-xs font-bold leading-none flex items-center justify-center"
         title="Dismiss notice"
         @click="dismissZoomNotice"
       >
-        ✕
+        <AppIcon name="close" class="w-3.5 h-3.5" />
       </button>
     </div>
 
@@ -109,7 +119,7 @@
       class="mb-3 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/40 text-indigo-900 dark:text-indigo-200 text-xs flex items-center justify-between gap-2 shadow-sm"
     >
       <div class="flex items-center gap-2 min-w-0">
-        <span class="text-sm shrink-0">🕒</span>
+        <AppIcon name="clock" class="w-4 h-4 text-indigo-400 shrink-0" />
         <span class="leading-tight text-[11px] sm:text-xs">
           Viewing historical snapshot for <strong>Round {{ roundsStore.viewingRoundNumber }}</strong> (Read-Only). Cards reflect past theories.
         </span>
@@ -121,6 +131,12 @@
       >
         Return to Live →
       </button>
+    </div>
+
+    <!-- Mobile Touch Drag Hint -->
+    <div class="lg:hidden flex items-center justify-center gap-1.5 py-1 px-2 mb-1.5 text-[11px] text-gray-500 dark:text-gray-400 select-none">
+      <AppIcon name="touch" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+      <span>Tip: Press &amp; hold card briefly to drag</span>
     </div>
 
     <!-- 6 Strict Deduction Hierarchy Columns -->
@@ -139,44 +155,82 @@
       @removed="handleMemberRemoved"
     />
 
-    <!-- Bottom Footer Toolbar -->
-    <div class="fixed bottom-0 left-0 right-0 z-20 flex justify-between items-center px-3 py-1.5 bg-black/60 backdrop-blur-sm border-t border-gray-800/50">
-      <div class="flex items-center">
+    <!-- Modern Bottom Detective Toolbar (Persistent Dock) -->
+    <footer class="fixed bottom-0 left-0 right-0 z-30 h-12 flex items-center justify-between px-2 sm:px-4 md:px-6 bg-gray-900/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-700/60 dark:border-gray-800/80 shadow-2xl">
+      <!-- Left: Investigation Tools (Notes, Map, Tasks) -->
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <!-- Notes Button (Prominent & Evident) -->
         <button
-          class="px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors flex items-center gap-1"
+          class="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm flex items-center gap-1.5 transition-all shrink-0"
+          data-test="notes-btn"
+          title="Open Detective Notes (N)"
+          @click="toggleNotesModal"
+        >
+          <AppIcon name="notes" class="w-3.5 h-3.5 shrink-0" />
+          <span>Notes</span>
+          <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-blue-100 font-mono">N</kbd>
+        </button>
+
+        <!-- Map Toggle Button -->
+        <button
+          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shrink-0"
+          :class="mapsStore.isMapVisible
+            ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/40'
+            : 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700/60'"
+          data-test="toggle-map-btn"
+          title="Toggle Interactive Map"
+          @click="toggleMapVisibility"
+        >
+          <AppIcon name="map" class="w-3.5 h-3.5 shrink-0" />
+          <span>{{ mapsStore.isMapVisible ? 'Hide' : 'Map' }}</span>
+        </button>
+
+        <!-- Tasks Reference Button -->
+        <button
+          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors flex items-center gap-1.5 shrink-0"
           data-test="tasks-btn"
-          title="Open tasks reference guide"
+          title="Open Tasks & Visual Reference Guide"
           @click="isTasksModalOpen = true"
         >
-          <span class="icon-list text-xs opacity-70" />
-          <span>Tasks Reference</span>
+          <AppIcon name="tasks" class="w-3.5 h-3.5 shrink-0 opacity-80" />
+          <span>Tasks</span><span class="hidden sm:inline">&nbsp;Guide</span>
         </button>
       </div>
 
-      <div class="flex items-center">
+      <!-- Right: System Controls (Settings, Help, About) -->
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
-          class="mr-2 px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
           data-test="settings-btn"
+          title="Settings"
+          aria-label="Settings"
           @click="toggleSettingsModal"
         >
-          Settings
+          <AppIcon name="settings" class="w-4 h-4 shrink-0" />
+          <span class="hidden sm:inline">Settings</span>
         </button>
         <button
-          class="mr-2 px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
           data-test="help-btn"
+          title="How to play / Tutorial"
+          aria-label="Help"
           @click="toggleHelpModal"
         >
-          Help
+          <AppIcon name="help" class="w-4 h-4 shrink-0" />
+          <span class="hidden sm:inline">Help</span>
         </button>
         <button
-          class="px-2.5 py-0.5 text-xs font-medium rounded bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
           data-test="about-btn"
+          title="About Among Us Detective"
+          aria-label="About"
           @click="toggleAboutModal"
         >
-          About
+          <AppIcon name="about" class="w-4 h-4 shrink-0" />
+          <span class="hidden sm:inline">About</span>
         </button>
       </div>
-    </div>
+    </footer>
 
     <div class="relative">
       <Maps />
@@ -201,7 +255,17 @@ const settingsStore = useSettingsStore()
 const notesStore = useNotesStore()
 const tasksStore = useTasksStore()
 const roundsStore = useRoundsStore()
+const mapsStore = useMapsStore()
 const { gtag } = useGtag()
+
+function toggleMapVisibility() {
+  mapsStore.toggleMap()
+  if (mapsStore.isMapVisible) {
+    nextTick(() => {
+      document.querySelector('.map-container')?.scrollIntoView({ behavior: 'smooth' })
+    })
+  }
+}
 
 const isHelpModalOpen = ref(false)
 const isAboutModalOpen = ref(false)

@@ -1,30 +1,25 @@
 <template>
   <div>
-    <div class="flex flex-col mb-2 md:flex-row">
+    <div class="flex flex-col mb-2 md:flex-row items-start md:items-center gap-2">
       <button
-        v-show="!isMapVisible"
-        class="self-start py-1 button-sm"
+        class="h-8 px-3 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 shadow-sm"
+        :class="mapsStore.isMapVisible
+          ? 'bg-blue-600/20 text-blue-400 border-blue-500/40 hover:bg-blue-600/30'
+          : 'bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700/60'"
         data-test="toggle-map-btn"
-        @click="isMapVisible = true"
+        @click="mapsStore.toggleMap()"
       >
-        Show map
-      </button>
-      <button
-        v-show="isMapVisible"
-        class="self-start py-1 md:rounded-r-none button-sm"
-        data-test="toggle-map-btn"
-        @click="isMapVisible = false"
-      >
-        Hide map
+        <AppIcon name="map" class="w-3.5 h-3.5 shrink-0" />
+        <span>{{ mapsStore.isMapVisible ? 'Hide map' : 'Show map' }}</span>
       </button>
       <div
-        v-show="isMapVisible"
-        class="flex self-start p-1 mt-2 rounded md:rounded-l-none bg-blue-900 dark:bg-gray-900 md:mt-0"
+        v-show="mapsStore.isMapVisible"
+        class="flex items-center p-1 rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
       >
         <MapSelector :selected-map="mapsStore.selectedMap" @map-selected="selectMap" />
       </div>
     </div>
-    <div v-show="isMapVisible" class="mx-auto map-container" data-test="map-container">
+    <div v-show="mapsStore.isMapVisible" class="mx-auto map-container" data-test="map-container">
       <MapPlayerTracker class="z-10" />
       <div
         class="map-picture-container"
@@ -82,7 +77,6 @@ const notesStore = useNotesStore()
 const settingsStore = useSettingsStore()
 const { gtag } = useGtag()
 
-const isMapVisible = ref(false)
 const areSensorsVisible = ref(false)
 let keyupListener: ((e: KeyboardEvent) => void) | null = null
 
@@ -98,7 +92,7 @@ onMounted(() => {
       !notesStore.areNotesOpen &&
       !settingsStore.settingsModalOpenState
     ) {
-      isMapVisible.value = !isMapVisible.value
+      mapsStore.toggleMap()
     }
   }
   document.addEventListener('keyup', keyupListener)

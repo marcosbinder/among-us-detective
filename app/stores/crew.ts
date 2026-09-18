@@ -434,8 +434,8 @@ export const useCrewStore = defineStore("crew", () => {
 
   function setPresetPlayerCount(count: number) {
     crewMembers.value = crewMembers.value.map((m, idx) => {
-      // ME is always active!
-      const isActive = m.color === playerColor.value || idx < count;
+      // ME is active unless count is 0
+      const isActive = count === 0 ? false : (m.color === playerColor.value || idx < count);
       return {
         ...m,
         isActive,

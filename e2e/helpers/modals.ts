@@ -25,7 +25,7 @@ export async function openTasks(page: Page): Promise<void> {
     .locator("[data-test='tasks-btn']:visible")
     .first()
     .click();
-  await page.waitForSelector("[data-test='reset-tasks-btn']", {
+  await page.waitForSelector("[role='dialog']", {
     state: "visible",
   });
 }

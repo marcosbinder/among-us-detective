@@ -32,9 +32,11 @@ This document serves as the single source of truth for all modernizations, featu
 ### 1.1 Match Lobby & Roster Selector (`app/components/GameRosterSelector.vue`)
 - **18 Official Among Us Colors**: All colors represented by mini bean avatars with status LEDs.
 - **Count Indicator**: Tracks active players out of 15 (calculates how many are not in game).
+- **Responsive Sizing**: Compact 36px bean tiles on mobile (so all 18 fit in 2 rows instead of taking half the screen) and 48-54px on desktop.
 - **Collapsible/Minimizable Panel**: Includes an `isMinimized` toggle button to collapse the roster mid-game and save vertical screen space.
-- **Presets**: 10 Players, 15 Players, and All 18 Players quick buttons.
+- **Presets**: 15 Players, All 18 Players, and Clear (cleaned up obsolete 10-player button).
 - **"ME" Isolation**: User's own player is prominently displayed in a `ME: (Color)` badge, cannot be deactivated, and is excluded from deduction clutter.
+- **Touch Adaptation**: "Right click to set as Me" hint is displayed on PC only (`hidden md:inline`).
 
 ### 1.2 3-Column Split-Screen Deduction Board (`app/components/CrewTracker.vue`)
 - **Optimized 3-Column Layout**:
@@ -44,7 +46,12 @@ This document serves as the single source of truth for all modernizations, featu
 - **Zero-Clip Wrapping**: Removed rigid `overflow-hidden` and equal `flex-1` splits so 15–18 player beans wrap seamlessly into 2 or 3 rows without getting cut in half.
 - **Drag-and-Drop**: Full drag-and-drop support across all 6 columns (`vuedraggable`).
 
-### 1.3 Compact Floating Role Popover (`app/components/PlayerCard.vue`)
+### 1.3 Mobile Touch Drag-and-Drop with Finger Tracking (`app/components/CrewPool.vue`)
+- **Finger Tracking Fallback**: Uses `:force-fallback="true"` and `:fallback-on-body="true"` so that during mobile dragging, the card physically follows the player's finger across the screen instead of remaining fixed.
+- **Scroll Protection**: `:delay="160"` with `:delay-on-touch-only="true"` and `:touch-start-threshold="4"` prevents page scrolling from triggering accidental card drags.
+- **High-Performance CSS**: `transition: none !important;` on `.sortable-fallback` ensures instantaneous 1:1 finger tracking without animation lag.
+
+### 1.4 Compact Floating Role Popover (`app/components/PlayerCard.vue`)
 - **Anchored Popover**: Small (~215px wide) floating menu anchored right next to the clicked tile (`getBoundingClientRect`), flipping to the left if near the right edge of the screen.
 - **Non-Intrusive**: No full-screen dark/blurred backdrop. Screen remains 100% visible and interactive.
 - **Auto-Dismiss on Scroll & Drag**: Intercepts page scroll and card drag events to immediately close the popover, preventing it from floating/following the viewport.
@@ -53,21 +60,21 @@ This document serves as the single source of truth for all modernizations, featu
   - **Crew Roles**: 5 official roles (Detective, Judge, Scientist, Engineer, Noisemaker).
   - **Impostor Roles**: 3 official roles (Shapeshifter, Phantom, Viper).
   - **Claim Status**: One-click toggle between `✓ Verified` and `? Unverified`, plus a `✕ Clear Role` button.
+  - **Direct Mark as Dead / Revive**: Quick action with "Died in Round X" badge.
 - **Official Local PNG Icons**: 8 official high-res PNG icons stored in `public/images/roles/` with zero external image dependencies.
 
-### 1.4 Deductive Trigger Automation (`app/stores/crew.ts`)
-- **Claim Triggers**:
-  - Assigning a Crew role automatically moves player to `trusted` (unless already in `hard_clear`).
-  - Assigning an Impostor role automatically moves player to `suspicious` (unless already in `impostor`).
-- **Confirmation Triggers**:
-  - Confirming Crew (`roleConfirmed = true`) automatically promotes player to `hard_clear`.
-  - Confirming Impostor (`roleConfirmed = true`) automatically moves player to `impostor`.
-  - Dragging a confirmed player out of `hard_clear` or `impostor` automatically reverts them to an unconfirmed claim (`?`) while preserving their assigned role.
+### 1.5 Round Timeline & Snapshot History (`app/stores/rounds.ts`, `app/pages/index.vue`)
+- **Meeting Snapshots**: Clicking "Next Round" archives complete board state into round snapshots.
+- **Interactive Timeline**: Allows read-only historical inspection of past rounds to detect shifting claims and lies.
+- **Contradiction Badges**: Displays current live status difference if viewing past rounds.
+- **Round Ceiling**: Limited to a clean 10 rounds max with inline warning badge.
 
-### 1.5 Dark Mode & Performance
-- Configured `darkMode: ['class', '.dark-mode']` in `tailwind.config.js`.
-- Fixed white flash with dedicated `app/spa-loading-template.html`.
-- Disabled heavy Sentry AST dev instrumentation for instant Vite startup.
+### 1.6 Modern Bottom Dock & Top Controls (`app/pages/index.vue`)
+- **Top Bar**: "Next Round (Meeting ended)" and "New Match (Reset game)" clearly explained with subtitles on all screen sizes including mobile.
+- **Persistent Bottom Dock**: Quick 1-click access to Notes (with hotkey [N]), Map, Tasks Reference Guide, Settings, Help, and About.
+
+### 1.7 Detailed v2.0 Changelog (`app/components/Changelog.vue`)
+- Explicitly documents both **Added Features** and **Cleaned Up / Removed Legacy Elements** (removed old modals, emojis, table layouts, redundant buttons).
 
 ---
 
@@ -223,6 +230,22 @@ This document serves as the single source of truth for all modernizations, featu
 - **Specification**:
   - Subtle sound cues or border flash for meeting called, body reported, or round timer expiration.
   - Setting toggle to mute/unmute audio effects.
+
+### 5.4 Modernize & Improve Disclaimer (`app/pages/disclaimer.vue`)
+- **Files**: `app/pages/disclaimer.vue`, `app/components/AboutModal.vue`
+- **Specification**:
+  - Full modern rewrite replacing legacy 2020 text with clean, authoritative legal clarity.
+  - Reaffirm 100% compliance with Innersloth's Companion & Modding policy: purely an external manual digital notepad; does not hook game memory, inject code, or alter files.
+  - Modern card-based UI with dark mode support, crisp typography, and direct navigation back to app.
+
+### 5.5 Help Modal & Tutorial Video Overhaul (`app/components/HelpModal.vue`)
+- **Files**: `app/components/HelpModal.vue`, `public/help/`
+- **Specification**:
+  - Re-record / update walkthrough demonstrations showing new v2 features.
+  - Clear user guide explaining:
+    - How to record claims and locations during task phases vs meetings.
+    - Exactly when to use "Next Round (Meeting ended)" vs "New Match (Reset game)".
+    - How to use room pins on maps and verify claimed roles.
 
 ---
 

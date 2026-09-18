@@ -11,13 +11,14 @@
 
 <script setup lang="ts">
 const upcomingChanges: string[] = [
+  'Disclaimer Modernization — overhaul disclaimer with current Innersloth companion tool policies, legal clarity, and modern dark-mode styling',
+  'Help & Tutorial Video/Visual Overhaul — re-recorded video demonstrations and interactive walkthrough on how to use the lobby, meeting rounds, and deduction tracking',
   'Dedicated Impostor Mode — specialized workspace when playing as Impostor with kill cooldown tracker, alibi disruption tools, fake task router, and sabotage coordination',
   'Map Location Drop Pins — drag player tokens onto map rooms as (x, y) pins without removing cards from the deduction board',
   'Clear Map Tokens — one-click wipe for round map pins between meetings',
   'Dual Focus-Safe Notes — volatile round notepad (auto-cleared each round) and persistent match notes with proper cursor focus retention',
   'Fix tracking fellow imposters when you are an impostor too',
   'Optional saving of all state after page reload',
-  'Fix double-click shortcuts on mobile',
-  'Text guide for new players',
+  'Audio & sensory feedback (subtle clicks and meeting bells via Web Audio API)',
 ]
 </script>

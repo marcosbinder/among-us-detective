@@ -36,7 +36,7 @@
           <span class="text-[9px] text-yellow-400/60 group-hover:text-yellow-400 transition-colors ml-0.5">▼</span>
         </button>
         <span
-          class="inline max-w-[92px] text-[8px] sm:max-w-none sm:text-[9px] font-semibold leading-tight text-gray-400 dark:text-gray-500"
+          class="hidden md:inline text-[9px] font-semibold leading-tight text-gray-400 dark:text-gray-500"
           title="Right-click a player bean to set it as Me"
         >
           Right click to set as Me
@@ -44,8 +44,8 @@
       </div>
 
       <!-- Presets & Collapse State Control -->
-      <div class="flex items-center gap-1 text-[11px]">
-        <span v-if="!isMinimized" class="text-gray-400 mr-1 hidden sm:inline">Presets:</span>
+      <div class="flex items-center gap-1 text-[10px] sm:text-[11px]">
+        <span v-if="!isMinimized" class="text-gray-400 mr-0.5 hidden sm:inline">Presets:</span>
         <button
           v-if="!isMinimized"
           class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold transition-colors"
@@ -57,14 +57,6 @@
         <button
           v-if="!isMinimized"
           class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold transition-colors"
-          title="10 players"
-          @click="setPreset10"
-        >
-          10 Players
-        </button>
-        <button
-          v-if="!isMinimized"
-          class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold transition-colors"
           data-test="activate-all-btn"
           title="All 18 players"
           @click="selectAll"
@@ -72,11 +64,13 @@
           All 18
         </button>
         <button
-          class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-700 transition-colors ml-1"
-          :title="isMinimized ? 'Expand Roster' : 'Minimize Roster'"
-          @click="isMinimized = !isMinimized"
+          v-if="!isMinimized"
+          class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-semibold transition-colors"
+          data-test="clear-all-btn"
+          title="Clear all players"
+          @click="clearAll"
         >
-          {{ isMinimized ? 'Expand' : 'Minimize' }}
+          Clear
         </button>
       </div>
     </div>
@@ -126,26 +120,25 @@
     <!-- 18 Colors: Compact Bean Character Row (collapsible) -->
     <div
       v-if="!isMinimized"
-      class="flex flex-wrap items-center justify-center gap-1.5 pt-2 mt-1.5 border-t border-gray-800"
+      class="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 pt-1.5 sm:pt-2 mt-1 sm:mt-1.5 border-t border-gray-800"
     >
       <div
         v-for="color in allColors"
         :key="color"
-        class="roster-bean relative flex flex-col items-center justify-center p-1 rounded transition-all cursor-pointer select-none"
+        class="roster-bean relative flex flex-col items-center justify-center p-0.5 sm:p-1 rounded transition-all cursor-pointer select-none w-[36px] min-h-[42px] sm:w-[48px] sm:min-h-[52px] md:w-[54px] md:min-h-[56px]"
         :class="[
           isMemberActive(color)
             ? 'bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 opacity-100'
             : 'bg-gray-900/40 hover:bg-gray-900/70 border border-dashed border-gray-800 opacity-30 grayscale',
           isPlayerColor(color) ? 'ring-2 ring-yellow-400 !border-yellow-400 !opacity-100 !grayscale-0 shadow-md' : ''
         ]"
-        style="width: 56px; min-height: 58px;"
         :title="`${color} (${isMemberActive(color) ? 'Playing' : 'Not In Game'})${isPlayerColor(color) ? ' - You (Me - Cannot turn off)' : ''}. Click to toggle. Double click to set as Me.`"
         @click="toggleActive(color)"
         @contextmenu.prevent="setAsMyPlayer(color)"
         @dblclick.prevent="setAsMyPlayer(color)"
       >
         <!-- Bean Avatar -->
-        <div class="w-6 h-6 flex items-center justify-center pointer-events-none">
+        <div class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center pointer-events-none">
           <CrewIcon
             :color="color"
             :is-dead="false"
@@ -159,18 +152,18 @@
         <div class="mt-0.5 flex items-center justify-center">
           <span
             v-if="isPlayerColor(color)"
-            class="text-[8px] font-black px-1 rounded bg-yellow-400 text-black leading-tight"
+            class="text-[6px] sm:text-[8px] font-black px-0.5 sm:px-1 rounded bg-yellow-400 text-black leading-tight"
           >
             ME
           </span>
           <span
             v-else
-            class="w-1.5 h-1.5 rounded-full"
+            class="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full"
             :class="isMemberActive(color) ? 'bg-emerald-500 shadow-[0_0_4px_#10b981]' : 'bg-gray-600'"
           />
         </div>
 
-        <span class="mt-0.5 w-full text-center text-[8px] font-bold capitalize leading-[9px] text-gray-300 break-words">
+        <span class="mt-0.5 w-full text-center text-[7px] sm:text-[8px] font-bold capitalize leading-[8px] sm:leading-[9px] text-gray-300 break-words truncate">
           {{ color }}
         </span>
       </div>
@@ -243,6 +236,10 @@ function setPreset10() {
 
 function selectAll() {
   crewStore.setPresetPlayerCount(18)
+}
+
+function clearAll() {
+  crewStore.setPresetPlayerCount(0)
 }
 </script>
 

@@ -15,11 +15,20 @@
         </template>
         <template v-else>
           <div class="space-y-2 mt-2 text-sm text-gray-700 dark:text-gray-300">
-            <p>📝 Among Us Detective is a digital notebook for Among Us</p>
-            <p>🙈 This tool is <b>not</b> a hack</p>
-            <p>
-              ✅ It is 100% legal and safe to use
-              <NuxtLink to="/disclaimer" class="text-xs text-blue-500 hover:underline ml-1">(Read the disclaimer)</NuxtLink>
+            <p class="flex items-center gap-2">
+              <AppIcon name="file" class="w-4 h-4 text-blue-500 shrink-0" />
+              <span>Among Us Detective is a digital notebook for Among Us</span>
+            </p>
+            <p class="flex items-center gap-2">
+              <AppIcon name="shield" class="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>This tool is <b>not</b> a hack</span>
+            </p>
+            <p class="flex items-center gap-2">
+              <AppIcon name="check" class="w-4 h-4 text-emerald-500 stroke-[3] shrink-0" />
+              <span>
+                It is 100% legal and safe to use
+                <NuxtLink to="/disclaimer" class="text-xs text-blue-500 hover:underline ml-1">(Read the disclaimer)</NuxtLink>
+              </span>
             </p>
           </div>
 

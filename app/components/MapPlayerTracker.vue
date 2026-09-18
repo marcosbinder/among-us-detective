@@ -1,8 +1,9 @@
 <template>
   <section class="relative map-player-tracker">
     <div class="flex justify-between items-center mb-1">
-      <div v-if="roundsStore.isViewingHistory" class="text-xs text-amber-500 font-semibold">
-        🕒 Round {{ roundsStore.viewingRoundNumber }} Map Snapshot (Read-Only)
+      <div v-if="roundsStore.isViewingHistory" class="text-xs text-amber-500 font-semibold flex items-center gap-1">
+        <AppIcon name="clock" class="w-3.5 h-3.5 shrink-0" />
+        <span>Round {{ roundsStore.viewingRoundNumber }} Map Snapshot (Read-Only)</span>
       </div>
       <div v-else />
       <button

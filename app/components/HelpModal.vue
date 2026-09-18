@@ -119,7 +119,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>Drag & drop:</b> Drag player cards between columns to classify them as your deductions develop.",
+      "<b>Drag & drop:</b> Drag player cards between columns to classify them as your deductions develop. On touchscreens and mobile devices, press and hold a card briefly before dragging to prevent accidental scrolling.",
     media: {
       type: "video",
       webm: "marking-as-innocent.webm",
@@ -136,7 +136,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>Dead players:</b> Double-click a card or open the card popover and tap <b>💀 Mark as Dead</b>. Dead players display the round they died in (e.g. <b>R1</b>) and remain dead in all future rounds.",
+      "<b>Dead players:</b> Double-click a card or open the card popover and tap <b>Mark as dead</b>. Dead players display the round they died in (e.g. <b>R1</b>) and remain dead in all future rounds.",
     media: {
       type: "video",
       webm: "marking-as-dead.webm",
@@ -145,7 +145,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>New round & Snapshots:</b> When a meeting ends, click <b>New round</b>. The current round is archived into a permanent snapshot, and the board advances into Round 2 with all your current deductions preserved!",
+      "<b>Next round (Meetings):</b> Click <b>Next round</b> whenever an emergency meeting or body report concludes. This archives the completed round into a permanent snapshot and advances the board into Round 2 with all your current deductions preserved!",
     media: {
       type: "video",
       webm: "new-round.webm",
@@ -158,7 +158,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>New match:</b> When a game concludes, click <b>New match</b>. This clears round history and resets deductions to Unknown, while keeping your active lobby roster intact.",
+      "<b>New match (Full Game Reset):</b> Click <b>New match</b> only when the entire game concludes and you return to the lobby. This clears all round history and resets deductions to Unknown for a fresh game, while preserving your active lobby roster and custom player names.",
     media: {
       type: "video",
       webm: "new-game.webm",
@@ -167,7 +167,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>Dual notes:</b> Press <b>N</b> to open Notes. Round notes save with each round snapshot, while Match notes persist across the entire game. Multi-language speech-to-text is supported!",
+      "<b>Dual notes:</b> Click <b>Notes</b> in the bottom bar or press <b>N</b> to open Notes. Round notes save with each round snapshot, while Game notes persist across the entire match. Multi-language speech-to-text dictation is supported!",
     media: {
       type: "video",
       webm: "taking-notes.webm",
@@ -176,7 +176,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>Interactive maps:</b> Press <b>M</b> or click Show map, then drag player beans onto rooms to track sightings and kills. Players who died in earlier rounds are automatically hidden.",
+      "<b>Interactive maps:</b> Click <b>Map</b> in the bottom dock or press <b>M</b>, then drag player beans onto rooms to track sightings and kills. Players who died in earlier rounds are automatically hidden.",
     media: {
       type: "video",
       webm: "tracking-on-map.webm",
@@ -185,7 +185,7 @@ const steps: Step[] = [
   },
   {
     description:
-      "<b>Tasks reference:</b> Click <b>Tasks Reference</b> in the bottom bar to review tasks by room, with warnings for visual tasks and common tasks.",
+      "<b>Tasks guide:</b> Click <b>Tasks Guide</b> in the bottom bar to inspect task locations across the map. Pay special attention to <b>Common tasks</b> (if one player has it, everyone does) and <b>Visual tasks</b> (which prove innocence).",
     media: {
       type: "video",
       webm: "tasks.webm",
@@ -195,6 +195,10 @@ const steps: Step[] = [
   {
     description:
       "<b>Keyboard shortcuts:</b> <b>N</b> = Notes, <b>M</b> = Map, <b>Escape</b> = Close modals. Customize your experience (Board Zoom, theme, languages) in <b>Settings</b>.",
+  },
+  {
+    description:
+      "<b>Settings, Help, and About:</b> Use the modern bottom toolbar to customize settings, reopen this tutorial, or view project credits.",
   },
 ];
 

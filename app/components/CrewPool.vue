@@ -4,9 +4,17 @@
       v-model="crewMembersInPool"
       group="crewMembers"
       item-key="color"
-      :delay="140"
+      :animation="150"
+      :delay="160"
       :delay-on-touch-only="true"
-      :touch-start-threshold="6"
+      :touch-start-threshold="4"
+      :force-fallback="true"
+      :fallback-on-body="true"
+      :fallback-tolerance="3"
+      ghost-class="sortable-ghost"
+      chosen-class="sortable-chosen"
+      drag-class="sortable-drag"
+      fallback-class="sortable-fallback"
       class="flex flex-wrap content-start items-start gap-1 sm:gap-1.5 p-1 sm:p-1.5 w-full flex-1"
       :class="{ 'min-h-[64px] sm:min-h-[85px]': crewMembers.length === 0 }"
     >
@@ -57,5 +65,25 @@ function removeMember(member: CrewMember) {
       @apply text-theme-gray-extra-light;
     }
   }
+}
+
+/* Floating clone that tracks the user's finger/mouse */
+.sortable-fallback {
+  transition: none !important;
+  opacity: 0.95 !important;
+  pointer-events: none !important;
+  z-index: 999999 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  cursor: grabbing !important;
+}
+
+/* Ghost placeholder left behind in the columns */
+.sortable-ghost {
+  opacity: 0.3 !important;
+}
+
+/* Chosen card */
+.sortable-chosen {
+  cursor: grabbing !important;
 }
 </style>

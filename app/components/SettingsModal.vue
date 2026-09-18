@@ -53,14 +53,15 @@
             >
               <span class="text-sm text-gray-700 dark:text-gray-300">Interface theme</span>
               <button
-                class="px-2.5 py-1 text-xs font-bold rounded transition-colors"
+                class="px-2.5 py-1 text-xs font-bold rounded transition-colors inline-flex items-center gap-1.5"
                 :class="darkModeStore.isDarkMode
                   ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 border border-indigo-500/40'
                   : 'bg-yellow-500/20 text-yellow-600 hover:bg-yellow-500/30 border border-yellow-500/40'"
                 data-test="setting-theme-btn"
                 @click="toggleDarkMode"
               >
-                {{ darkModeStore.isDarkMode ? "🌙 Dark" : "☀️ Light" }}
+                <AppIcon :name="darkModeStore.isDarkMode ? 'moon' : 'sun'" class="w-3.5 h-3.5 shrink-0" />
+                <span>{{ darkModeStore.isDarkMode ? "Dark" : "Light" }}</span>
               </button>
             </div>
 
@@ -116,8 +117,9 @@
                   </button>
                 </div>
               </div>
-              <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">
-                💡 Use Board Zoom here instead of browser zoom to keep the deduction columns from squishing.
+              <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight flex items-center gap-1.5 mt-1">
+                <AppIcon name="lightbulb" class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
+                <span>Use Board Zoom here instead of browser zoom to keep the deduction columns from squishing.</span>
               </p>
             </div>
 

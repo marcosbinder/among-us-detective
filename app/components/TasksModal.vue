@@ -5,30 +5,35 @@
       <template #body>
         <!-- Detective Tip Banner -->
         <div class="p-2.5 mb-3 rounded-lg bg-blue-500/10 border border-blue-500/25 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-          <p class="font-bold mb-0.5 flex items-center gap-1.5 text-xs">
-            <span>💡</span> Detective Knowledge
+          <p class="font-bold mb-1 flex items-center gap-1.5 text-xs">
+            <AppIcon name="lightbulb" class="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
+            <span>Detective Knowledge</span>
           </p>
-          <ul class="list-disc list-inside space-y-0.5 text-[11px] opacity-90">
-            <li><strong class="font-semibold">🔑 Common Tasks:</strong> Either everyone in the lobby has them, or no one does. Catch impostors claiming a common task nobody has!</li>
-            <li><strong class="font-semibold">👁️ Visual Tasks:</strong> Have visible in-game animations (shields, asteroids, trash, medbay scan). Proves innocence when visual tasks are ON.</li>
+          <ul class="list-disc list-inside space-y-1 text-[11px] opacity-90">
+            <li>
+              <span class="inline-flex items-center gap-1 font-semibold text-blue-900 dark:text-blue-200">
+                <AppIcon name="key" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+                Common Tasks:
+              </span>
+              Either everyone in the lobby has them, or no one does. Catch impostors claiming a common task nobody has!
+            </li>
+            <li>
+              <span class="inline-flex items-center gap-1 font-semibold text-emerald-900 dark:text-emerald-200">
+                <AppIcon name="eye" class="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                Visual Tasks:
+              </span>
+              Have visible in-game animations (shields, asteroids, trash, medbay scan). Proves innocence when visual tasks are ON.
+            </li>
           </ul>
         </div>
 
-        <!-- Controls: MapSelector, Search, Reset -->
+        <!-- Controls: MapSelector and Search -->
         <div class="space-y-2 mb-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center justify-between gap-2">
             <MapSelector
               :selected-map="mapsStore.selectedMap"
               @map-selected="(map) => mapsStore.setSelectedMap(map)"
             />
-            <button
-              class="button-danger button-sm"
-              data-test="reset-tasks-btn"
-              title="Reset checked tasks"
-              @click="tasksStore.resetAllTasks()"
-            >
-              Reset checks
-            </button>
           </div>
 
           <!-- Search & Filter Bar -->
@@ -42,10 +47,10 @@
               />
               <button
                 v-if="searchQuery"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600 flex items-center justify-center"
                 @click="searchQuery = ''"
               >
-                ✕
+                <AppIcon name="close" class="w-3 h-3" />
               </button>
             </div>
 
@@ -54,58 +59,47 @@
               <button
                 v-for="filter in filterOptions"
                 :key="filter.id"
-                class="px-2 py-1 text-xs font-semibold rounded whitespace-nowrap transition-colors"
+                class="px-2.5 py-1 text-xs font-semibold rounded-md whitespace-nowrap transition-colors flex items-center gap-1"
                 :class="activeFilter === filter.id
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
                 @click="activeFilter = filter.id"
               >
-                {{ filter.label }}
+                <AppIcon v-if="filter.icon" :name="filter.icon" class="w-3.5 h-3.5 shrink-0" />
+                <span>{{ filter.label }}</span>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Tasks Table -->
-        <div class="max-h-96 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700/60">
+        <div class="max-h-96 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700/60 shadow-inner">
           <table class="w-full text-left text-xs border-collapse">
-            <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10">
+            <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
               <tr>
                 <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Task Name</th>
                 <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Room / Location</th>
-                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Properties</th>
+                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Classification</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900/50">
               <tr
                 v-for="task in filteredTasks"
                 :key="task.name"
-                class="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
+                class="hover:bg-blue-50/40 dark:hover:bg-gray-800/60 transition-colors"
               >
-                <td class="p-2.5 font-medium text-gray-800 dark:text-gray-200">
-                  <Checkbox
-                    :id="`task-checkbox-${task.originalIndex}`"
-                    :is-checked="task.isDone"
-                    @changed="
-                      (value) =>
-                        tasksStore.setTask({
-                          map: mapsStore.selectedMap,
-                          taskIndex: task.originalIndex,
-                          isDone: value,
-                        })
-                    "
-                  >
-                    {{ task.name }}
-                  </Checkbox>
+                <td class="p-2.5 font-semibold text-gray-900 dark:text-gray-100">
+                  {{ task.name }}
                 </td>
                 <td class="p-2.5 text-gray-600 dark:text-gray-400">
                   <div class="flex flex-wrap gap-1">
                     <span
                       v-for="(loc, locIdx) in task.locations"
                       :key="locIdx"
-                      class="px-1.5 py-0.5 text-[10px] rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                      class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
                     >
-                      📍 {{ loc }}
+                      <AppIcon name="pin" class="w-3 h-3 text-red-500/80 shrink-0" />
+                      <span>{{ loc }}</span>
                     </span>
                   </div>
                 </td>
@@ -114,10 +108,11 @@
                     <span
                       v-for="(type, i) in task.types"
                       :key="i"
-                      class="px-1.5 py-0.5 text-[10px] font-bold rounded"
+                      class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold rounded"
                       :class="getTaskBadgeStyle(type)"
                     >
-                      {{ getTaskTypeDisplay(type) }}
+                      <AppIcon v-if="getTaskTypeInfo(type).icon" :name="getTaskTypeInfo(type).icon" class="w-3 h-3 shrink-0" />
+                      <span>{{ getTaskTypeInfo(type).label }}</span>
                     </span>
                   </div>
                 </td>
@@ -145,11 +140,11 @@ const activeFilter = ref("all");
 const searchQuery = ref("");
 
 const filterOptions = [
-  { id: "all", label: "All" },
-  { id: "visual", label: "👁️ Visual" },
-  { id: "common", label: "🔑 Common" },
-  { id: "short", label: "⚡ Short" },
-  { id: "long", label: "⏱️ Long" },
+  { id: "all", label: "All", icon: "" },
+  { id: "visual", label: "Visual", icon: "eye" },
+  { id: "common", label: "Common", icon: "key" },
+  { id: "short", label: "Short", icon: "zap" },
+  { id: "long", label: "Long", icon: "timer" },
 ];
 
 const currentMapTasks = computed(() => {
@@ -216,11 +211,11 @@ function getTaskBadgeStyle(type: string): string {
   return "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300";
 }
 
-function getTaskTypeDisplay(type: string): string {
-  if (type.includes("Visual")) return "👁️ Visual";
-  if (type.includes("Common")) return "🔑 Common";
-  if (type.includes("Long")) return "⏱️ Long";
-  if (type.includes("Short")) return "⚡ Short";
-  return type;
+function getTaskTypeInfo(type: string): { label: string; icon: string } {
+  if (type.includes("Visual")) return { label: "Visual", icon: "eye" };
+  if (type.includes("Common")) return { label: "Common", icon: "key" };
+  if (type.includes("Long")) return { label: "Long", icon: "timer" };
+  if (type.includes("Short")) return { label: "Short", icon: "zap" };
+  return { label: type, icon: "" };
 }
 </script>

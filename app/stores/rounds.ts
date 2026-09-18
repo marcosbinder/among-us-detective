@@ -8,6 +8,8 @@ export interface RoundSnapshot {
   mapPositions?: Record<string, string>
 }
 
+export const MAX_ROUNDS = 10
+
 export const useRoundsStore = defineStore(
   'rounds',
   () => {
@@ -17,6 +19,7 @@ export const useRoundsStore = defineStore(
     const currentMapPositions = ref<Record<string, string>>({})
 
     const isViewingHistory = computed(() => viewingRoundNumber.value !== null)
+    const isMaxRoundsReached = computed(() => currentRoundNumber.value >= MAX_ROUNDS)
 
     const activeSnapshot = computed(() => {
       if (viewingRoundNumber.value === null) return null
@@ -32,6 +35,8 @@ export const useRoundsStore = defineStore(
     }
 
     function archiveCurrentRound(currentCrewMembers: CrewMember[], roundNotes: string) {
+      if (currentRoundNumber.value >= MAX_ROUNDS) return
+
       const snapshot: RoundSnapshot = {
         roundNumber: currentRoundNumber.value,
         timestamp: Date.now(),
@@ -71,6 +76,7 @@ export const useRoundsStore = defineStore(
       roundHistory,
       currentMapPositions,
       isViewingHistory,
+      isMaxRoundsReached,
       activeSnapshot,
       setMapPosition,
       clearMapPositions,

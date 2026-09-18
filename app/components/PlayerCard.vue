@@ -118,9 +118,10 @@
             </button>
             <span
               v-else
-              class="shrink-0 px-2 py-0.5 text-[11px] font-bold rounded bg-yellow-400 text-black shadow-sm"
+              class="shrink-0 px-2 py-0.5 text-[11px] font-bold rounded bg-yellow-400 text-black shadow-sm flex items-center gap-1"
             >
-              ★ Me
+              <AppIcon name="star" class="w-3 h-3 fill-current" />
+              <span>Me</span>
             </span>
           </div>
 
@@ -153,7 +154,7 @@
             <button
               v-if="member.role"
               type="button"
-              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors text-center flex items-center justify-center gap-1"
+              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors text-center flex items-center justify-center gap-1.5"
               :class="member.roleConfirmed
                 ? isImpostorRole
                   ? 'bg-rose-700 text-white hover:bg-rose-600 shadow-sm'
@@ -163,7 +164,8 @@
                   : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm'"
               @click="toggleRoleConfirmed"
             >
-              {{ member.roleConfirmed ? 'Undo verification' : isImpostorRole ? '✓ Confirm impostor' : '✓ Confirm role' }}
+              <AppIcon v-if="!member.roleConfirmed" name="check" class="w-3 h-3 stroke-[3]" />
+              <span>{{ member.roleConfirmed ? 'Undo verification' : isImpostorRole ? 'Confirm impostor' : 'Confirm role' }}</span>
             </button>
             <p v-else class="text-[10px] leading-tight text-gray-500 dark:text-gray-400">
               Choose a role below, then confirm it here.
@@ -222,22 +224,24 @@
             <div v-if="member.role" class="flex justify-end">
               <button
                 type="button"
-                class="px-2 py-0.5 text-[11px] text-gray-400 hover:text-red-500 rounded hover:bg-red-500/10 transition-colors"
+                class="px-2 py-0.5 text-[11px] text-gray-400 hover:text-red-500 rounded hover:bg-red-500/10 transition-colors flex items-center gap-1"
                 title="Clear role"
                 @click="clearRole"
               >
-                ✕ Clear role
+                <AppIcon name="close" class="w-2.5 h-2.5" />
+                <span>Clear role</span>
               </button>
             </div>
 
             <button
               type="button"
-              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors flex items-center justify-center gap-1"
+              class="w-full py-1.5 px-2 text-[11px] font-bold rounded transition-colors flex items-center justify-center gap-1.5"
               :class="member.isDead
                 ? 'bg-red-500/20 text-red-500 dark:text-red-400 hover:bg-red-500/30 border border-red-500/40'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white border border-gray-300 dark:border-gray-700'"
               @click="handleToggleDead"
             >
+              <AppIcon :name="member.isDead ? 'heart' : 'skull'" class="w-3.5 h-3.5 shrink-0" />
               <span>{{ member.isDead ? 'Revive player' : 'Mark as dead' }}</span>
               <span v-if="member.isDead && member.diedInRound" class="text-[9px] opacity-80 ml-1">
                 (Died R{{ member.diedInRound }})
