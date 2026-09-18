@@ -18,10 +18,10 @@
         ? 'bg-white text-black px-1 py-0.5 ring-1 ring-gray-400 shadow-sm'
         : 'bg-black/60 text-white px-1 py-0.2 backdrop-blur-sm'"
     >
-      {{ (showPlayerName && playerName) ? playerName : color }}
+      {{ (showPlayerName && playerName) ? playerName : tColor(color) }}
     </span>
     <span v-if="isImposter" class="is-imposter-text">IMP</span>
-    <div v-if="isDead" class="absolute inset-0 z-20 cross-icon">
+    <div v-if="isDead" class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none cross-icon p-1">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="2841.9 760.3 2643.9 2643.8"
@@ -99,6 +99,8 @@
 </template>
 
 <script setup lang="ts">
+const { tColor } = useI18n()
+
 defineProps<{
   color: string
   playerName?: string

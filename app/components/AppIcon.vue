@@ -22,6 +22,29 @@
       <line x1="16" y1="6" x2="16" y2="22" />
     </g>
 
+    <!-- Users / Roster / Players -->
+    <g v-else-if="name === 'users' || name === 'roster'">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </g>
+
+    <!-- Arrows & Chevrons -->
+    <g v-else-if="name === 'arrow-left'">
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </g>
+    <g v-else-if="name === 'chevron-left'">
+      <polyline points="15 18 9 12 15 6" />
+    </g>
+    <g v-else-if="name === 'chevron-down'">
+      <polyline points="6 9 12 15 18 9" />
+    </g>
+    <g v-else-if="name === 'chevron-up'">
+      <polyline points="18 15 12 9 6 15" />
+    </g>
+
     <!-- Tasks / Checklist -->
     <g v-else-if="name === 'tasks' || name === 'list'">
       <polyline points="9 11 12 14 22 4" />
@@ -72,6 +95,13 @@
       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
       <line x1="12" y1="9" x2="12" y2="13" />
       <line x1="12" y1="17" x2="12.01" y2="17" />
+    </g>
+
+    <!-- Target / Crosshair / Scapegoat -->
+    <g v-else-if="name === 'target' || name === 'crosshair'">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
     </g>
 
     <!-- Close / X -->
@@ -133,11 +163,26 @@
       <polyline points="20 6 9 17 4 12" />
     </g>
 
-    <!-- Skull (Dead Player) -->
-    <g v-else-if="name === 'skull' || name === 'dead'">
+    <!-- Skull / Dead Player / Impostor -->
+    <g v-else-if="name === 'dead' || name === 'dead-body' || name === 'skull'">
       <circle cx="9" cy="12" r="1.2" fill="currentColor" />
       <circle cx="15" cy="12" r="1.2" fill="currentColor" />
       <path d="M8 20v2h8v-2M10 17v3M14 17v3M12 4a7 7 0 0 0-7 7c0 2.2 1 4 2.5 5.2V18a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1.8c1.5-1.2 2.5-3 2.5-5.2a7 7 0 0 0-7-7z" />
+    </g>
+
+    <!-- Ghost (Among Us Dead Player Ghost) -->
+    <g v-else-if="name === 'ghost'">
+      <circle cx="9" cy="11" r="1.2" fill="currentColor" />
+      <circle cx="15" cy="11" r="1.2" fill="currentColor" />
+      <path d="M4 12a8 8 0 0 1 16 0v7a2 2 0 0 1-2 2c-.7 0-1.3-.3-1.7-.8L14 18l-2 2-2-2-2.3 2.2c-.4.5-1 .8-1.7.8a2 2 0 0 1-2-2v-7z" />
+    </g>
+
+    <!-- Tombstone / Grave (Alternative Dead Icon) -->
+    <g v-else-if="name === 'tombstone' || name === 'grave'">
+      <path d="M5 21V9a7 7 0 0 1 14 0v12" />
+      <path d="M3 21h18" />
+      <line x1="12" y1="8" x2="12" y2="14" />
+      <line x1="9" y1="11" x2="15" y2="11" />
     </g>
 
     <!-- Heart / Revive -->

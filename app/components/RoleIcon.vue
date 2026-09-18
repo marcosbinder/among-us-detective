@@ -9,6 +9,14 @@
       draggable="false"
     />
 
+    <!-- Generic Impostor Icon (Skull) -->
+    <div
+      v-else-if="role && role.toLowerCase() === 'impostor'"
+      class="w-full h-full flex items-center justify-center text-rose-500 drop-shadow-sm"
+    >
+      <AppIcon name="skull" class="w-full h-full p-0.5" />
+    </div>
+
     <!-- Empty / unassigned role placeholder -->
     <svg
       v-else
@@ -67,6 +75,7 @@ const roleImages: Record<string, string> = {
   scientist: '/images/roles/scientist.png',
   engineer: '/images/roles/engineer.png',
   noisemaker: '/images/roles/noisemaker.png',
+  impostor: '/images/roles/impostor.png',
   shapeshifter: '/images/roles/shapeshifter.png',
   phantom: '/images/roles/phantom.png',
   viper: '/images/roles/viper.png',
@@ -78,7 +87,7 @@ const imageSrc = computed(() => {
 })
 
 const isImpostorRole = computed(() =>
-  ['shapeshifter', 'phantom', 'viper'].includes((props.role || '').toLowerCase())
+  ['impostor', 'shapeshifter', 'phantom', 'viper'].includes((props.role || '').toLowerCase())
 )
 
 const sizeClass = computed(() => {
