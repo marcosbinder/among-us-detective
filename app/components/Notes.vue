@@ -1,5 +1,67 @@
 <template>
   <div class="flex flex-col" data-test="notes-container">
+    <!-- Round Navigation Timeline inside Notes -->
+    <div class="flex items-center justify-between gap-1 overflow-x-auto pb-2 mb-2 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-1 shrink-0">
+        <span class="text-[10px] font-bold uppercase text-gray-400 mr-1">Rounds:</span>
+        <button
+          v-for="snap in roundsStore.roundHistory"
+          :key="snap.roundNumber"
+          type="button"
+          class="px-2 py-0.5 text-[11px] font-bold rounded border transition-all"
+          :class="roundsStore.viewingRoundNumber === snap.roundNumber
+            ? 'bg-amber-500 text-black border-amber-400 shadow-sm'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
+          :title="`View archived notes from Round ${snap.roundNumber}`"
+          @click="roundsStore.setViewingRound(snap.roundNumber)"
+        >
+          R{{ snap.roundNumber }}
+        </button>
+        <button
+          type="button"
+          class="px-2 py-0.5 text-[11px] font-bold rounded border transition-all flex items-center gap-1"
+          :class="!roundsStore.isViewingHistory
+            ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
+          title="Return to current live round"
+          @click="roundsStore.setViewingRound(null)"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>R{{ roundsStore.currentRoundNumber }} (Live)</span>
+        </button>
+      </div>
+
+      <!-- Speech Recognition Controls -->
+      <div v-if="isSpeechRecognitionSupported" class="flex items-center gap-1.5 text-[11px] shrink-0">
+        <!-- Mic Permission Status / Request Button -->
+        <button
+          type="button"
+          class="px-2 py-0.5 text-[10px] font-bold rounded border transition-all flex items-center gap-1"
+          :class="micPermissionState === 'granted'
+            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 cursor-default'
+            : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-400 shadow-sm cursor-pointer'"
+          :title="micPermissionState === 'granted' ? 'Microphone permission active' : 'Click to request browser microphone permission'"
+          @click="requestMicrophonePermission"
+        >
+          <AppIcon :name="micPermissionState === 'granted' ? 'check' : 'mic'" class="w-3 h-3 shrink-0" />
+          <span>{{ micPermissionState === 'granted' ? 'Mic Ready' : 'Allow Mic' }}</span>
+        </button>
+
+        <span class="text-gray-400 text-[10px]">Lang:</span>
+        <select
+          v-model="selectedSpeechLang"
+          class="text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+          title="Voice recognition language"
+        >
+          <option value="auto">🌐 Auto</option>
+          <option value="pt-BR">🇧🇷 Português</option>
+          <option value="en-US">🇺🇸 English</option>
+          <option value="es-ES">🇪🇸 Español</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Historical snapshot warning banner -->
     <div
       v-if="roundsStore.isViewingHistory"
       class="p-2 mb-2 bg-amber-500/10 border border-amber-500/30 rounded text-amber-500 text-xs font-semibold flex items-center justify-between"
@@ -12,39 +74,71 @@
         class="text-[11px] underline hover:text-amber-400 font-bold"
         @click="roundsStore.setViewingRound(null)"
       >
-        Return to Live
+        Return to Live →
       </button>
     </div>
 
-    <div v-show="showRoundNotes" class="my-2 round-notes-wrapper">
-      <span class="text-sm text-red-500">{{ speechError }}</span>
-      <div class="flex justify-between">
-        <div class="flex items-center justify-center">
+    <!-- Round Notes Section -->
+    <div v-show="showRoundNotes" class="my-1.5 round-notes-wrapper">
+      <!-- Dismissible Speech Error Alert with Retry Permission -->
+      <div
+        v-if="speechError"
+        class="mb-2 px-2.5 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 dark:text-red-400 text-xs flex items-center justify-between gap-2"
+      >
+        <div class="flex items-center gap-1.5 min-w-0">
+          <AppIcon name="alert" class="w-3.5 h-3.5 shrink-0 text-red-400" />
+          <span class="truncate">{{ speechError }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            class="text-[11px] font-bold underline hover:text-red-300 px-1"
+            title="Request microphone permission again"
+            @click="requestMicrophonePermission"
+          >
+            Allow Mic
+          </button>
+          <button
+            type="button"
+            class="shrink-0 text-red-400 hover:text-red-300 font-bold text-xs p-0.5"
+            title="Dismiss error"
+            @click="speechError = ''"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+      <div class="flex justify-between items-center mb-1">
+        <div class="flex items-center gap-2">
           <label
             for="round-notes"
-            class="block mr-1 text-sm font-medium leading-5 text-gray-700 dark:text-gray-300"
+            class="text-xs font-bold text-gray-800 dark:text-gray-200"
           >
             <template v-if="roundsStore.isViewingHistory">
               Round {{ roundsStore.viewingRoundNumber }} Notes
             </template>
-            <template v-else>This round</template>
+            <template v-else>
+              Round {{ roundsStore.currentRoundNumber }} Notes
+            </template>
           </label>
           <button
             v-if="isSpeechRecognitionSupported && !roundsStore.isViewingHistory"
-            class="relative flex items-center justify-center w-8 h-8 record-round-button"
-            :class="{
-              'text-player-green': isRecordingRoundNotes,
-              'text-player-red':
-                lastRecordedType === 'roundNotes' && speechError.length > 0,
-            }"
+            type="button"
+            class="px-2 py-0.5 text-xs font-semibold rounded border flex items-center gap-1 transition-all"
+            :class="isRecordingRoundNotes
+              ? 'bg-red-600 text-white border-red-500 shadow-md animate-pulse'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
+            :title="isRecordingRoundNotes ? 'Listening... click to stop' : 'Click to dictate notes'"
             @click="toggleRecordRoundNotes"
           >
-            <span class="icon-mic" />
+            <span v-if="isRecordingRoundNotes" class="w-2 h-2 rounded-full bg-white animate-ping" />
+            <AppIcon name="mic" class="w-3.5 h-3.5 shrink-0" />
+            <span class="text-[10px]">{{ isRecordingRoundNotes ? 'Listening' : 'Dictate' }}</span>
           </button>
         </div>
-        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">
-          <template v-if="roundsStore.isViewingHistory">Snapshot (read-only)</template>
-          <template v-else>Cleared each round</template>
+        <span class="text-[10px] text-gray-500 dark:text-gray-400">
+          <template v-if="roundsStore.isViewingHistory">Historical snapshot (Read-Only)</template>
+          <template v-else>Saved &amp; carried to next round</template>
         </span>
       </div>
       <div class="relative mt-1 rounded-md">
@@ -53,38 +147,41 @@
           ref="roundNotesEl"
           v-model="displayRoundNotes"
           :readonly="roundsStore.isViewingHistory"
-          placeholder="e.g. Red saw me do medbay"
-          rows="5"
+          placeholder="e.g. Red saw me scan in medbay, Yellow claims Engineer..."
+          rows="4"
           class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           :class="{ 'opacity-80 bg-gray-50 dark:bg-gray-900 cursor-not-allowed': roundsStore.isViewingHistory }"
         />
       </div>
     </div>
-    <div class="game-notes-wrapper">
-      <div class="flex justify-between">
-        <div class="flex items-center justify-center">
+
+    <!-- Match / Game Notes Section -->
+    <div class="game-notes-wrapper mt-2.5">
+      <div class="flex justify-between items-center mb-1">
+        <div class="flex items-center gap-2">
           <label
             for="game-notes"
-            class="block text-sm font-medium leading-5 text-gray-700 dark:text-gray-300"
+            class="text-xs font-bold text-gray-800 dark:text-gray-200"
           >
-            <template v-if="resetNotesOnNewGame">This game</template>
-            <template v-else>General</template>
+            <span>Match Notes</span>
           </label>
           <button
             v-if="isSpeechRecognitionSupported"
-            class="relative flex items-center justify-center w-8 h-8 record-round-button"
-            :class="{
-              'text-player-green': isRecordingGameNotes,
-              'text-player-red':
-                lastRecordedType === 'gameNotes' && speechError.length > 0,
-            }"
+            type="button"
+            class="px-2 py-0.5 text-xs font-semibold rounded border flex items-center gap-1 transition-all"
+            :class="isRecordingGameNotes
+              ? 'bg-red-600 text-white border-red-500 shadow-md animate-pulse'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
+            :title="isRecordingGameNotes ? 'Listening... click to stop' : 'Click to dictate notes'"
             @click="toggleRecordGameNotes"
           >
-            <span class="icon-mic" />
+            <span v-if="isRecordingGameNotes" class="w-2 h-2 rounded-full bg-white animate-ping" />
+            <AppIcon name="mic" class="w-3.5 h-3.5 shrink-0" />
+            <span class="text-[10px]">{{ isRecordingGameNotes ? 'Listening' : 'Dictate' }}</span>
           </button>
         </div>
-        <span class="text-xs leading-5 text-gray-500 dark:text-gray-400">
-          <template v-if="resetNotesOnNewGame">Cleared each game</template>
+        <span class="text-[10px] text-gray-500 dark:text-gray-400">
+          <template v-if="resetNotesOnNewGame">Saved for entire game</template>
           <template v-else>Never cleared</template>
         </span>
       </div>
@@ -93,8 +190,8 @@
           id="game-notes"
           ref="gameNotesEl"
           v-model="gameNotes"
-          placeholder="e.g. Orange and cyan are a group"
-          rows="5"
+          placeholder="e.g. Orange and Cyan grouping together every round..."
+          rows="4"
           class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
@@ -129,6 +226,11 @@ let gameNotesHighlighter: any = null;
 const isSpeechRecognitionSupported = computed(
   () => typeof webkitSpeechRecognition !== "undefined"
 );
+
+const selectedSpeechLang = computed({
+  get: () => settingsStore.speechLanguage,
+  set: (val: any) => settingsStore.setSpeechLanguage(val),
+});
 
 const displayRoundNotes = computed({
   get: () => {
@@ -173,13 +275,85 @@ watch(
 watch(
   () => roundsStore.viewingRoundNumber,
   () => {
+    speechError.value = "";
     nextTick(() => {
       roundNotesHighlighter?.handleInput();
     });
   }
 );
 
+const micPermissionState = ref<'granted' | 'prompt' | 'denied' | 'unknown'>('unknown');
+
+async function updateMicPermissionState() {
+  if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
+    try {
+      const status = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      micPermissionState.value = status.state;
+      status.onchange = () => {
+        micPermissionState.value = status.state;
+      };
+    } catch {
+      // Permission query for 'microphone' is not supported on some browsers
+    }
+  }
+}
+
+async function requestMicrophonePermission(): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    return true;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Immediately stop & disable every audio track to ensure the mic hardware is instantly released
+    stream.getTracks().forEach((track) => {
+      track.stop();
+      track.enabled = false;
+    });
+    micPermissionState.value = 'granted';
+    speechError.value = '';
+    return true;
+  } catch (err: any) {
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      micPermissionState.value = 'denied';
+      speechError.value = 'Microphone access blocked. Click "Allow Mic" or enable permissions in your browser URL bar.';
+    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      speechError.value = 'No microphone device was detected on your computer/phone.';
+    } else {
+      speechError.value = 'Microphone permission error: ' + (err.message || 'Permission denied');
+    }
+    return false;
+  }
+}
+
+let maxRecordingTimeout: any = null;
+
+function clearRecordingTimeout() {
+  if (maxRecordingTimeout) {
+    clearTimeout(maxRecordingTimeout);
+    maxRecordingTimeout = null;
+  }
+}
+
+function startRecordingTimeout() {
+  clearRecordingTimeout();
+  // Privacy safety auto-kill: automatically shut down mic after 60 seconds
+  maxRecordingTimeout = setTimeout(() => {
+    stopAllRecording();
+  }, 60000);
+}
+
+function stopAllRecording() {
+  clearRecordingTimeout();
+  isRecordingRoundNotes.value = false;
+  isRecordingGameNotes.value = false;
+  try {
+    speechRecognition?.abort();
+    speechRecognition?.stop();
+  } catch {}
+}
+
 onMounted(() => {
+  speechError.value = "";
   const playerHighlightColors = (allColors as string[]).map((color) => ({
     highlight: color,
     className: `bg-player-${color}-light`,
@@ -195,7 +369,13 @@ onMounted(() => {
     });
   }
   initSpeechRecording();
+  updateMicPermissionState();
   roundNotesEl.value?.focus();
+});
+
+onUnmounted(() => {
+  stopAllRecording();
+  speechError.value = "";
 });
 
 function initSpeechRecording() {
@@ -221,6 +401,11 @@ function initSpeechRecording() {
 
   speechRecognition.onstart = () => {
     speechError.value = "";
+    startRecordingTimeout();
+  };
+
+  speechRecognition.onend = () => {
+    stopAllRecording();
   };
 
   speechRecognition.onresult = (event: any) => {
@@ -228,7 +413,7 @@ function initSpeechRecording() {
     speechError.value = "";
     if (typeof event.results === "undefined") {
       speechRecognition.onend = null;
-      speechRecognition.stop();
+      stopAllRecording();
       return;
     }
     for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -247,24 +432,34 @@ function initSpeechRecording() {
   };
 
   speechRecognition.onerror = (event: any) => {
+    stopAllRecording();
     if (event.error === "no-speech") speechError.value = "No speech detected";
-    if (event.error === "audio-capture")
+    else if (event.error === "audio-capture")
       speechError.value = "Check your recording device";
-    if (event.error === "not-allowed")
-      speechError.value = "Check recording permissions in your browser";
-    isRecordingRoundNotes.value = false;
-    isRecordingGameNotes.value = false;
+    else if (event.error === "not-allowed") {
+      micPermissionState.value = "denied";
+      speechError.value = "Microphone access blocked. Click 'Allow Mic' or enable it in browser settings.";
+    }
   };
 }
 
-function toggleRecordRoundNotes() {
+async function toggleRecordRoundNotes() {
   if (!isRecordingRoundNotes.value) {
+    stopAllRecording();
+    speechError.value = "";
+    const hasPermission = await requestMicrophonePermission();
+    if (!hasPermission) return;
+
     isRecordingRoundNotes.value = true;
     lastRecordedType.value = "roundNotes";
-    speechRecognition?.start();
+    try {
+      speechRecognition?.start();
+    } catch (err: any) {
+      stopAllRecording();
+      speechError.value = "Check recording permissions in your browser";
+    }
   } else {
-    isRecordingRoundNotes.value = false;
-    speechRecognition?.stop();
+    stopAllRecording();
     roundNotesHighlighter?.handleInput();
     setTimeout(() => {
       if (roundNotesEl.value) {
@@ -274,14 +469,23 @@ function toggleRecordRoundNotes() {
   }
 }
 
-function toggleRecordGameNotes() {
+async function toggleRecordGameNotes() {
   if (!isRecordingGameNotes.value) {
+    stopAllRecording();
+    speechError.value = "";
+    const hasPermission = await requestMicrophonePermission();
+    if (!hasPermission) return;
+
     isRecordingGameNotes.value = true;
     lastRecordedType.value = "gameNotes";
-    speechRecognition?.start();
+    try {
+      speechRecognition?.start();
+    } catch (err: any) {
+      stopAllRecording();
+      speechError.value = "Check recording permissions in your browser";
+    }
   } else {
-    isRecordingGameNotes.value = false;
-    speechRecognition?.stop();
+    stopAllRecording();
     gameNotesHighlighter?.handleInput();
     setTimeout(() => {
       if (gameNotesEl.value) {

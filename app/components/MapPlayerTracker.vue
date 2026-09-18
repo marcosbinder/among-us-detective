@@ -8,10 +8,11 @@
       <div v-else />
       <button
         v-if="trackedCrewMembers.length > 0 && !roundsStore.isViewingHistory"
-        class="button-sm"
+        class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white border border-gray-700/60 transition-colors flex items-center gap-1 shadow-sm"
         @click="resetPositions"
       >
-        Reset positions
+        <AppIcon name="refresh" class="w-3 h-3 shrink-0" />
+        <span>Reset positions</span>
       </button>
     </div>
     <div class="container">
@@ -59,11 +60,11 @@ const trackedCrewMembers = computed(() => {
   if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
     const snap = roundsStore.activeSnapshot;
     return snap.crewMembers.filter(
-      (m) => m.isActive && (!m.isDead || m.diedInRound === snap.roundNumber)
+      (m) => m.isActive && (!m.isDead || m.diedInRound === snap.roundNumber) && (settingsStore.canTrackOwnColor || !m.isPlayer)
     );
   }
   return crewStore.activeCrewMembers.filter(
-    (m) => !m.isDead || (m.diedInRound != null && m.diedInRound === roundsStore.currentRoundNumber)
+    (m) => (!m.isDead || (m.diedInRound != null && m.diedInRound === roundsStore.currentRoundNumber)) && (settingsStore.canTrackOwnColor || !m.isPlayer)
   );
 });
 

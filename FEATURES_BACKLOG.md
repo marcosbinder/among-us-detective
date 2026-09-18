@@ -24,6 +24,11 @@ This document serves as the single source of truth for all planned features, arc
 13. [Feature 13: Full Playwright E2E Test Suite Modernization](#feature-13-full-playwright-e2e-test-suite-modernization)
 14. [Feature 14: Match State Export/Import & Full Session Recovery](#feature-14-match-state-exportimport--full-session-recovery)
 15. [Feature 15: Mobile Touch Gestures & Haptic Feedback Polish](#feature-15-mobile-touch-gestures--haptic-feedback-polish)
+16. [Feature 16: Modernize & Improve Disclaimer](#feature-16-modernize--improve-disclaimer-apppagesdisclaimervue)
+17. [Feature 17: Help Modal & Tutorial Video/Visual Walkthrough Overhaul](#feature-17-help-modal--tutorial-videovisual-walkthrough-overhaul-appcomponentshelpmodalvue)
+18. [Feature 18: Player Task Completion Tracker](#feature-18-player-task-completion-tracker-terminou-as-tasks)
+19. [Feature 19: Player Context Menu Enrichment & Settings Simplification](#feature-19-player-context-menu-enrichment--settings-simplification)
+20. [Feature 20: Multilingual Localization (i18n)](#feature-20-multilingual-localization-i18n)
 
 ---
 
@@ -272,6 +277,45 @@ On mobile and split-screen, double-clicking to mark a player dead is unreliable 
   - How to log claims and roles during discussions.
   - Explaining the vital difference between **"Next Round (Meeting ended)"** (saving snapshot of current meeting) and **"New Match (Reset game)"** (starting a brand new game).
   - How to drop room pins on interactive maps.
+
+---
+
+## Feature 18: Player Task Completion Tracker (`terminou as tasks`)
+### 🎯 Purpose & User Story
+- Add a status toggle to mark whether a player has finished all their tasks (`Tasks: Finished` / `In Progress`).
+- In Among Us meetings, knowing who still has tasks left vs who is faking is crucial for catching impostors wandering near finished rooms.
+- Visual badge or checkmark indicator on the player card.
+
+---
+
+## Feature 19: Player Context Menu Enrichment & Settings Simplification
+### 🎯 Purpose & User Story
+- Move legacy checkboxes out of global Settings:
+  - `showMeetingsCount`, `showTasksCheckbox`, and `showImposterCheckbox`.
+- Relocate meeting participation counts and task status directly inside the clicked Player Card's floating context menu where it naturally belongs.
+- Keep the Settings modal uncluttered and focused on global display preferences (Dark Mode, Board Zoom, Speech Recognition Language).
+
+---
+
+## Feature 20: Multilingual Localization (i18n)
+### 🎯 Purpose & User Story
+- Full interface translations supporting the 5 most popular Among Us player communities:
+  1. **English (`en-US`)** — Default
+  2. **Portuguese (`pt-BR`)** — Português (Brasil)
+  3. **Spanish (`es-ES`)** — Español
+  4. **French (`fr-FR`)** — Français
+  5. **German (`de-DE`)** — Deutsch
+- **Browser Language Auto-Detection**: Detect `navigator.language` on first visit and automatically pick the closest supported locale, falling back to English.
+- **Language Switcher**: Dedicated language selector inside the Settings modal and persistent storage in `settingsStore`.
+- **Game Terminology Exclusions**:
+  - Keep map proper names in English (*The Skeld*, *MIRA HQ*, *Polus*, *The Airship*, *The Fungle*, *Submerged*).
+  - Keep room names in English (*Electrical, Medbay, Navigation, Reactor, Security, Admin, Weapons, Upper Engine...*) so detectives across all languages share uniform room callouts during Discord/in-game meetings.
+- **Translated UI Components**:
+  - Deduction board columns (*Hard Clear, Trusted, Unknown, Suspicious, Impostor, Dead*).
+  - Meeting round controls (*Next Round, New Match, Live, Meeting ended, Reset game*).
+  - Quick Detective Notepad & Full Notes Modal (tabs, dictation badges, placeholder examples).
+  - Role selection badges (*Detective, Judge, Scientist, Engineer, Noisemaker, Shapeshifter, Phantom, Viper*).
+  - Settings, Help, About, and Disclaimer modals.
 
 ---
 *Maintained by Marcos Binder for Among Us Detective.*

@@ -12,16 +12,15 @@
     ]"
   >
     <span
-      v-if="showColorName"
-      class="absolute -top-3 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded text-[9px] font-bold capitalize leading-3"
+      v-if="showColorName || (showPlayerName && playerName)"
+      class="absolute -top-3.5 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded text-[9px] font-bold capitalize leading-tight"
       :class="highlightColorName
         ? 'bg-white text-black px-1 py-0.5 ring-1 ring-gray-400 shadow-sm'
-        : 'bg-transparent text-white px-0'"
+        : 'bg-black/60 text-white px-1 py-0.2 backdrop-blur-sm'"
     >
-      {{ color }}
+      {{ (showPlayerName && playerName) ? playerName : color }}
     </span>
     <span v-if="isImposter" class="is-imposter-text">IMP</span>
-    <span v-if="showPlayerName" class="player-name">{{ playerName }}</span>
     <div v-if="isDead" class="absolute inset-0 z-20 cross-icon">
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -37,7 +37,10 @@
         <div v-show="mapsStore.selectedMap === 'mira-hq'" class="relative z-0">
           <div class="absolute inset-0 z-10">
             <button
-              class="absolute right-0 m-2 button-sm"
+              class="absolute right-2 top-2 z-20 px-2.5 py-1 text-xs font-semibold rounded-lg transition-all shadow-md flex items-center gap-1"
+              :class="areSensorsVisible
+                ? 'bg-amber-600 text-white border border-amber-500 hover:bg-amber-500'
+                : 'bg-gray-900/90 text-gray-200 border border-gray-700 hover:bg-gray-800'"
               data-test="toggle-sensors-btn"
               @click="areSensorsVisible = !areSensorsVisible"
             >

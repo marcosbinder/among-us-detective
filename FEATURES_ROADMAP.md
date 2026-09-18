@@ -247,6 +247,13 @@ This document serves as the single source of truth for all modernizations, featu
     - Exactly when to use "Next Round (Meeting ended)" vs "New Match (Reset game)".
     - How to use room pins on maps and verify claimed roles.
 
+### 5.6 Multilingual Localization (i18n)
+- **Supported Languages**: English (`en-US` - default), Portuguese (`pt-BR`), Spanish (`es-ES`), French (`fr-FR`), German (`de-DE`).
+- **Key Specifications**:
+  - Auto-detection via `navigator.language` with persistent preference stored in `settingsStore`.
+  - Game Terminology Exclusions: Keep map names (*The Skeld, MIRA HQ, Polus, The Airship, The Fungle, Submerged*) and room names (*Electrical, Medbay, Navigation, Admin, Reactor, Security...*) in English to maintain universal communication in multiplayer lobbies.
+  - Translated deduction headers (*Hard Clear, Trusted, Unknown, Suspicious, Impostor, Dead*), round controls, badges, and modal text.
+
 ---
 
 ## 6. Implementation Order & Phasing Plan

@@ -19,6 +19,9 @@ const upcomingChanges: string[] = [
   'Dual Focus-Safe Notes — volatile round notepad (auto-cleared each round) and persistent match notes with proper cursor focus retention',
   'Fix tracking fellow imposters when you are an impostor too',
   'Optional saving of all state after page reload',
+  'Player Task Completion Tracker — mark and view whether a player has finished their tasks during meetings',
+  'Player Card Context Menu Migration — relocate task checklists and meeting counts from global Settings into the individual player card popover',
+  'Multilingual Localization (i18n) — full interface translations for English, Portuguese, Spanish, French, and German with auto-detection of browser language (excluding map proper nouns)',
   'Audio & sensory feedback (subtle clicks and meeting bells via Web Audio API)',
 ]
 </script>

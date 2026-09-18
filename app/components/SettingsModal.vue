@@ -250,6 +250,27 @@
               </select>
             </div>
 
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-mic-permission"
+            >
+              <div class="flex flex-col">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Microphone permission</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">Browser access for Notes dictation</span>
+              </div>
+              <button
+                type="button"
+                class="px-2.5 py-1 text-xs font-semibold rounded-md border transition-all flex items-center gap-1.5"
+                :class="micPermissionState === 'granted'
+                  ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 cursor-default'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-500 shadow-sm cursor-pointer'"
+                @click="requestMicPermission"
+              >
+                <AppIcon :name="micPermissionState === 'granted' ? 'check' : 'mic'" class="w-3.5 h-3.5 shrink-0" />
+                <span>{{ micPermissionState === 'granted' ? 'Allowed ✓' : 'Allow Mic' }}</span>
+              </button>
+            </div>
+
             <!-- Map -->
             <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Map</div>
 
@@ -292,6 +313,45 @@ const crewStore = useCrewStore();
 const { gtag } = useGtag();
 
 const isEditingPlayerNames = ref(false);
+const micPermissionState = ref<'granted' | 'prompt' | 'denied' | 'unknown'>('unknown');
+
+async function updateMicPermissionState() {
+  if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
+    try {
+      const status = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      micPermissionState.value = status.state;
+      status.onchange = () => {
+        micPermissionState.value = status.state;
+      };
+    } catch {}
+  }
+}
+
+async function requestMicPermission() {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    alert('Microphone input is not supported in this browser.');
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((track) => {
+      track.stop();
+      track.enabled = false;
+    });
+    micPermissionState.value = 'granted';
+  } catch (err: any) {
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      micPermissionState.value = 'denied';
+      alert('Microphone permission was denied. Please allow microphone access in your browser settings (URL bar).');
+    } else {
+      alert('Microphone error: ' + (err.message || 'Permission denied'));
+    }
+  }
+}
+
+onMounted(() => {
+  updateMicPermissionState();
+});
 
 function getPlayerName(color: string): string {
   return crewStore.crewMembers.find((m) => m.color === color)?.playerName ?? "";

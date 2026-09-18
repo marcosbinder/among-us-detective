@@ -92,7 +92,7 @@
       <div class="flex items-center gap-2 min-w-0">
         <AppIcon name="alert" class="w-4 h-4 text-amber-500 shrink-0" />
         <div class="leading-tight text-[11px] sm:text-xs">
-          <span>Browser zoom detected. If columns feel cramped, use built-in <strong>Board Zoom</strong> in </span>
+          <span>Browser zoom detected ({{ browserZoomPercent }}%). If layout feels cramped or too small, use built-in <strong>Board Zoom</strong> in </span>
           <button
             type="button"
             class="underline font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500"
@@ -150,10 +150,106 @@
       :dead="displayedCrewMembers.dead"
       :highlight-color-names="settingsStore.highlightColorNames"
       :show-player-names="settingsStore.showPlayerNames"
-      class="mb-2 lg:mb-4"
+      class="mb-2 lg:mb-3"
       @changed="handleCrewChanged"
       @removed="handleMemberRemoved"
     />
+
+    <!-- Desktop Quick Notepad (Visible on PC below columns) -->
+    <div class="hidden lg:block mt-3 mb-6 p-3.5 sm:p-4 rounded-xl bg-gray-900/70 dark:bg-gray-950/70 border border-gray-700/60 dark:border-gray-800/80 shadow-md backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <AppIcon name="notes" class="w-4 h-4 shrink-0" />
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-gray-100">Detective Notepad</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700/50">Quick Scratchpad</span>
+            </div>
+            <span class="text-[11px] text-gray-400">Jot quick deductions and player alibis mid-game</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 hover:text-blue-300 border border-blue-500/30 flex items-center gap-1.5 transition-all shadow-sm"
+          @click="toggleNotesModal"
+        >
+          <AppIcon name="mic" class="w-3.5 h-3.5 text-blue-400" />
+          <span>Full Notes &amp; Dictation</span>
+          <kbd class="text-[9px] px-1 py-0.2 rounded bg-black/40 text-gray-300 border border-gray-700/50 font-mono">N</kbd>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Round Notes Column -->
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between text-xs font-semibold text-gray-300 mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <span
+                v-if="roundsStore.isViewingHistory"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30"
+              >
+                <AppIcon name="clock" class="w-3 h-3 shrink-0" />
+                Round {{ roundsStore.viewingRoundNumber }} (Archived)
+              </span>
+              <span
+                v-else
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                Round {{ roundsStore.currentRoundNumber }} Notes
+              </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span v-if="roundsStore.isViewingHistory" class="text-[10px] text-amber-400 font-medium">
+                Read-only snapshot
+              </span>
+              <span v-else class="text-[10px] text-gray-500 font-normal">
+                Saved &amp; inherited per round
+              </span>
+              <button
+                v-if="roundsStore.isViewingHistory"
+                type="button"
+                class="text-[10px] text-amber-400 hover:text-amber-300 underline font-bold"
+                @click="roundsStore.setViewingRound(null)"
+              >
+                Return to Live →
+              </button>
+            </div>
+          </div>
+          <textarea
+            v-model="quickRoundNotes"
+            :readonly="roundsStore.isViewingHistory"
+            rows="3"
+            :placeholder="roundsStore.isViewingHistory ? 'No notes recorded for this round' : 'e.g. Lime and Cyan went to Electrical together...'"
+            class="w-full p-2.5 text-xs rounded-lg border bg-gray-800/80 dark:bg-gray-900/90 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500/80 transition-all resize-y min-h-[76px]"
+            :class="roundsStore.isViewingHistory
+              ? 'border-amber-500/40 bg-amber-950/10 text-amber-200/90 cursor-not-allowed'
+              : 'border-gray-700/70 dark:border-gray-700/60'"
+          />
+        </div>
+
+        <!-- Match Notes Column -->
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between text-xs font-semibold text-gray-300 mb-1.5">
+            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              Match Notes
+            </span>
+            <span class="text-[10px] text-gray-500 font-normal">
+              Persistent across all rounds
+            </span>
+          </div>
+          <textarea
+            v-model="notesStore.gameNotes"
+            rows="3"
+            placeholder="e.g. Red claims Engineer, White vouches for Orange..."
+            class="w-full p-2.5 text-xs rounded-lg border border-gray-700/70 dark:border-gray-700/60 bg-gray-800/80 dark:bg-gray-900/90 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500/80 transition-all resize-y min-h-[76px]"
+          />
+        </div>
+      </div>
+    </div>
 
     <!-- Modern Bottom Detective Toolbar (Persistent Dock) -->
     <footer class="fixed bottom-0 left-0 right-0 z-30 h-12 flex items-center justify-between px-2 sm:px-4 md:px-6 bg-gray-900/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-700/60 dark:border-gray-800/80 shadow-2xl">
@@ -299,20 +395,35 @@ const isNotesModalOpen = computed({
   set: (value: boolean) => notesStore.setNotesOpenState(value),
 })
 
+const quickRoundNotes = computed({
+  get: () => {
+    if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
+      return roundsStore.activeSnapshot.roundNotes || ''
+    }
+    return notesStore.roundNotes
+  },
+  set: (value: string) => {
+    if (roundsStore.isViewingHistory) return
+    notesStore.setRoundNotes(value)
+  },
+})
+
 const isSettingsModalOpen = computed({
   get: () => settingsStore.settingsModalOpenState,
   set: (value: boolean) => settingsStore.setSettingsModalOpenState(value),
 })
 
 const isBrowserZoomed = ref(false)
+const browserZoomPercent = ref(100)
 const isZoomNoticeDismissed = ref(false)
 
 function checkBrowserZoom() {
   if (typeof window === 'undefined') return
   const dpr = window.devicePixelRatio || 1
   const vpScale = window.visualViewport?.scale || 1
-  // Trigger warning if browser zoom or viewport pinch scale is active
-  isBrowserZoomed.value = vpScale > 1.05 || dpr >= 1.2
+  browserZoomPercent.value = Math.round(dpr * 100)
+  // Trigger warning if browser zoom is enlarged (> 115%) OR reduced (< 90%)
+  isBrowserZoomed.value = vpScale > 1.05 || vpScale < 0.95 || dpr >= 1.18 || dpr <= 0.88
 }
 
 function dismissZoomNotice() {
@@ -349,6 +460,10 @@ onMounted(() => {
   }
 
   keyupListener = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+      return
+    }
     if (e.code === 'KeyN' && !isNotesModalOpen.value && !isSettingsModalOpen.value) {
       isNotesModalOpen.value = true
     } else if (e.code === 'Escape' && isNotesModalOpen.value) {
@@ -382,11 +497,11 @@ function initNewMatch() {
 }
 
 function initNewRound() {
-  // Archive current round before advancing
+  // Archive current round before advancing (saves snapshot with current roundNotes)
   roundsStore.archiveCurrentRound(crewStore.crewMembers, notesStore.roundNotes)
   crewStore.resetActiveCrew()
   tasksStore.resetAllTasks()
-  notesStore.clearRoundNotes()
+  // Retain notesStore.roundNotes so Round 2 inherits the notes draft from Round 1
   gtag('event', 'init_new_round', { event_category: 'global_stats' })
 }
 

@@ -23,7 +23,7 @@
         ? 'h-3.5 sm:h-4 px-0.5 sm:px-1 py-0.5 leading-3 bg-white text-black ring-1 ring-gray-400 shadow-sm'
         : 'h-3 text-white bg-transparent'"
     >
-      {{ member.color }}
+      {{ (showPlayerNames && member.playerName) ? member.playerName : member.color }}
     </span>
 
     <!-- Avatar Character Bean -->

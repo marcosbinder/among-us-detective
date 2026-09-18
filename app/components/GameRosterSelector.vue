@@ -125,8 +125,9 @@
       <div
         v-for="color in allColors"
         :key="color"
-        class="roster-bean relative flex flex-col items-center justify-center p-0.5 sm:p-1 rounded transition-all cursor-pointer select-none w-[36px] min-h-[42px] sm:w-[48px] sm:min-h-[52px] md:w-[54px] md:min-h-[56px]"
+        class="roster-bean relative flex flex-col items-center justify-center p-0.5 sm:p-1 rounded transition-all cursor-pointer select-none"
         :class="[
+          rosterBeanSizeClasses,
           isMemberActive(color)
             ? 'bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 opacity-100'
             : 'bg-gray-900/40 hover:bg-gray-900/70 border border-dashed border-gray-800 opacity-30 grayscale',
@@ -138,7 +139,7 @@
         @dblclick.prevent="setAsMyPlayer(color)"
       >
         <!-- Bean Avatar -->
-        <div class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center pointer-events-none">
+        <div :class="rosterAvatarSizeClasses" class="flex items-center justify-center pointer-events-none">
           <CrewIcon
             :color="color"
             :is-dead="false"
@@ -163,8 +164,13 @@
           />
         </div>
 
-        <span class="mt-0.5 w-full text-center text-[7px] sm:text-[8px] font-bold capitalize leading-[8px] sm:leading-[9px] text-gray-300 break-words truncate">
-          {{ color }}
+        <span
+          class="mt-0.5 w-full text-center text-[7px] sm:text-[8px] font-bold capitalize leading-[8px] sm:leading-[9px] break-words truncate"
+          :class="settingsStore.highlightColorNames
+            ? 'bg-white text-black px-0.5 rounded shadow-sm'
+            : 'text-gray-300'"
+        >
+          {{ getRosterDisplayName(color) }}
         </span>
       </div>
     </div>
@@ -175,9 +181,40 @@
 import allColors from '~/utils/playerColors.js'
 
 const crewStore = useCrewStore()
+const settingsStore = useSettingsStore()
 const isMinimized = ref(false)
 const isColorPickerOpen = ref(false)
 const colorPickerEl = ref<HTMLElement | null>(null)
+
+function getRosterDisplayName(color: string): string {
+  if (settingsStore.showPlayerNames) {
+    const member = crewStore.crewMembers.find((m) => m.color === color)
+    if (member?.playerName) return member.playerName
+  }
+  return color
+}
+
+const rosterBeanSizeClasses = computed(() => {
+  const zoom = settingsStore.boardZoom || 'normal'
+  if (zoom === 'compact') {
+    return 'w-[32px] min-h-[38px] sm:w-[42px] sm:min-h-[46px]'
+  }
+  if (zoom === 'large') {
+    return 'w-[42px] min-h-[48px] sm:w-[54px] sm:min-h-[60px] md:w-[60px] md:min-h-[62px]'
+  }
+  if (zoom === 'extra-large') {
+    return 'w-[48px] min-h-[54px] sm:w-[60px] sm:min-h-[68px] md:w-[68px] md:min-h-[70px]'
+  }
+  return 'w-[36px] min-h-[42px] sm:w-[48px] sm:min-h-[52px] md:w-[54px] md:min-h-[56px]'
+})
+
+const rosterAvatarSizeClasses = computed(() => {
+  const zoom = settingsStore.boardZoom || 'normal'
+  if (zoom === 'compact') return 'w-3.5 h-3.5 sm:w-4.5 sm:h-4.5'
+  if (zoom === 'large') return 'w-5 h-5 sm:w-6.5 sm:h-6.5 md:w-7 md:h-7'
+  if (zoom === 'extra-large') return 'w-6 h-6 sm:w-7.5 sm:h-7.5 md:w-8 md:h-8'
+  return 'w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6'
+})
 
 const activeCount = computed(() => {
   return crewStore.crewMembers.filter(m => m.isActive).length
