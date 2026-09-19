@@ -2,6 +2,7 @@ import { test as base, Page } from "@playwright/test";
 
 const DEFAULT_SETTINGS_STATE = JSON.stringify({
   highlightColorNames: false,
+  highlightNotesColors: true,
   showImposterCheckbox: true,
   showTasksCheckbox: true,
   showMeetingsCount: true,
@@ -12,6 +13,8 @@ const DEFAULT_SETTINGS_STATE = JSON.stringify({
   showRoundNotes: true,
   canTrackOwnColor: true,
   isImproveMapContrastEnabled: true,
+  uiLanguage: 'en-US',
+  hasAutoDetectedLanguage: true,
 });
 
 const DEFAULT_DARKMODE_STATE = JSON.stringify({
@@ -55,7 +58,7 @@ export const test = base.extend({
       }
     );
 
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForSelector("[data-test='new-game-btn']", {
       state: "attached",
     });
@@ -67,7 +70,7 @@ export { expect } from "@playwright/test";
 
 /** Helper: navigate to home and wait for app readiness (for tests that navigate away). */
 export async function goHome(page: Page): Promise<void> {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.waitForSelector("[data-test='new-game-btn']", {
     state: "attached",
   });

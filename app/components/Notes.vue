@@ -3,7 +3,7 @@
     <!-- Round Navigation Timeline inside Notes -->
     <div class="flex items-center justify-between gap-1 overflow-x-auto pb-2 mb-2 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-1 shrink-0">
-        <span class="text-[10px] font-bold uppercase text-gray-400 mr-1">Rounds:</span>
+        <span class="text-[10px] font-bold uppercase text-gray-400 mr-1">{{ t('header.timeline') }}:</span>
         <button
           v-for="snap in roundsStore.roundHistory"
           :key="snap.roundNumber"
@@ -12,7 +12,7 @@
           :class="roundsStore.viewingRoundNumber === snap.roundNumber
             ? 'bg-amber-500 text-black border-amber-400 shadow-sm'
             : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
-          :title="`View archived notes from Round ${snap.roundNumber}`"
+          :title="`R${snap.roundNumber}`"
           @click="roundsStore.setViewingRound(snap.roundNumber)"
         >
           R{{ snap.roundNumber }}
@@ -23,11 +23,11 @@
           :class="!roundsStore.isViewingHistory
             ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
             : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
-          title="Return to current live round"
+          :title="t('header.returnToLive')"
           @click="roundsStore.setViewingRound(null)"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>R{{ roundsStore.currentRoundNumber }} (Live)</span>
+          <span>R{{ roundsStore.currentRoundNumber }} ({{ t('header.live') }})</span>
         </button>
       </div>
 
@@ -40,11 +40,11 @@
           :class="micPermissionState === 'granted'
             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 cursor-default'
             : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-400 shadow-sm cursor-pointer'"
-          :title="micPermissionState === 'granted' ? 'Microphone permission active' : 'Click to request browser microphone permission'"
+          :title="micPermissionState === 'granted' ? t('settings.micAllowed') : t('settings.micAllow')"
           @click="requestMicrophonePermission"
         >
           <AppIcon :name="micPermissionState === 'granted' ? 'check' : 'mic'" class="w-3 h-3 shrink-0" />
-          <span>{{ micPermissionState === 'granted' ? 'Mic Ready' : 'Allow Mic' }}</span>
+          <span>{{ micPermissionState === 'granted' ? t('settings.micAllowed') : t('settings.micAllow') }}</span>
         </button>
 
         <span class="text-gray-400 text-[10px]">Lang:</span>
@@ -57,6 +57,9 @@
           <option value="pt-BR">🇧🇷 Português</option>
           <option value="en-US">🇺🇸 English</option>
           <option value="es-ES">🇪🇸 Español</option>
+          <option value="ko-KR">🇰🇷 한국어</option>
+          <option value="fr-FR">🇫🇷 Français</option>
+          <option value="de-DE">🇩🇪 Deutsch</option>
         </select>
       </div>
     </div>
@@ -68,13 +71,13 @@
     >
       <span class="flex items-center gap-1">
         <AppIcon name="clock" class="w-3.5 h-3.5 shrink-0" />
-        <span>Archived notes from Round {{ roundsStore.viewingRoundNumber }} (Read-Only)</span>
+        <span>{{ t('header.historyNotice') }} R{{ roundsStore.viewingRoundNumber }} {{ t('header.historyReadOnly') }}</span>
       </span>
       <button
         class="text-[11px] underline hover:text-amber-400 font-bold"
         @click="roundsStore.setViewingRound(null)"
       >
-        Return to Live →
+        {{ t('header.returnToLive') }}
       </button>
     </div>
 
@@ -115,10 +118,10 @@
             class="text-xs font-bold text-gray-800 dark:text-gray-200"
           >
             <template v-if="roundsStore.isViewingHistory">
-              Round {{ roundsStore.viewingRoundNumber }} Notes
+              {{ t('notes.roundNotes', { round: roundsStore.viewingRoundNumber }) }}
             </template>
             <template v-else>
-              Round {{ roundsStore.currentRoundNumber }} Notes
+              {{ t('notes.roundNotes', { round: roundsStore.currentRoundNumber }) }}
             </template>
           </label>
           <button
@@ -128,17 +131,17 @@
             :class="isRecordingRoundNotes
               ? 'bg-red-600 text-white border-red-500 shadow-md animate-pulse'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
-            :title="isRecordingRoundNotes ? 'Listening... click to stop' : 'Click to dictate notes'"
+            :title="isRecordingRoundNotes ? t('notes.stopVoice') : t('notes.startVoice')"
             @click="toggleRecordRoundNotes"
           >
             <span v-if="isRecordingRoundNotes" class="w-2 h-2 rounded-full bg-white animate-ping" />
             <AppIcon name="mic" class="w-3.5 h-3.5 shrink-0" />
-            <span class="text-[10px]">{{ isRecordingRoundNotes ? 'Listening' : 'Dictate' }}</span>
+            <span class="text-[10px]">{{ isRecordingRoundNotes ? t('notes.listening') : t('notes.startVoice') }}</span>
           </button>
         </div>
         <span class="text-[10px] text-gray-500 dark:text-gray-400">
-          <template v-if="roundsStore.isViewingHistory">Historical snapshot (Read-Only)</template>
-          <template v-else>Saved &amp; carried to next round</template>
+          <template v-if="roundsStore.isViewingHistory">{{ t('notes.readOnlySnapshot') }}</template>
+          <template v-else>{{ t('notes.savedInherited') }}</template>
         </span>
       </div>
       <div class="relative mt-1 rounded-md">
@@ -147,7 +150,7 @@
           ref="roundNotesEl"
           v-model="displayRoundNotes"
           :readonly="roundsStore.isViewingHistory"
-          placeholder="e.g. Red saw me scan in medbay, Yellow claims Engineer..."
+          :placeholder="t('notes.roundPlaceholder')"
           rows="4"
           class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           :class="{ 'opacity-80 bg-gray-50 dark:bg-gray-900 cursor-not-allowed': roundsStore.isViewingHistory }"
@@ -163,7 +166,7 @@
             for="game-notes"
             class="text-xs font-bold text-gray-800 dark:text-gray-200"
           >
-            <span>Match Notes</span>
+            <span>{{ t('notes.matchNotes') }}</span>
           </label>
           <button
             v-if="isSpeechRecognitionSupported"
@@ -172,17 +175,16 @@
             :class="isRecordingGameNotes
               ? 'bg-red-600 text-white border-red-500 shadow-md animate-pulse'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'"
-            :title="isRecordingGameNotes ? 'Listening... click to stop' : 'Click to dictate notes'"
+            :title="isRecordingGameNotes ? t('notes.stopVoice') : t('notes.startVoice')"
             @click="toggleRecordGameNotes"
           >
             <span v-if="isRecordingGameNotes" class="w-2 h-2 rounded-full bg-white animate-ping" />
             <AppIcon name="mic" class="w-3.5 h-3.5 shrink-0" />
-            <span class="text-[10px]">{{ isRecordingGameNotes ? 'Listening' : 'Dictate' }}</span>
+            <span class="text-[10px]">{{ isRecordingGameNotes ? t('notes.listening') : t('notes.startVoice') }}</span>
           </button>
         </div>
         <span class="text-[10px] text-gray-500 dark:text-gray-400">
-          <template v-if="resetNotesOnNewGame">Saved for entire game</template>
-          <template v-else>Never cleared</template>
+          {{ t('notes.persistentRounds') }}
         </span>
       </div>
       <div class="relative w-full mt-1">
@@ -190,7 +192,7 @@
           id="game-notes"
           ref="gameNotesEl"
           v-model="gameNotes"
-          placeholder="e.g. Orange and Cyan grouping together every round..."
+          :placeholder="t('notes.matchPlaceholder')"
           rows="4"
           class="w-full p-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
@@ -207,6 +209,7 @@ import allColors from "~/utils/playerColors.js";
 declare const webkitSpeechRecognition: any;
 declare const webkitSpeechGrammarList: any;
 
+const { t } = useI18n();
 const notesStore = useNotesStore();
 const roundsStore = useRoundsStore();
 const settingsStore = useSettingsStore();

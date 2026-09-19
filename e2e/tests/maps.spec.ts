@@ -18,7 +18,7 @@ test.describe("Map display and selection", () => {
   test("Clicking Hide map hides the map container again", async ({ page }) => {
     await page.click("[data-test='toggle-map-btn']"); // show
     // After showing, click the now-visible "Hide map" button specifically
-    await page.locator("[data-test='toggle-map-btn']:visible").click(); // hide
+    await page.locator("[data-test='toggle-map-btn']:visible").first().click(); // hide
     await expect(page.locator("[data-test='map-container']")).not.toBeVisible();
   });
 
@@ -37,7 +37,7 @@ test.describe("Map display and selection", () => {
     test("The Skeld is selected by default", async ({ page }) => {
       await expect(
         page.locator("[data-test='map-btn-the-skeld']").first()
-      ).toHaveClass(/button-success/);
+      ).toHaveClass(/bg-emerald-600/);
     });
 
     test("Selecting Mira HQ activates its button", async ({ page }) => {
@@ -47,10 +47,10 @@ test.describe("Map display and selection", () => {
         .click();
       await expect(
         page.locator("[data-test='map-btn-mira-hq']").first()
-      ).toHaveClass(/button-success/);
+      ).toHaveClass(/bg-emerald-600/);
       await expect(
         page.locator("[data-test='map-btn-the-skeld']").first()
-      ).not.toHaveClass(/button-success/);
+      ).not.toHaveClass(/bg-emerald-600/);
     });
 
     test("Selecting Polus activates its button", async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe("Map display and selection", () => {
         .click();
       await expect(
         page.locator("[data-test='map-btn-polus']").first()
-      ).toHaveClass(/button-success/);
+      ).toHaveClass(/bg-emerald-600/);
     });
 
     test("Selecting The Airship activates its button", async ({ page }) => {
@@ -70,7 +70,7 @@ test.describe("Map display and selection", () => {
         .click();
       await expect(
         page.locator("[data-test='map-btn-the-airship']").first()
-      ).toHaveClass(/button-success/);
+      ).toHaveClass(/bg-emerald-600/);
     });
 
     test("Selecting The Fungle activates its button", async ({ page }) => {
@@ -80,7 +80,7 @@ test.describe("Map display and selection", () => {
         .click();
       await expect(
         page.locator("[data-test='map-btn-the-fungle']").first()
-      ).toHaveClass(/button-success/);
+      ).toHaveClass(/bg-emerald-600/);
     });
 
     test("Mira HQ shows a Show/Hide sensors button", async ({ page }) => {

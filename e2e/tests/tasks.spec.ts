@@ -31,7 +31,7 @@ test.describe("Tasks modal", () => {
     await expect(page.locator("[role='dialog'] table tbody tr").first()).toBeVisible();
 
     // Switch to Mira HQ
-    await page.locator("[role='dialog'] [data-test='map-btn-mira-hq']").click();
+    await page.locator("[role='dialog']").getByRole("button", { name: "Mira HQ" }).click();
     await expect(page.locator("[role='dialog'] table tbody tr").first()).toBeVisible();
   });
 
@@ -39,5 +39,30 @@ test.describe("Tasks modal", () => {
     await openTasks(page);
     await closeModal(page);
     await expect(page.locator("[role='dialog']")).not.toBeVisible();
+  });
+
+  test("Player card allows toggling task completion and displays checkmark badge", async ({
+    page,
+  }) => {
+    // Activate all crew
+    await page.click("[data-test='activate-all-btn']");
+    const card = page.locator("[data-test^='crew-member-']").first();
+    await expect(card).toBeVisible();
+
+    // Click card to open context menu
+    await card.click();
+    const tasksToggleBtn = page.locator("[data-test='card-toggle-tasks-btn']");
+    await expect(tasksToggleBtn).toBeVisible();
+    await expect(tasksToggleBtn).toContainText("In Progress");
+
+    // Toggle tasks to done
+    await tasksToggleBtn.click();
+    await expect(tasksToggleBtn).toContainText("Done");
+
+    // Close menu by clicking overlay or close button
+    await page.locator("[data-test='card-menu-overlay']").click({ force: true });
+
+    // Check that card now has tasks done badge
+    await expect(card.locator("[data-test='tasks-done-badge']")).toBeVisible();
   });
 });

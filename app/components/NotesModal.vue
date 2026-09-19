@@ -1,6 +1,6 @@
 <template>
   <Modal @close="emit('close')">
-    <template #title>Notes</template>
+    <template #title>{{ t('dock.notes') }}</template>
     <template #body>
       <Notes />
     </template>
@@ -8,5 +8,6 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const emit = defineEmits<{ close: [] }>()
 </script>
