@@ -3,6 +3,28 @@
     <Modal @close="emit('close')">
       <template #title>Tasks & Visual Reference</template>
       <template #body>
+        <!-- Impostor Fake Tasks Alert Banner (when Impostor Mode is active) -->
+        <div
+          v-if="impostorStore.isImpostorModeActive"
+          class="p-2.5 mb-3 rounded-lg bg-red-500/15 border border-red-500/30 text-xs text-red-900 dark:text-red-200 leading-relaxed shadow-sm"
+        >
+          <div class="flex items-center justify-between font-bold mb-1">
+            <span class="flex items-center gap-1.5 text-xs text-red-700 dark:text-red-400">
+              <AppIcon name="flame" class="w-4 h-4 shrink-0" />
+              <span>Impostor Tactics: Fake Tasks Advisory</span>
+            </span>
+            <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-500/20 text-red-700 dark:text-red-300 font-bold">
+              Impostor Mode
+            </span>
+          </div>
+          <p class="text-[11px] opacity-90 mb-1">
+            ⚠️ <strong>Never fake Visual Tasks</strong> if visual animations are ON in match settings — crewmates will see no animation and report you!
+          </p>
+          <p class="text-[11px] opacity-90">
+            🎯 <strong>Safe to fake:</strong> Common tasks (only if everyone has them) or Short tasks without animations (Wires, Download, Swipe Card). Stand at the station for the realistic duration!
+          </p>
+        </div>
+
         <!-- Detective Tip Banner -->
         <div class="p-2.5 mb-3 rounded-lg bg-blue-500/10 border border-blue-500/25 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
           <p class="font-bold mb-1 flex items-center gap-1.5 text-xs">
@@ -135,6 +157,7 @@ const emit = defineEmits<{ close: [] }>();
 
 const tasksStore = useTasksStore();
 const mapsStore = useMapsStore();
+const impostorStore = useImpostorStore();
 
 const activeFilter = ref("all");
 const searchQuery = ref("");
