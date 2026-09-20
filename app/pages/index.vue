@@ -1,12 +1,12 @@
 <template>
   <div
-    class="flex flex-col p-2 pb-20 sm:pb-24 lg:p-8 lg:pb-24 transition-colors duration-300 min-h-screen text-gray-100"
+    class="flex flex-col p-2 pb-20 sm:pb-24 lg:p-8 lg:pb-24 transition-colors duration-300 min-h-screen text-gray-100 w-full max-w-full overflow-x-hidden"
     :class="impostorStore.isImpostorModeActive
       ? 'bg-gradient-to-b from-rose-950/40 via-gray-950 to-gray-950'
       : 'bg-gradient-to-b from-gray-900/40 via-gray-950 to-gray-950'"
   >
     <!-- Header Action Controls -->
-    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 w-full max-w-full">
       <!-- Left: Round Timeline Selector -->
       <div
         class="flex items-center gap-1 p-1 rounded-lg border shadow-inner overflow-x-auto min-w-0 max-w-full transition-colors"
@@ -94,7 +94,7 @@
           </div>
 
           <button
-            class="h-9 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm w-full sm:w-auto justify-center"
+            class="min-h-[38px] py-1 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm w-full sm:w-auto justify-center"
             :class="crewStore.activeCrewMembers.length > 0 && !roundsStore.isViewingHistory && !roundsStore.isMaxRoundsReached
               ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 shadow-emerald-950/30'
               : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
@@ -104,12 +104,12 @@
             @click="initNewRound"
           >
             <AppIcon name="bell" class="w-4 h-4 shrink-0" />
-            <div class="flex flex-col text-left leading-none">
+            <div class="flex flex-col text-left leading-tight py-0.5">
               <div class="flex items-center gap-1">
-                <span>{{ t('header.nextRound') }}</span>
+                <span class="leading-tight">{{ t('header.nextRound') }}</span>
                 <span v-if="roundsStore.isMaxRoundsReached" class="text-[9px] text-amber-300 font-semibold">(Max R10)</span>
               </div>
-              <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">{{ t('header.meetingEnded') }}</span>
+              <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5 leading-tight">{{ t('header.meetingEnded') }}</span>
             </div>
           </button>
         </div>
@@ -118,7 +118,7 @@
 
         <!-- New Match Button (Destructive / Full Reset Action) -->
         <button
-          class="h-9 px-2.5 sm:px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 justify-center"
+          class="min-h-[38px] py-1 px-2.5 sm:px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 justify-center"
           :class="crewStore.activeCrewMembers.length > 0
             ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/40'
             : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
@@ -128,9 +128,9 @@
           @click="initNewMatch"
         >
           <AppIcon name="refresh" class="w-3.5 h-3.5 shrink-0" />
-          <div class="flex flex-col text-left leading-none">
-            <span>{{ t('header.newMatch') }}</span>
-            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">{{ t('header.resetGame') }}</span>
+          <div class="flex flex-col text-left leading-tight py-0.5">
+            <span class="leading-tight">{{ t('header.newMatch') }}</span>
+            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5 leading-tight">{{ t('header.resetGame') }}</span>
           </div>
         </button>
       </div>
@@ -214,7 +214,7 @@
     />
 
     <!-- Unified Detective / Impostor Notepad (Collapsible, Voice-Integrated, Dual-Role) -->
-    <DetectiveNotepad ref="notepadRef" class="mt-3 mb-4" @open-impostor-hud="toggleImpostorModal" />
+    <DetectiveNotepad ref="notepadRef" class="mt-3 mb-4" />
 
     <!-- Interactive Map Section (Below Detective Notepad) -->
     <div class="relative mb-16">
@@ -222,24 +222,26 @@
     </div>
 
     <!-- Modern Bottom Detective Toolbar (Persistent Dock) -->
-    <footer class="fixed bottom-0 left-0 right-0 z-30 h-12 flex items-center justify-between px-2 sm:px-4 md:px-6 bg-gray-900/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-700/60 dark:border-gray-800/80 shadow-2xl">
+    <footer class="fixed bottom-0 left-0 right-0 z-30 h-12 flex items-center justify-between px-1.5 sm:px-4 md:px-6 bg-gray-900/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-700/60 dark:border-gray-800/80 shadow-2xl max-w-full overflow-x-hidden">
       <!-- Left: Investigation Tools (Notes, Map, Tasks, Impostor) -->
       <div class="flex items-center gap-1 sm:gap-2 shrink-0">
         <!-- Notes Button (Prominent & Evident) -->
         <button
-          class="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm flex items-center gap-1.5 transition-all shrink-0 cursor-pointer"
+          type="button"
+          class="h-8 px-2 sm:px-3 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm flex items-center gap-1 sm:gap-1.5 transition-all shrink-0 cursor-pointer"
           data-test="notes-btn"
           :title="`${t('dock.notes')} (N)`"
           @click="handleDockNotesClick"
         >
           <AppIcon name="notes" class="w-3.5 h-3.5 shrink-0" />
-          <span>{{ t('dock.notes') }}</span>
+          <span class="hidden xs:inline sm:inline">{{ t('dock.notes') }}</span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-blue-100 font-mono">N</kbd>
         </button>
 
         <!-- Map Toggle Button -->
         <button
-          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+          type="button"
+          class="h-8 px-1.5 sm:px-2.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 cursor-pointer"
           :class="mapsStore.isMapVisible
             ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/40'
             : 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700/60'"
@@ -248,13 +250,14 @@
           @click="toggleMapVisibility"
         >
           <AppIcon name="map" class="w-3.5 h-3.5 shrink-0" />
-          <span>{{ mapsStore.isMapVisible ? t('dock.hideMap') : t('dock.map') }}</span>
+          <span class="hidden xs:inline sm:inline">{{ mapsStore.isMapVisible ? t('dock.hideMap') : t('dock.map') }}</span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-gray-300 font-mono">M</kbd>
         </button>
 
         <!-- Tasks Reference Button -->
         <button
-          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
+          type="button"
+          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 cursor-pointer shadow-xs"
           :class="impostorStore.isImpostorModeActive
             ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-amber-100 border border-amber-500/60 ring-1 ring-amber-500/40 font-bold'
             : 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60'"
@@ -263,29 +266,31 @@
           @click="toggleTasksModal"
         >
           <AppIcon name="tasks" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-amber-400' : 'opacity-80'" />
-          <span>{{ t('dock.tasksGuide') }}</span>
+          <span class="hidden sm:inline">{{ t('dock.tasksGuide') }}</span>
+          <span class="sm:hidden text-xs">Tasks</span>
           <span
             v-if="impostorStore.isImpostorModeActive"
-            class="hidden xs:inline text-[9px] px-1 py-0.2 rounded bg-amber-500/30 text-amber-200 font-black uppercase tracking-wider"
+            class="text-[8px] sm:text-[9px] px-1 py-0.2 rounded bg-amber-500/30 text-amber-200 font-black uppercase tracking-wider"
           >
             Fake
           </span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-gray-300 font-mono">T</kbd>
         </button>
 
-        <!-- Impostor Mode Toggle Button -->
+        <!-- Impostor Mode Direct Toggle Button -->
         <button
-          class="h-8 px-2 sm:px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
+          type="button"
+          class="h-8 px-2 sm:px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 sm:gap-1.5 shrink-0 shadow-sm cursor-pointer"
           :class="impostorStore.isImpostorModeActive
-            ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/70 border border-rose-400 ring-2 ring-rose-500/80 animate-pulse'
+            ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/70 border border-rose-400 ring-2 ring-rose-500/80'
             : 'bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 hover:text-rose-300 border border-rose-800/50'"
           data-test="impostor-mode-btn"
           :title="`${t('dock.impostorMode')} (I)`"
-          @click="toggleImpostorModal"
+          @click="impostorStore.toggleImpostorMode()"
         >
           <AppIcon name="skull" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-white' : 'text-rose-400'" />
           <span class="hidden sm:inline">{{ t('dock.impostorMode') }}</span>
-          <span class="sm:hidden">{{ t('dock.impostorShort') }}</span>
+          <span class="sm:hidden text-xs">Impostor</span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-rose-200 font-mono">I</kbd>
         </button>
       </div>
@@ -293,7 +298,8 @@
       <!-- Right: System Controls (Settings, Help, About) -->
       <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <button
-          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
+          type="button"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="settings-btn"
           title="Settings"
           aria-label="Settings"
@@ -303,7 +309,8 @@
           <span class="hidden sm:inline">{{ t('dock.settings') }}</span>
         </button>
         <button
-          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
+          type="button"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="help-btn"
           title="How to play / Tutorial"
           aria-label="Help"
@@ -313,7 +320,8 @@
           <span class="hidden sm:inline">{{ t('dock.help') }}</span>
         </button>
         <button
-          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
+          type="button"
+          class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="about-btn"
           title="About Among Us Detective"
           aria-label="About"
@@ -329,7 +337,6 @@
     <AboutModal v-if="isAboutModalOpen" @close="toggleAboutModal" />
     <SettingsModal v-if="isSettingsModalOpen" @close="toggleSettingsModal" />
     <TasksModal v-if="isTasksModalOpen" @close="isTasksModalOpen = false" />
-    <ImpostorModeModal v-if="isImpostorModalOpen" @close="isImpostorModalOpen = false" />
     <CookieWarning />
   </div>
 </template>
@@ -377,7 +384,6 @@ function toggleMapVisibility() {
 const isHelpModalOpen = ref(false)
 const isAboutModalOpen = ref(false)
 const isTasksModalOpen = ref(false)
-const isImpostorModalOpen = ref(false)
 const isNextRoundInfoOpen = ref(false)
 const isNextRoundInfoHover = ref(false)
 const isTouchDevice = ref(false)
@@ -496,10 +502,6 @@ onMounted(() => {
       if (isTyping) {
         target.blur()
       }
-      if (isImpostorModalOpen.value) {
-        isImpostorModalOpen.value = false
-        return
-      }
       if (notepadRef.value && !notepadRef.value.isMinimized) {
         notepadRef.value.minimize()
       }
@@ -510,19 +512,19 @@ onMounted(() => {
       return
     }
 
-    if (e.code === 'KeyN' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value && !isImpostorModalOpen.value) {
+    if (e.code === 'KeyN' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value) {
       e.preventDefault()
       toggleNotes()
       return
     }
 
-    if (e.code === 'KeyM' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value && !isImpostorModalOpen.value) {
+    if (e.code === 'KeyM' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value) {
       e.preventDefault()
       toggleMapVisibility()
       return
     }
 
-    if (e.code === 'KeyT' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isImpostorModalOpen.value) {
+    if (e.code === 'KeyT' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value) {
       e.preventDefault()
       toggleTasksModal()
       return
@@ -530,7 +532,7 @@ onMounted(() => {
 
     if (e.code === 'KeyI' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value) {
       e.preventDefault()
-      toggleImpostorModal()
+      impostorStore.toggleImpostorMode()
       return
     }
 
@@ -611,15 +613,6 @@ function toggleTasksModal() {
   const newValue = !isTasksModalOpen.value
   isTasksModalOpen.value = newValue
   if (newValue) gtag('event', 'open_fake_tasks', { event_category: 'global_stats' })
-}
-
-function toggleImpostorModal() {
-  if (!impostorStore.isImpostorModeActive) {
-    impostorStore.setImpostorMode(true)
-  }
-  const newValue = !isImpostorModalOpen.value
-  isImpostorModalOpen.value = newValue
-  if (newValue) gtag('event', 'open_impostor_hud', { event_category: 'global_stats' })
 }
 </script>
 

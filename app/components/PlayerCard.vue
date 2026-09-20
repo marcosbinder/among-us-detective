@@ -18,7 +18,7 @@
     @dragstart="closeMenu"
   >
     <span
-      class="w-full shrink-0 font-bold capitalize text-center break-words leading-tight rounded mb-0.5"
+      class="w-full shrink-0 font-bold capitalize text-center break-words leading-tight rounded mb-1 sm:mb-1.5"
       :class="[
         nameTextClasses,
         highlightColorNames

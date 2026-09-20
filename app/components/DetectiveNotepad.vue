@@ -9,7 +9,7 @@
   >
     <!-- Notepad Header Bar (Clean, Compact & Perfectly Aligned) -->
     <header
-      class="flex items-center justify-between px-2.5 py-1.5 sm:px-3 sm:py-1.5 gap-2 border-b transition-colors"
+      class="flex flex-wrap sm:flex-nowrap items-center justify-between px-2.5 py-1.5 sm:px-3 sm:py-1.5 gap-2 border-b transition-colors w-full max-w-full overflow-hidden"
       :class="impostorStore.isImpostorModeActive
         ? 'border-rose-900/40 bg-rose-950/40'
         : 'border-gray-800/80 bg-gray-900/60'"
@@ -90,19 +90,6 @@
             {{ t('notes.allowMic') }}
           </button>
         </div>
-
-        <!-- Impostor Mode HUD / Kill Timer Shortcut -->
-        <button
-          v-if="impostorStore.isImpostorModeActive"
-          type="button"
-          data-test="open-impostor-hud-btn"
-          class="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold bg-rose-600 hover:bg-rose-500 text-white border border-rose-400 shadow-sm cursor-pointer transition-all select-none"
-          :title="t('impostor.openHud')"
-          @click="emit('open-impostor-hud')"
-        >
-          <AppIcon name="skull" class="w-3.5 h-3.5 shrink-0" />
-          <span>HUD</span>
-        </button>
 
         <!-- Color Highlighting Toggle -->
         <button
@@ -319,10 +306,6 @@ import { useImpostorStore } from '~/stores/impostor'
 declare const SpeechRecognition: any
 declare const webkitSpeechRecognition: any
 declare const webkitSpeechGrammarList: any
-
-const emit = defineEmits<{
-  'open-impostor-hud': []
-}>()
 
 const { t, locale } = useI18n()
 const notesStore = useNotesStore()
