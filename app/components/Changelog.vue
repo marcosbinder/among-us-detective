@@ -23,9 +23,24 @@ interface ChangelogItem {
 
 const changelog: ChangelogItem[] = [
   {
-    date: 'Version 2.0 (2026)',
+    date: '2026-09-20 (v2.1 - Performance, Shortcuts & Help Overhaul)',
+    changes: [
+      '<b>⚡ Performance & Smoothness:</b> Added "Disable animations" option in Settings to eliminate all CSS transitions and keyframes, providing a lightweight, lag-free experience on low-end hardware',
+      '<b>📚 Help Modal Visual Overhaul:</b> Expanded modal to comfortable ~700px width, replaced native tab scrollbar with sleek segmented navigation, increased card spacing, and visually upgraded Lobby Setup, Impostor HUD, and Hotkeys panel',
+      '<b>⌨️ Full Keyboard Shortcuts:</b> Added quick hotkey access: <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">N</kbd> (Notes), <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">M</kbd> (Map), <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">T</kbd> (Tasks), <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">I</kbd> (Impostor HUD), <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">L</kbd> (Roster), <kbd class="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700 font-mono text-xs">Esc</kbd> (Close/Minimize)',
+      '<b>📜 Disclaimer & Authorship Credits:</b> Clarified original authorship conceived and credited by Alexandre Atlesque with link to original GitHub (<a href="https://github.com/atlesque/among-us-detective" target="_blank" class="text-blue-500 underline">atlesque/among-us-detective</a>), modernized by Marcos Binder (<a href="mailto:mrbbinder@gmail.com" class="text-emerald-500 underline">mrbbinder@gmail.com</a> / <a href="https://github.com/marcosbinder/among-us-detective" target="_blank" class="text-gray-400 underline">fork v2.0</a>), added original legacy disclaimer viewer, and clarified that PayPal donations go directly to Alexandre Atlesque',
+      '<b>🌐 100% Multilingual:</b> Complete i18n coverage across all 6 locales (en-US, pt-BR, es-ES, ko-KR, fr-FR, de-DE)',
+    ],
+  },
+  {
+    date: '2026-09-18 (Version 2.0 Overhaul)',
     changes: [
       '<b>✨ Added & Modernized:</b>',
+      'Multilingual localization (i18n) supporting English, Portuguese, Spanish, Korean, French, and German with browser auto-detection and Settings switcher',
+      'Dedicated Impostor Operations HUD with interactive kill cooldown timer, fake task safety advisor, sabotage planner, and fellow impostor coordination',
+      'Player Tasks Completion tracker (Done ✓ / In Progress) and Emergency Meetings counter directly in player card context menu',
+      'Modern 4-tab visual walkthrough tutorial (Match Setup, Meeting Rounds, Deduction Board, Map & Voice Notes)',
+      'Modern responsive dark-mode Disclaimer page detailing 100% compliance with Innersloth companion tool policy',
       'Modern 6-column deduction hierarchy: Hard Clear, Trusted, Unknown, Suspicious, Impostor, and Dead',
       'Match Lobby Roster with all 18 official Among Us bean colors, live count indicator, and responsive mobile layout',
       'Compact floating Role Popover with official role icons (Detective, Judge, Scientist, Engineer, Noisemaker, Shapeshifter, Phantom, Viper) and claim verification badges',
