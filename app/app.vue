@@ -14,12 +14,28 @@
 </template>
 
 <script setup lang="ts">
+import { checkAndExpireMatchSession, touchMatchActivity } from '~/utils/sessionManager'
+
 const darkModeStore = useDarkModeStore()
 const { isDarkMode, hasDarkModeBeenSetBefore } = storeToRefs(darkModeStore)
+const settingsStore = useSettingsStore()
+const { disableAnimations } = storeToRefs(settingsStore)
+
+const crewStore = useCrewStore()
+const roundsStore = useRoundsStore()
+const notesStore = useNotesStore()
+const tasksStore = useTasksStore()
+const impostorStore = useImpostorStore()
+
+const { locale } = useI18n()
 
 useHead({
   htmlAttrs: {
-    class: computed(() => (isDarkMode.value ? 'dark-mode' : '')),
+    lang: computed(() => locale.value || 'en'),
+    class: computed(() => [
+      isDarkMode.value ? 'dark-mode' : '',
+      disableAnimations.value ? 'disable-animations' : ''
+    ].filter(Boolean).join(' ')),
   },
 })
 
@@ -30,6 +46,45 @@ onMounted(() => {
   if (!hasDarkModeBeenSetBefore.value) {
     darkModeStore.setDarkMode(true)
   }
+
+  // Verify match session expiration (2-hour TTL)
+  checkAndExpireMatchSession({
+    crewStore,
+    roundsStore,
+    notesStore,
+    tasksStore,
+    impostorStore,
+  })
+
+  // Re-check when returning to the tab after being away
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkAndExpireMatchSession({
+        crewStore,
+        roundsStore,
+        notesStore,
+        tasksStore,
+        impostorStore,
+      })
+    }
+  })
+
+  // Touch match activity on active state changes
+  watch(
+    () => [
+      crewStore.crewMembers,
+      roundsStore.currentRoundNumber,
+      roundsStore.roundHistory,
+      notesStore.roundNotes,
+      notesStore.gameNotes,
+      impostorStore.isImpostorModeActive,
+      impostorStore.fellowImpostors,
+    ],
+    () => {
+      touchMatchActivity()
+    },
+    { deep: true }
+  )
 
   const hasDismissed = JSON.parse(localStorage.getItem('appInstallationDismissed') ?? 'false')
   if (!hasDismissed) {

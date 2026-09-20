@@ -8,9 +8,6 @@
       :delay="160"
       :delay-on-touch-only="true"
       :touch-start-threshold="4"
-      :force-fallback="true"
-      :fallback-on-body="true"
-      :fallback-tolerance="3"
       ghost-class="sortable-ghost"
       chosen-class="sortable-chosen"
       drag-class="sortable-drag"
@@ -26,7 +23,6 @@
           :show-player-names="showPlayerNames === true"
           :is-player="member.isPlayer"
           :data-test="`crew-member-${member.color}`"
-          @dblclick="removeMember(member)"
         />
       </template>
     </Draggable>
@@ -45,17 +41,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   changed: [value: CrewMember[]]
-  removed: [member: CrewMember]
 }>()
 
 const crewMembersInPool = computed({
   get: () => props.crewMembers,
   set: (value: CrewMember[]) => emit('changed', value),
 })
-
-function removeMember(member: CrewMember) {
-  emit('removed', member)
-}
 </script>
 
 <style lang="scss">

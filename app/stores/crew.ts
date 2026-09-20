@@ -284,7 +284,6 @@ export const useCrewStore = defineStore("crew", () => {
           roleConfirmed = true;
         } else if (status === 'impostor') {
           if (isCrewRole) {
-            role = null;
             roleConfirmed = false;
           } else if (isImpostor) {
             roleConfirmed = true;
@@ -804,4 +803,4 @@ export const useCrewStore = defineStore("crew", () => {
     setCrewMemberPlayerName,
     resetAllPlayerNames,
   };
-});
+}, { persist: true });

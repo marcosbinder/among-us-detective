@@ -2,6 +2,7 @@ export const useSettingsStore = defineStore(
   "settings",
   () => {
     const highlightColorNames = ref(false);
+    const highlightNotesColors = ref(true);
     const showImposterCheckbox = ref(true);
     const showTasksCheckbox = ref(true);
     const showMeetingsCount = ref(true);
@@ -13,18 +14,36 @@ export const useSettingsStore = defineStore(
     const canTrackOwnColor = ref(true);
     const isImproveMapContrastEnabled = ref(true);
     const boardZoom = ref<'compact' | 'normal' | 'large' | 'extra-large'>('normal');
-    const speechLanguage = ref<'auto' | 'pt-BR' | 'en-US' | 'es-ES'>('auto');
+    const disableAnimations = ref(false);
+    const speechLanguage = ref<'auto' | 'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('auto');
+    const uiLanguage = ref<'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('en-US');
+    const hasAutoDetectedLanguage = ref(false);
+
+    function setDisableAnimations(value: boolean) {
+      disableAnimations.value = value;
+    }
 
     function setBoardZoom(value: 'compact' | 'normal' | 'large' | 'extra-large') {
       boardZoom.value = value;
     }
 
-    function setSpeechLanguage(value: 'auto' | 'pt-BR' | 'en-US' | 'es-ES') {
+    function setSpeechLanguage(value: 'auto' | 'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE') {
       speechLanguage.value = value;
+    }
+
+    function setUiLanguage(value: 'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE') {
+      uiLanguage.value = value;
+    }
+
+    function setHasAutoDetectedLanguage(value: boolean) {
+      hasAutoDetectedLanguage.value = value;
     }
 
     function setHighlightColorNames(value: boolean) {
       highlightColorNames.value = value;
+    }
+    function setHighlightNotesColors(value: boolean) {
+      highlightNotesColors.value = value;
     }
     function setShowImposterCheckbox(value: boolean) {
       showImposterCheckbox.value = value;
@@ -59,6 +78,7 @@ export const useSettingsStore = defineStore(
 
     return {
       highlightColorNames,
+      highlightNotesColors,
       showImposterCheckbox,
       showTasksCheckbox,
       showMeetingsCount,
@@ -70,8 +90,12 @@ export const useSettingsStore = defineStore(
       canTrackOwnColor,
       isImproveMapContrastEnabled,
       boardZoom,
+      disableAnimations,
       speechLanguage,
+      uiLanguage,
+      hasAutoDetectedLanguage,
       setHighlightColorNames,
+      setHighlightNotesColors,
       setShowImposterCheckbox,
       setShowTasksCheckbox,
       setShowMeetingsCount,
@@ -83,7 +107,10 @@ export const useSettingsStore = defineStore(
       setCanTrackOwnColor,
       setIsImproveMapContrastEnabled,
       setBoardZoom,
+      setDisableAnimations,
       setSpeechLanguage,
+      setUiLanguage,
+      setHasAutoDetectedLanguage,
     };
   },
   { persist: true }

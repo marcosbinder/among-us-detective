@@ -1,12 +1,22 @@
 <template>
-  <div class="flex flex-col p-2 pb-20 sm:pb-24 lg:p-8 lg:pb-24">
+  <div
+    class="flex flex-col p-2 pb-20 sm:pb-24 lg:p-8 lg:pb-24 transition-colors duration-300 min-h-screen text-gray-100"
+    :class="impostorStore.isImpostorModeActive
+      ? 'bg-gradient-to-b from-rose-950/40 via-gray-950 to-gray-950'
+      : 'bg-gradient-to-b from-gray-900/40 via-gray-950 to-gray-950'"
+  >
     <!-- Header Action Controls -->
     <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
       <!-- Left: Round Timeline Selector -->
-      <div class="flex items-center gap-1 bg-gray-200/80 dark:bg-gray-900/80 p-1 rounded-lg border border-gray-300 dark:border-gray-800 shadow-inner overflow-x-auto min-w-0 max-w-full">
+      <div
+        class="flex items-center gap-1 p-1 rounded-lg border shadow-inner overflow-x-auto min-w-0 max-w-full transition-colors"
+        :class="impostorStore.isImpostorModeActive
+          ? 'bg-rose-950/30 border-rose-900/40'
+          : 'bg-gray-200/80 dark:bg-gray-900/80 border-gray-300 dark:border-gray-800'"
+      >
         <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1.5 shrink-0 flex items-center gap-1">
           <AppIcon name="clock" class="w-3.5 h-3.5 shrink-0" />
-          <span class="hidden md:inline">Timeline</span>
+          <span class="hidden md:inline">{{ t('header.timeline') }}</span>
         </span>
         <button
           v-for="s in roundsStore.roundHistory"
@@ -31,32 +41,78 @@
         >
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
           <span>R{{ roundsStore.currentRoundNumber }}</span>
-          <span class="text-[10px] opacity-80 hidden sm:inline">(Live)</span>
+          <span class="text-[10px] opacity-80 hidden sm:inline">({{ t('header.live') }})</span>
         </button>
       </div>
 
       <!-- Right: Meeting / Match Controls -->
       <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-        <!-- Next Round Button (Primary Action for End of Meeting) -->
-        <button
-          class="h-9 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm flex-1 sm:flex-initial justify-center"
-          :class="crewStore.activeCrewMembers.length > 0 && !roundsStore.isViewingHistory && !roundsStore.isMaxRoundsReached
-            ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 shadow-emerald-950/30'
-            : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
-          :disabled="crewStore.activeCrewMembers.length <= 0 || roundsStore.isViewingHistory || roundsStore.isMaxRoundsReached"
-          data-test="new-round-btn"
-          :title="roundsStore.isMaxRoundsReached ? 'Maximum rounds reached (10 rounds)' : 'Meeting concluded — archive round snapshot and advance to next meeting'"
-          @click="initNewRound"
-        >
-          <AppIcon name="bell" class="w-4 h-4 shrink-0" />
-          <div class="flex flex-col text-left leading-none">
-            <div class="flex items-center gap-1">
-              <span>Next Round</span>
-              <span v-if="roundsStore.isMaxRoundsReached" class="text-[9px] text-amber-300 font-semibold">(Max R10)</span>
-            </div>
-            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">Meeting ended</span>
+        <!-- Next Round Button & Info Hint -->
+        <div class="relative flex items-center gap-1.5 flex-1 sm:flex-initial">
+          <!-- Discreet Info (i) Hint Button & Popover on the Left -->
+          <div class="relative inline-flex items-center">
+            <button
+              type="button"
+              class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all shrink-0 cursor-pointer"
+              :class="isNextRoundInfoOpen || isNextRoundInfoHover
+                ? 'bg-amber-500/25 text-amber-300 border border-amber-400/60 shadow-sm'
+                : 'bg-gray-800/60 hover:bg-gray-700 text-gray-400 hover:text-gray-200 border border-gray-700/60'"
+              :title="t('header.nextRoundHint')"
+              :aria-label="t('header.nextRoundHint')"
+              data-test="next-round-info-btn"
+              @mouseenter="isNextRoundInfoHover = true"
+              @mouseleave="isNextRoundInfoHover = false"
+              @click="isNextRoundInfoOpen = !isNextRoundInfoOpen"
+            >
+              i
+            </button>
+
+            <!-- Floating Tooltip / Popover -->
+            <transition name="fade">
+              <div
+                v-if="isNextRoundInfoOpen || isNextRoundInfoHover"
+                class="absolute top-full mt-2 left-0 z-50 w-56 sm:w-64 p-2.5 text-xs text-gray-200 bg-gray-900/95 dark:bg-black/95 border border-amber-500/40 rounded-xl shadow-2xl backdrop-blur-md text-left"
+              >
+                <div class="flex items-center justify-between gap-1.5 font-bold mb-1 text-amber-400 text-[11px]">
+                  <div class="flex items-center gap-1">
+                    <AppIcon name="alert" class="w-3.5 h-3.5 shrink-0" />
+                    <span>{{ t('header.nextRound') }}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="sm:hidden text-[10px] text-gray-400 hover:text-white px-1"
+                    @click.stop="isNextRoundInfoOpen = false"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p class="text-[11px] sm:text-xs font-normal leading-tight text-gray-200">
+                  {{ t('header.nextRoundHint') }}
+                </p>
+              </div>
+            </transition>
           </div>
-        </button>
+
+          <button
+            class="h-9 px-3 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm w-full sm:w-auto justify-center"
+            :class="crewStore.activeCrewMembers.length > 0 && !roundsStore.isViewingHistory && !roundsStore.isMaxRoundsReached
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/40 shadow-emerald-950/30'
+              : 'bg-gray-800/40 text-gray-500 border border-gray-700/30 cursor-not-allowed'"
+            :disabled="crewStore.activeCrewMembers.length <= 0 || roundsStore.isViewingHistory || roundsStore.isMaxRoundsReached"
+            data-test="new-round-btn"
+            :title="roundsStore.isMaxRoundsReached ? 'Maximum rounds reached (10 rounds)' : t('header.nextRoundHint')"
+            @click="initNewRound"
+          >
+            <AppIcon name="bell" class="w-4 h-4 shrink-0" />
+            <div class="flex flex-col text-left leading-none">
+              <div class="flex items-center gap-1">
+                <span>{{ t('header.nextRound') }}</span>
+                <span v-if="roundsStore.isMaxRoundsReached" class="text-[9px] text-amber-300 font-semibold">(Max R10)</span>
+              </div>
+              <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">{{ t('header.meetingEnded') }}</span>
+            </div>
+          </button>
+        </div>
 
         <div class="h-6 w-px bg-gray-700/60 hidden sm:block" />
 
@@ -73,15 +129,15 @@
         >
           <AppIcon name="refresh" class="w-3.5 h-3.5 shrink-0" />
           <div class="flex flex-col text-left leading-none">
-            <span>New Match</span>
-            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">Reset game</span>
+            <span>{{ t('header.newMatch') }}</span>
+            <span class="text-[8px] sm:text-[9px] font-normal opacity-75 block mt-0.5">{{ t('header.resetGame') }}</span>
           </div>
         </button>
       </div>
     </header>
 
     <!-- Match Lobby & Roster Selector (18 Colors, Glowing LEDs, Presets) -->
-    <GameRosterSelector />
+    <GameRosterSelector ref="rosterSelectorRef" />
 
     <!-- Browser Zoom Notice Banner -->
     <div
@@ -92,15 +148,15 @@
       <div class="flex items-center gap-2 min-w-0">
         <AppIcon name="alert" class="w-4 h-4 text-amber-500 shrink-0" />
         <div class="leading-tight text-[11px] sm:text-xs">
-          <span>Browser zoom detected ({{ browserZoomPercent }}%). If layout feels cramped or too small, use built-in <strong>Board Zoom</strong> in </span>
+          <span>{{ t('zoom.detected', { percent: browserZoomPercent }) }} <strong>{{ t('zoom.boardZoom') }}</strong> {{ t('zoom.inSettings').toLowerCase() }} </span>
           <button
             type="button"
             class="underline font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500"
             @click="openSettingsForZoom"
           >
-            Settings
+            {{ t('dock.settings') }}
           </button>
-          <span> for the cleanest fit.</span>
+          <span> {{ t('zoom.forCleanest') }}</span>
         </div>
       </div>
       <button
@@ -121,7 +177,7 @@
       <div class="flex items-center gap-2 min-w-0">
         <AppIcon name="clock" class="w-4 h-4 text-indigo-400 shrink-0" />
         <span class="leading-tight text-[11px] sm:text-xs">
-          Viewing historical snapshot for <strong>Round {{ roundsStore.viewingRoundNumber }}</strong> (Read-Only). Cards reflect past theories.
+          {{ t('header.historyNotice') }} <strong>R{{ roundsStore.viewingRoundNumber }}</strong> {{ t('header.historyReadOnly') }}
         </span>
       </div>
       <button
@@ -129,14 +185,17 @@
         class="shrink-0 px-2.5 py-1 text-xs font-bold rounded bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
         @click="roundsStore.setViewingRound(null)"
       >
-        Return to Live →
+        {{ t('header.returnToLive') }}
       </button>
     </div>
 
-    <!-- Mobile Touch Drag Hint -->
-    <div class="lg:hidden flex items-center justify-center gap-1.5 py-1 px-2 mb-1.5 text-[11px] text-gray-500 dark:text-gray-400 select-none">
+    <!-- Mobile Touch Drag Hint (Only shown on physical touch screens, never on desktop mouse even when resized) -->
+    <div
+      v-if="isTouchDevice"
+      class="touch-only-hint lg:hidden flex items-center justify-center gap-1.5 py-1 px-2 mb-1.5 text-[11px] text-gray-500 dark:text-gray-400 select-none"
+    >
       <AppIcon name="touch" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
-      <span>Tip: Press &amp; hold card briefly to drag</span>
+      <span>{{ t('header.mobileDragHint') }}</span>
     </div>
 
     <!-- 6 Strict Deduction Hierarchy Columns -->
@@ -152,144 +211,82 @@
       :show-player-names="settingsStore.showPlayerNames"
       class="mb-2 lg:mb-3"
       @changed="handleCrewChanged"
-      @removed="handleMemberRemoved"
     />
 
-    <!-- Desktop Quick Notepad (Visible on PC below columns) -->
-    <div class="hidden lg:block mt-3 mb-6 p-3.5 sm:p-4 rounded-xl bg-gray-900/70 dark:bg-gray-950/70 border border-gray-700/60 dark:border-gray-800/80 shadow-md backdrop-blur-sm">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            <AppIcon name="notes" class="w-4 h-4 shrink-0" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-gray-100">Detective Notepad</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700/50">Quick Scratchpad</span>
-            </div>
-            <span class="text-[11px] text-gray-400">Jot quick deductions and player alibis mid-game</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-600/15 hover:bg-blue-600/25 text-blue-400 hover:text-blue-300 border border-blue-500/30 flex items-center gap-1.5 transition-all shadow-sm"
-          @click="toggleNotesModal"
-        >
-          <AppIcon name="mic" class="w-3.5 h-3.5 text-blue-400" />
-          <span>Full Notes &amp; Dictation</span>
-          <kbd class="text-[9px] px-1 py-0.2 rounded bg-black/40 text-gray-300 border border-gray-700/50 font-mono">N</kbd>
-        </button>
-      </div>
+    <!-- Unified Detective / Impostor Notepad (Collapsible, Voice-Integrated, Dual-Role) -->
+    <DetectiveNotepad ref="notepadRef" class="mt-3 mb-4" @open-impostor-hud="toggleImpostorModal" />
 
-      <div class="grid grid-cols-2 gap-3">
-        <!-- Round Notes Column -->
-        <div class="flex flex-col">
-          <div class="flex items-center justify-between text-xs font-semibold text-gray-300 mb-1.5">
-            <div class="flex items-center gap-1.5">
-              <span
-                v-if="roundsStore.isViewingHistory"
-                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30"
-              >
-                <AppIcon name="clock" class="w-3 h-3 shrink-0" />
-                Round {{ roundsStore.viewingRoundNumber }} (Archived)
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                Round {{ roundsStore.currentRoundNumber }} Notes
-              </span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span v-if="roundsStore.isViewingHistory" class="text-[10px] text-amber-400 font-medium">
-                Read-only snapshot
-              </span>
-              <span v-else class="text-[10px] text-gray-500 font-normal">
-                Saved &amp; inherited per round
-              </span>
-              <button
-                v-if="roundsStore.isViewingHistory"
-                type="button"
-                class="text-[10px] text-amber-400 hover:text-amber-300 underline font-bold"
-                @click="roundsStore.setViewingRound(null)"
-              >
-                Return to Live →
-              </button>
-            </div>
-          </div>
-          <textarea
-            v-model="quickRoundNotes"
-            :readonly="roundsStore.isViewingHistory"
-            rows="3"
-            :placeholder="roundsStore.isViewingHistory ? 'No notes recorded for this round' : 'e.g. Lime and Cyan went to Electrical together...'"
-            class="w-full p-2.5 text-xs rounded-lg border bg-gray-800/80 dark:bg-gray-900/90 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500/80 transition-all resize-y min-h-[76px]"
-            :class="roundsStore.isViewingHistory
-              ? 'border-amber-500/40 bg-amber-950/10 text-amber-200/90 cursor-not-allowed'
-              : 'border-gray-700/70 dark:border-gray-700/60'"
-          />
-        </div>
-
-        <!-- Match Notes Column -->
-        <div class="flex flex-col">
-          <div class="flex items-center justify-between text-xs font-semibold text-gray-300 mb-1.5">
-            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-              Match Notes
-            </span>
-            <span class="text-[10px] text-gray-500 font-normal">
-              Persistent across all rounds
-            </span>
-          </div>
-          <textarea
-            v-model="notesStore.gameNotes"
-            rows="3"
-            placeholder="e.g. Red claims Engineer, White vouches for Orange..."
-            class="w-full p-2.5 text-xs rounded-lg border border-gray-700/70 dark:border-gray-700/60 bg-gray-800/80 dark:bg-gray-900/90 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500/80 transition-all resize-y min-h-[76px]"
-          />
-        </div>
-      </div>
+    <!-- Interactive Map Section (Below Detective Notepad) -->
+    <div class="relative mb-16">
+      <Maps />
     </div>
 
     <!-- Modern Bottom Detective Toolbar (Persistent Dock) -->
     <footer class="fixed bottom-0 left-0 right-0 z-30 h-12 flex items-center justify-between px-2 sm:px-4 md:px-6 bg-gray-900/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-700/60 dark:border-gray-800/80 shadow-2xl">
-      <!-- Left: Investigation Tools (Notes, Map, Tasks) -->
+      <!-- Left: Investigation Tools (Notes, Map, Tasks, Impostor) -->
       <div class="flex items-center gap-1 sm:gap-2 shrink-0">
         <!-- Notes Button (Prominent & Evident) -->
         <button
-          class="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm flex items-center gap-1.5 transition-all shrink-0"
+          class="h-8 px-2.5 sm:px-3 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-sm flex items-center gap-1.5 transition-all shrink-0 cursor-pointer"
           data-test="notes-btn"
-          title="Open Detective Notes (N)"
-          @click="toggleNotesModal"
+          :title="`${t('dock.notes')} (N)`"
+          @click="handleDockNotesClick"
         >
           <AppIcon name="notes" class="w-3.5 h-3.5 shrink-0" />
-          <span>Notes</span>
+          <span>{{ t('dock.notes') }}</span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-blue-100 font-mono">N</kbd>
         </button>
 
         <!-- Map Toggle Button -->
         <button
-          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shrink-0"
+          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
           :class="mapsStore.isMapVisible
             ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500/50 hover:bg-indigo-600/40'
             : 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700/60'"
           data-test="toggle-map-btn"
-          title="Toggle Interactive Map"
+          :title="`${mapsStore.isMapVisible ? t('dock.hideMap') : t('dock.map')} (M)`"
           @click="toggleMapVisibility"
         >
           <AppIcon name="map" class="w-3.5 h-3.5 shrink-0" />
-          <span>{{ mapsStore.isMapVisible ? 'Hide' : 'Map' }}</span>
+          <span>{{ mapsStore.isMapVisible ? t('dock.hideMap') : t('dock.map') }}</span>
+          <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-gray-300 font-mono">M</kbd>
         </button>
 
         <!-- Tasks Reference Button -->
         <button
-          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60 transition-colors flex items-center gap-1.5 shrink-0"
+          class="h-8 px-2 sm:px-2.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
+          :class="impostorStore.isImpostorModeActive
+            ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-amber-100 border border-amber-500/60 ring-1 ring-amber-500/40 font-bold'
+            : 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700/60'"
           data-test="tasks-btn"
-          title="Open Tasks & Visual Reference Guide"
-          @click="isTasksModalOpen = true"
+          :title="`${t('dock.tasksGuide')} (T)`"
+          @click="toggleTasksModal"
         >
-          <AppIcon name="tasks" class="w-3.5 h-3.5 shrink-0 opacity-80" />
-          <span>Tasks</span><span class="hidden sm:inline">&nbsp;Guide</span>
+          <AppIcon name="tasks" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-amber-400' : 'opacity-80'" />
+          <span>{{ t('dock.tasksGuide') }}</span>
+          <span
+            v-if="impostorStore.isImpostorModeActive"
+            class="hidden xs:inline text-[9px] px-1 py-0.2 rounded bg-amber-500/30 text-amber-200 font-black uppercase tracking-wider"
+          >
+            Fake
+          </span>
+          <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-gray-300 font-mono">T</kbd>
+        </button>
+
+        <!-- Impostor Mode Toggle Button -->
+        <button
+          class="h-8 px-2 sm:px-2.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
+          :class="impostorStore.isImpostorModeActive
+            ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/70 border border-rose-400 ring-2 ring-rose-500/80 animate-pulse'
+            : 'bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 hover:text-rose-300 border border-rose-800/50'"
+          data-test="impostor-mode-btn"
+          :title="`${t('dock.impostorMode')} (I)`"
+          @click="toggleImpostorModal"
+        >
+          <AppIcon name="skull" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-white' : 'text-rose-400'" />
+          <span class="hidden sm:inline">{{ t('dock.impostorMode') }}</span>
+          <span class="sm:hidden">{{ t('dock.impostorShort') }}</span>
+          <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-rose-200 font-mono">I</kbd>
         </button>
       </div>
 
@@ -303,7 +300,7 @@
           @click="toggleSettingsModal"
         >
           <AppIcon name="settings" class="w-4 h-4 shrink-0" />
-          <span class="hidden sm:inline">Settings</span>
+          <span class="hidden sm:inline">{{ t('dock.settings') }}</span>
         </button>
         <button
           class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
@@ -313,7 +310,7 @@
           @click="toggleHelpModal"
         >
           <AppIcon name="help" class="w-4 h-4 shrink-0" />
-          <span class="hidden sm:inline">Help</span>
+          <span class="hidden sm:inline">{{ t('dock.help') }}</span>
         </button>
         <button
           class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1"
@@ -323,28 +320,23 @@
           @click="toggleAboutModal"
         >
           <AppIcon name="about" class="w-4 h-4 shrink-0" />
-          <span class="hidden sm:inline">About</span>
+          <span class="hidden sm:inline">{{ t('dock.about') }}</span>
         </button>
       </div>
     </footer>
 
-    <div class="relative">
-      <Maps />
-    </div>
-    <NotesModal
-      v-if="isNotesModalOpen"
-      @close="toggleNotesModal"
-    />
     <HelpModal v-if="isHelpModalOpen" @close="toggleHelpModal" />
     <AboutModal v-if="isAboutModalOpen" @close="toggleAboutModal" />
     <SettingsModal v-if="isSettingsModalOpen" @close="toggleSettingsModal" />
-    <TasksModal v-if="isTasksModalOpen" @close="toggleTasksModal" />
+    <TasksModal v-if="isTasksModalOpen" @close="isTasksModalOpen = false" />
+    <ImpostorModeModal v-if="isImpostorModalOpen" @close="isImpostorModalOpen = false" />
     <CookieWarning />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CrewMember } from '~/stores/crew'
+import { useImpostorStore } from '~/stores/impostor'
 
 const crewStore = useCrewStore()
 const settingsStore = useSettingsStore()
@@ -352,7 +344,26 @@ const notesStore = useNotesStore()
 const tasksStore = useTasksStore()
 const roundsStore = useRoundsStore()
 const mapsStore = useMapsStore()
+const impostorStore = useImpostorStore()
 const { gtag } = useGtag()
+const { t } = useI18n()
+const { micPermissionState, requestMicrophonePermission, initMicrophonePrompt } = useMicrophone()
+
+const notepadRef = ref<any>(null)
+const rosterSelectorRef = ref<any>(null)
+
+function toggleNotes() {
+  if (!notepadRef.value) return
+  if (notepadRef.value.isMinimized) {
+    notepadRef.value.expandAndFocus()
+  } else {
+    notepadRef.value.minimize()
+  }
+}
+
+function handleDockNotesClick() {
+  toggleNotes()
+}
 
 function toggleMapVisibility() {
   mapsStore.toggleMap()
@@ -366,6 +377,10 @@ function toggleMapVisibility() {
 const isHelpModalOpen = ref(false)
 const isAboutModalOpen = ref(false)
 const isTasksModalOpen = ref(false)
+const isImpostorModalOpen = ref(false)
+const isNextRoundInfoOpen = ref(false)
+const isNextRoundInfoHover = ref(false)
+const isTouchDevice = ref(false)
 
 const displayedCrewMembers = computed(() => {
   if (roundsStore.isViewingHistory && roundsStore.activeSnapshot) {
@@ -419,10 +434,16 @@ const isZoomNoticeDismissed = ref(false)
 
 function checkBrowserZoom() {
   if (typeof window === 'undefined') return
+  // On mobile/tablet or touch screens, devicePixelRatio is screen pixel density (Retina/OLED 2.5x, 3x), NOT browser zoom.
+  const isMobileOrTouch = window.innerWidth < 1024 || 'ontouchstart' in window || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0)
+  if (isMobileOrTouch) {
+    isBrowserZoomed.value = false
+    return
+  }
   const dpr = window.devicePixelRatio || 1
   const vpScale = window.visualViewport?.scale || 1
   browserZoomPercent.value = Math.round(dpr * 100)
-  // Trigger warning if browser zoom is enlarged (> 115%) OR reduced (< 90%)
+  // Trigger warning on desktop only if browser zoom is enlarged (> 118%) OR reduced (< 88%)
   isBrowserZoomed.value = vpScale > 1.05 || vpScale < 0.95 || dpr >= 1.18 || dpr <= 0.88
 }
 
@@ -437,10 +458,11 @@ function openSettingsForZoom() {
   settingsStore.setSettingsModalOpenState(true)
 }
 
-let keyupListener: ((e: KeyboardEvent) => void) | null = null
+let keydownListener: ((e: KeyboardEvent) => void) | null = null
 let zoomListener: (() => void) | null = null
 
 onMounted(() => {
+  initMicrophonePrompt()
   if (roundsStore.roundHistory.length === 0) {
     initNewMatch()
   }
@@ -459,24 +481,72 @@ onMounted(() => {
     window.visualViewport.addEventListener('resize', zoomListener)
   }
 
-  keyupListener = (e: KeyboardEvent) => {
+  if (typeof window !== 'undefined') {
+    const hasTouchSupport = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches
+    const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    isTouchDevice.value = (isCoarse || hasTouchSupport) && !isFinePointer
+  }
+
+  keydownListener = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement | null
-    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+    const isTyping = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+
+    if (e.key === 'Escape' || e.code === 'Escape') {
+      if (isTyping) {
+        target.blur()
+      }
+      if (isImpostorModalOpen.value) {
+        isImpostorModalOpen.value = false
+        return
+      }
+      if (notepadRef.value && !notepadRef.value.isMinimized) {
+        notepadRef.value.minimize()
+      }
       return
     }
-    if (e.code === 'KeyN' && !isNotesModalOpen.value && !isSettingsModalOpen.value) {
-      isNotesModalOpen.value = true
-    } else if (e.code === 'Escape' && isNotesModalOpen.value) {
-      isNotesModalOpen.value = false
+
+    if (isTyping) {
+      return
+    }
+
+    if (e.code === 'KeyN' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value && !isImpostorModalOpen.value) {
+      e.preventDefault()
+      toggleNotes()
+      return
+    }
+
+    if (e.code === 'KeyM' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value && !isImpostorModalOpen.value) {
+      e.preventDefault()
+      toggleMapVisibility()
+      return
+    }
+
+    if (e.code === 'KeyT' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isImpostorModalOpen.value) {
+      e.preventDefault()
+      toggleTasksModal()
+      return
+    }
+
+    if (e.code === 'KeyI' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value) {
+      e.preventDefault()
+      toggleImpostorModal()
+      return
+    }
+
+    if (e.code === 'KeyL' && !isSettingsModalOpen.value && !isHelpModalOpen.value && !isAboutModalOpen.value && !isTasksModalOpen.value) {
+      e.preventDefault()
+      rosterSelectorRef.value?.toggleMinimize()
+      return
     }
   }
-  document.addEventListener('keyup', keyupListener)
+  document.addEventListener('keydown', keydownListener)
 })
 
 onUnmounted(() => {
-  if (keyupListener) {
-    document.removeEventListener('keyup', keyupListener)
-    keyupListener = null
+  if (keydownListener) {
+    document.removeEventListener('keydown', keydownListener)
+    keydownListener = null
   }
   if (zoomListener) {
     window.removeEventListener('resize', zoomListener)
@@ -514,11 +584,6 @@ function handleCrewChanged({ type, value }: { type: string; value: CrewMember[] 
   }
 }
 
-function handleMemberRemoved({ list, member }: { list: string; member: CrewMember }) {
-  if (roundsStore.isViewingHistory) return
-  crewStore.togglePlayerDead(member.color)
-}
-
 function toggleHelpModal() {
   const newValue = !isHelpModalOpen.value
   isHelpModalOpen.value = newValue
@@ -538,9 +603,8 @@ function toggleSettingsModal() {
 }
 
 function toggleNotesModal() {
-  const newValue = !isNotesModalOpen.value
-  isNotesModalOpen.value = newValue
-  if (newValue) gtag('event', 'open_notes', { event_category: 'global_stats' })
+  notepadRef.value?.expandAndFocus()
+  gtag('event', 'open_notes', { event_category: 'global_stats' })
 }
 
 function toggleTasksModal() {
@@ -548,4 +612,21 @@ function toggleTasksModal() {
   isTasksModalOpen.value = newValue
   if (newValue) gtag('event', 'open_fake_tasks', { event_category: 'global_stats' })
 }
+
+function toggleImpostorModal() {
+  if (!impostorStore.isImpostorModeActive) {
+    impostorStore.setImpostorMode(true)
+  }
+  const newValue = !isImpostorModalOpen.value
+  isImpostorModalOpen.value = newValue
+  if (newValue) gtag('event', 'open_impostor_hud', { event_category: 'global_stats' })
+}
 </script>
+
+<style scoped>
+@media (hover: hover) and (pointer: fine) {
+  .touch-only-hint {
+    display: none !important;
+  }
+}
+</style>

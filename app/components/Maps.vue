@@ -10,7 +10,7 @@
         @click="mapsStore.toggleMap()"
       >
         <AppIcon name="map" class="w-3.5 h-3.5 shrink-0" />
-        <span>{{ mapsStore.isMapVisible ? 'Hide map' : 'Show map' }}</span>
+        <span>{{ mapsStore.isMapVisible ? t('map.hide') : t('map.show') }}</span>
       </button>
       <div
         v-show="mapsStore.isMapVisible"
@@ -44,7 +44,7 @@
               data-test="toggle-sensors-btn"
               @click="areSensorsVisible = !areSensorsVisible"
             >
-              {{ areSensorsVisible ? 'Hide sensors' : 'Show sensors' }}
+              {{ areSensorsVisible ? t('map.hideSensors') : t('map.showSensors') }}
             </button>
             <MiraHqOverlay v-show="areSensorsVisible" />
           </div>
@@ -78,35 +78,15 @@
 const mapsStore = useMapsStore()
 const notesStore = useNotesStore()
 const settingsStore = useSettingsStore()
+const { t } = useI18n()
 const { gtag } = useGtag()
 
 const areSensorsVisible = ref(false)
-let keyupListener: ((e: KeyboardEvent) => void) | null = null
 
 function selectMap(newMap: string) {
   mapsStore.setSelectedMap(newMap)
   gtag('event', `change_map_${newMap}`, { event_category: 'global_stats' })
 }
-
-onMounted(() => {
-  keyupListener = (e: KeyboardEvent) => {
-    if (
-      e.code === 'KeyM' &&
-      !notesStore.areNotesOpen &&
-      !settingsStore.settingsModalOpenState
-    ) {
-      mapsStore.toggleMap()
-    }
-  }
-  document.addEventListener('keyup', keyupListener)
-})
-
-onUnmounted(() => {
-  if (keyupListener) {
-    document.removeEventListener('keyup', keyupListener)
-    keyupListener = null
-  }
-})
 </script>
 
 <style lang="scss" scoped>

@@ -2,18 +2,18 @@
   <div class="flex">
     <Modal @close="handleCloseEvent">
       <template #title>{{
-        isEditingPlayerNames ? "Player names" : "Settings"
+        isEditingPlayerNames ? t('settings.playerNamesTitle') : t('settings.title')
       }}</template>
       <template #body>
         <!-- Player Names Editor Sub-View -->
         <template v-if="isEditingPlayerNames">
           <div class="flex justify-between items-center my-3">
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Edit player nicknames</span>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ t('settings.editNicknames') }}</span>
             <button
               class="px-2.5 py-1 text-xs font-bold rounded bg-red-500/15 text-red-500 hover:bg-red-500/25 border border-red-500/30 transition-colors"
               @click="crewStore.resetAllPlayerNames()"
             >
-              Reset all
+              {{ t('settings.resetAll') }}
             </button>
           </div>
           <div class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
@@ -23,7 +23,7 @@
               class="flex items-center gap-2 px-2 py-1.5 rounded bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60"
             >
               <CrewIcon :color="color" class="w-5 h-5 shrink-0" />
-              <span class="text-xs font-medium capitalize text-gray-600 dark:text-gray-400 w-14 shrink-0">{{ color }}</span>
+              <span class="text-xs font-medium capitalize text-gray-600 dark:text-gray-400 w-14 shrink-0">{{ tColor(color) }}</span>
               <input
                 type="text"
                 class="flex-1 px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -45,13 +45,34 @@
         <template v-else>
           <div class="space-y-2 mt-2">
             <!-- Display -->
-            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1">Display</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-1">{{ t('settings.display') }}</div>
+
+            <!-- UI Language -->
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-ui-language"
+            >
+              <div class="flex flex-col">
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.interfaceLanguage') }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">Auto: {{ locale }}</span>
+              </div>
+              <select
+                :value="locale"
+                class="px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+                data-test="select-ui-language"
+                @change="(e: Event) => setLocale((e.target as HTMLSelectElement).value as any)"
+              >
+                <option v-for="l in availableLocales" :key="l.code" :value="l.code">
+                  {{ l.flag }} {{ l.name }}
+                </option>
+              </select>
+            </div>
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-theme"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Interface theme</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.interfaceTheme') }}</span>
               <button
                 class="px-2.5 py-1 text-xs font-bold rounded transition-colors inline-flex items-center gap-1.5"
                 :class="darkModeStore.isDarkMode
@@ -66,13 +87,27 @@
             </div>
 
             <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-disable-animations"
+            >
+              <div class="flex flex-col">
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.disableAnimations') }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('settings.disableAnimationsSub') }}</span>
+              </div>
+              <Checkbox
+                :is-checked="settingsStore.disableAnimations"
+                @changed="settingsStore.setDisableAnimations"
+              />
+            </div>
+
+            <div
               class="flex flex-col gap-1.5 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-board-zoom"
             >
               <div class="flex items-center justify-between">
                 <div class="flex flex-col">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Board zoom</span>
-                  <span class="text-[11px] text-gray-500 dark:text-gray-400">Card & bean scale</span>
+                  <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.boardZoom') }}</span>
+                  <span class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('settings.cardBeanScale') }}</span>
                 </div>
                 <div class="flex items-center gap-1 bg-gray-200/70 dark:bg-gray-900/70 p-0.5 rounded border border-gray-300 dark:border-gray-700">
                   <button
@@ -83,7 +118,7 @@
                     data-test="zoom-btn-compact"
                     @click="settingsStore.setBoardZoom('compact')"
                   >
-                    Small
+                    {{ t('settings.zoomSmall') }}
                   </button>
                   <button
                     class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
@@ -93,7 +128,7 @@
                     data-test="zoom-btn-normal"
                     @click="settingsStore.setBoardZoom('normal')"
                   >
-                    Normal
+                    {{ t('settings.zoomNormal') }}
                   </button>
                   <button
                     class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
@@ -103,7 +138,7 @@
                     data-test="zoom-btn-large"
                     @click="settingsStore.setBoardZoom('large')"
                   >
-                    Large
+                    {{ t('settings.zoomLarge') }}
                   </button>
                   <button
                     class="px-2 py-0.5 text-xs font-semibold rounded transition-colors"
@@ -113,60 +148,24 @@
                     data-test="zoom-btn-xl"
                     @click="settingsStore.setBoardZoom('extra-large')"
                   >
-                    Extra Large
+                    {{ t('settings.zoomExtraLarge') }}
                   </button>
                 </div>
               </div>
               <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight flex items-center gap-1.5 mt-1">
                 <AppIcon name="lightbulb" class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
-                <span>Use Board Zoom here instead of browser zoom to keep the deduction columns from squishing.</span>
+                <span>{{ t('settings.zoomTip') }}</span>
               </p>
             </div>
 
-            <!-- Tracking -->
-            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Tracking</div>
-
-            <div
-              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
-              data-test="setting-show-imposter"
-            >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show Imposter checkbox</span>
-              <Checkbox
-                :is-checked="settingsStore.showImposterCheckbox"
-                @changed="settingsStore.setShowImposterCheckbox"
-              />
-            </div>
-
-            <div
-              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
-              data-test="setting-show-tasks"
-            >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show Tasks checkbox</span>
-              <Checkbox
-                :is-checked="settingsStore.showTasksCheckbox"
-                @changed="settingsStore.setShowTasksCheckbox"
-              />
-            </div>
-
-            <div
-              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
-              data-test="setting-show-meetings"
-            >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show Meetings count</span>
-              <Checkbox
-                :is-checked="settingsStore.showMeetingsCount"
-                @changed="settingsStore.setShowMeetingsCount"
-              />
-            </div>
-
             <!-- Players -->
-            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Players</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">{{ t('settings.players') }}</div>
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-highlight-color-names"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Highlight color names</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.highlightColorNames') }}</span>
               <Checkbox
                 :is-checked="settingsStore.highlightColorNames"
                 @changed="settingsStore.setHighlightColorNames"
@@ -177,7 +176,7 @@
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-show-player-names"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show player names</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.showPlayerNames') }}</span>
               <div class="flex items-center gap-2">
                 <Checkbox
                   :is-checked="settingsStore.showPlayerNames"
@@ -189,7 +188,7 @@
                   data-test="edit-player-names-btn"
                   @click="isEditingPlayerNames = true"
                 >
-                  Edit names
+                  {{ t('settings.editNames') }}
                 </button>
               </div>
             </div>
@@ -198,7 +197,7 @@
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-track-own-color"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Can track own color</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.canTrackOwnColor') }}</span>
               <Checkbox
                 :is-checked="settingsStore.canTrackOwnColor"
                 @changed="settingsStore.setCanTrackOwnColor"
@@ -206,13 +205,24 @@
             </div>
 
             <!-- Notes -->
-            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Notes</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">{{ t('settings.notesSection') }}</div>
+
+            <div
+              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
+              data-test="setting-notes-highlight-color-names"
+            >
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.highlightNotesColors') }}</span>
+              <Checkbox
+                :is-checked="settingsStore.highlightNotesColors"
+                @changed="settingsStore.setHighlightNotesColors"
+              />
+            </div>
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-reset-notes"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Reset notes each game</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.resetNotes') }}</span>
               <Checkbox
                 :is-checked="settingsStore.resetNotesOnNewGame"
                 @changed="settingsStore.setResetNotesOnNewGame"
@@ -223,7 +233,7 @@
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-show-round-notes"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show round notes</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.showRoundNotes') }}</span>
               <Checkbox
                 :is-checked="settingsStore.showRoundNotes"
                 @changed="settingsStore.setShowRoundNotes"
@@ -235,8 +245,8 @@
               data-test="setting-speech-language"
             >
               <div class="flex flex-col">
-                <span class="text-sm text-gray-700 dark:text-gray-300">Voice speech language</span>
-                <span class="text-[11px] text-gray-500 dark:text-gray-400">Microphone dictation in Notes</span>
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.voiceLanguage') }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('settings.voiceDictationSub') }}</span>
               </div>
               <select
                 :value="settingsStore.speechLanguage"
@@ -247,6 +257,9 @@
                 <option value="pt-BR">Português (Brasil)</option>
                 <option value="en-US">English (US)</option>
                 <option value="es-ES">Español</option>
+                <option value="ko-KR">한국어 (Korean)</option>
+                <option value="fr-FR">Français</option>
+                <option value="de-DE">Deutsch</option>
               </select>
             </div>
 
@@ -255,8 +268,8 @@
               data-test="setting-mic-permission"
             >
               <div class="flex flex-col">
-                <span class="text-sm text-gray-700 dark:text-gray-300">Microphone permission</span>
-                <span class="text-[11px] text-gray-500 dark:text-gray-400">Browser access for Notes dictation</span>
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.micPermission') }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('settings.micSub') }}</span>
               </div>
               <button
                 type="button"
@@ -267,18 +280,18 @@
                 @click="requestMicPermission"
               >
                 <AppIcon :name="micPermissionState === 'granted' ? 'check' : 'mic'" class="w-3.5 h-3.5 shrink-0" />
-                <span>{{ micPermissionState === 'granted' ? 'Allowed ✓' : 'Allow Mic' }}</span>
+                <span>{{ micPermissionState === 'granted' ? t('settings.micAllowed') : t('settings.micAllow') }}</span>
               </button>
             </div>
 
             <!-- Map -->
-            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">Map</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mt-3">{{ t('settings.mapSection') }}</div>
 
             <div
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-improve-map-contrast"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Improve map contrast</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.improveContrast') }}</span>
               <Checkbox
                 :is-checked="settingsStore.isImproveMapContrastEnabled"
                 @changed="settingsStore.setIsImproveMapContrastEnabled"
@@ -289,7 +302,7 @@
               class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/50"
               data-test="setting-show-map-color-names"
             >
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show color names</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.showMapColorNames') }}</span>
               <Checkbox
                 :is-checked="settingsStore.showMapColorNames"
                 @changed="settingsStore.setShowMapColorNames"
@@ -311,47 +324,14 @@ const settingsStore = useSettingsStore();
 const darkModeStore = useDarkModeStore();
 const crewStore = useCrewStore();
 const { gtag } = useGtag();
+const { t, tColor, locale, setLocale, availableLocales } = useI18n();
 
 const isEditingPlayerNames = ref(false);
-const micPermissionState = ref<'granted' | 'prompt' | 'denied' | 'unknown'>('unknown');
-
-async function updateMicPermissionState() {
-  if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
-    try {
-      const status = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-      micPermissionState.value = status.state;
-      status.onchange = () => {
-        micPermissionState.value = status.state;
-      };
-    } catch {}
-  }
-}
+const { micPermissionState, requestMicrophonePermission } = useMicrophone();
 
 async function requestMicPermission() {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-    alert('Microphone input is not supported in this browser.');
-    return;
-  }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach((track) => {
-      track.stop();
-      track.enabled = false;
-    });
-    micPermissionState.value = 'granted';
-  } catch (err: any) {
-    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-      micPermissionState.value = 'denied';
-      alert('Microphone permission was denied. Please allow microphone access in your browser settings (URL bar).');
-    } else {
-      alert('Microphone error: ' + (err.message || 'Permission denied'));
-    }
-  }
+  await requestMicrophonePermission();
 }
-
-onMounted(() => {
-  updateMicPermissionState();
-});
 
 function getPlayerName(color: string): string {
   return crewStore.crewMembers.find((m) => m.color === color)?.playerName ?? "";
