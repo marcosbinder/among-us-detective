@@ -267,7 +267,7 @@
         >
           <AppIcon name="tasks" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-amber-400' : 'opacity-80'" />
           <span class="hidden sm:inline">{{ t('dock.tasksGuide') }}</span>
-          <span class="sm:hidden text-xs">Tasks</span>
+          <span class="sm:hidden text-xs">{{ t('card.tasks') }}</span>
           <span
             v-if="impostorStore.isImpostorModeActive"
             class="text-[8px] sm:text-[9px] px-1 py-0.2 rounded bg-amber-500/30 text-amber-200 font-black uppercase tracking-wider"
@@ -290,7 +290,7 @@
         >
           <AppIcon name="skull" class="w-3.5 h-3.5 shrink-0" :class="impostorStore.isImpostorModeActive ? 'text-white' : 'text-rose-400'" />
           <span class="hidden sm:inline">{{ t('dock.impostorMode') }}</span>
-          <span class="sm:hidden text-xs">Impostor</span>
+          <span class="sm:hidden text-xs">{{ t('dock.impostorMode') }}</span>
           <kbd class="hidden md:inline-block text-[10px] px-1 py-0.2 rounded bg-black/25 text-rose-200 font-mono">I</kbd>
         </button>
       </div>
@@ -301,8 +301,8 @@
           type="button"
           class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="settings-btn"
-          title="Settings"
-          aria-label="Settings"
+          :title="t('dock.settings')"
+          :aria-label="t('dock.settings')"
           @click="toggleSettingsModal"
         >
           <AppIcon name="settings" class="w-4 h-4 shrink-0" />
@@ -312,8 +312,8 @@
           type="button"
           class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="help-btn"
-          title="How to play / Tutorial"
-          aria-label="Help"
+          :title="t('dock.help')"
+          :aria-label="t('dock.help')"
           @click="toggleHelpModal"
         >
           <AppIcon name="help" class="w-4 h-4 shrink-0" />
@@ -323,8 +323,8 @@
           type="button"
           class="h-8 w-8 sm:w-auto px-0 sm:px-2.5 text-xs font-medium rounded-lg bg-gray-800/60 hover:bg-gray-700/80 text-gray-400 hover:text-gray-200 border border-gray-700/40 transition-colors flex items-center justify-center gap-1 cursor-pointer"
           data-test="about-btn"
-          title="About Among Us Detective"
-          aria-label="About"
+          :title="t('dock.about')"
+          :aria-label="t('dock.about')"
           @click="toggleAboutModal"
         >
           <AppIcon name="about" class="w-4 h-4 shrink-0" />

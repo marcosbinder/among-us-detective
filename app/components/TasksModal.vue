@@ -1,96 +1,106 @@
 <template>
   <div class="flex">
-    <Modal @close="emit('close')">
-      <template #title>Tasks & Visual Reference</template>
+    <Modal max-width="700px" @close="emit('close')">
+      <template #title>{{ t('tasks.title') }}</template>
       <template #body>
         <!-- Impostor Fake Tasks Alert Banner (when Impostor Mode is active) -->
         <div
           v-if="impostorStore.isImpostorModeActive"
           class="p-2.5 mb-3 rounded-lg bg-red-500/15 border border-red-500/30 text-xs text-red-900 dark:text-red-200 leading-relaxed shadow-sm"
         >
-          <div class="flex items-center justify-between font-bold mb-1">
+          <div class="flex items-center justify-between font-bold mb-1.5">
             <span class="flex items-center gap-1.5 text-xs text-red-700 dark:text-red-400">
               <AppIcon name="flame" class="w-4 h-4 shrink-0" />
-              <span>Impostor Tactics: Fake Tasks Advisory</span>
+              <span>{{ t('tasks.impostorBannerTitle') }}</span>
             </span>
-            <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-500/20 text-red-700 dark:text-red-300 font-bold">
-              Impostor Mode
+            <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-500/20 text-red-700 dark:text-red-300 font-bold border border-red-500/30">
+              {{ t('tasks.impostorBadge') }}
             </span>
           </div>
-          <p class="text-[11px] opacity-90 mb-1">
-            ⚠️ <strong>Never fake Visual Tasks</strong> if visual animations are ON in match settings — crewmates will see no animation and report you!
-          </p>
-          <p class="text-[11px] opacity-90">
-            🎯 <strong>Safe to fake:</strong> Common tasks (only if everyone has them) or Short tasks without animations (Wires, Download, Swipe Card). Stand at the station for the realistic duration!
-          </p>
+          <div class="space-y-1.5 text-[11px] opacity-90">
+            <div class="flex items-start gap-1.5">
+              <AppIcon name="alert" class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-semibold text-red-900 dark:text-red-200 mr-1">{{ t('tasks.neverFakeVisualBold') }}</span>
+                <span>{{ t('tasks.neverFakeVisualDesc') }}</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <AppIcon name="target" class="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-semibold text-red-900 dark:text-red-200 mr-1">{{ t('tasks.safeToFakeBold') }}</span>
+                <span>{{ t('tasks.safeToFakeDesc') }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Detective Tip Banner -->
         <div class="p-2.5 mb-3 rounded-lg bg-blue-500/10 border border-blue-500/25 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-          <p class="font-bold mb-1 flex items-center gap-1.5 text-xs">
+          <p class="font-bold mb-1.5 flex items-center gap-1.5 text-xs">
             <AppIcon name="lightbulb" class="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
-            <span>Detective Knowledge</span>
+            <span>{{ t('tasks.detectiveKnowledgeTitle') }}</span>
           </p>
-          <ul class="list-disc list-inside space-y-1 text-[11px] opacity-90">
-            <li>
-              <span class="inline-flex items-center gap-1 font-semibold text-blue-900 dark:text-blue-200">
-                <AppIcon name="key" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
-                Common Tasks:
-              </span>
-              Either everyone in the lobby has them, or no one does. Catch impostors claiming a common task nobody has!
-            </li>
-            <li>
-              <span class="inline-flex items-center gap-1 font-semibold text-emerald-900 dark:text-emerald-200">
-                <AppIcon name="eye" class="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
-                Visual Tasks:
-              </span>
-              Have visible in-game animations (shields, asteroids, trash, medbay scan). Proves innocence when visual tasks are ON.
-            </li>
-          </ul>
+          <div class="space-y-1.5 text-[11px] opacity-90">
+            <div class="flex items-start gap-1.5">
+              <AppIcon name="key" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-semibold text-blue-900 dark:text-blue-200 mr-1">{{ t('tasks.commonTasksTitle') }}</span>
+                <span>{{ t('tasks.commonTasksDesc') }}</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-1.5">
+              <AppIcon name="eye" class="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-semibold text-emerald-900 dark:text-emerald-200 mr-1">{{ t('tasks.visualTasksTitle') }}</span>
+                <span>{{ t('tasks.visualTasksDesc') }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Controls: MapSelector and Search -->
+        <!-- Controls: MapSelector, Filter Pills, and Search -->
         <div class="space-y-2 mb-3">
-          <div class="flex items-center justify-between gap-2">
+          <!-- Maps Selector Row -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
             <MapSelector
               :selected-map="mapsStore.selectedMap"
               @map-selected="(map) => mapsStore.setSelectedMap(map)"
             />
           </div>
 
-          <!-- Search & Filter Bar -->
-          <div class="flex flex-col sm:flex-row gap-2">
-            <div class="relative flex-1">
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search task or room name..."
-                class="w-full px-3 py-1.5 text-xs rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <button
-                v-if="searchQuery"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600 flex items-center justify-center"
-                @click="searchQuery = ''"
-              >
-                <AppIcon name="close" class="w-3 h-3" />
-              </button>
-            </div>
+          <!-- Filter Pills Row -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            <button
+              v-for="filter in filterOptions"
+              :key="filter.id"
+              class="px-2.5 py-1 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 border"
+              :class="activeFilter === filter.id
+                ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700/60 hover:bg-gray-200 dark:hover:bg-gray-700'"
+              @click="activeFilter = filter.id"
+            >
+              <AppIcon v-if="filter.icon" :name="filter.icon" class="w-3.5 h-3.5 shrink-0" />
+              <span>{{ filter.label }}</span>
+            </button>
+          </div>
 
-            <!-- Filter Pills -->
-            <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
-              <button
-                v-for="filter in filterOptions"
-                :key="filter.id"
-                class="px-2.5 py-1 text-xs font-semibold rounded-md whitespace-nowrap transition-colors flex items-center gap-1"
-                :class="activeFilter === filter.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'"
-                @click="activeFilter = filter.id"
-              >
-                <AppIcon v-if="filter.icon" :name="filter.icon" class="w-3.5 h-3.5 shrink-0" />
-                <span>{{ filter.label }}</span>
-              </button>
-            </div>
+          <!-- Full-width Search Bar Row -->
+          <div class="relative w-full">
+            <AppIcon name="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" />
+            <input
+              v-model="searchQuery"
+              type="text"
+              :placeholder="t('tasks.searchPlaceholder')"
+              class="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
+            />
+            <button
+              v-if="searchQuery"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex items-center justify-center p-0.5 rounded"
+              @click="searchQuery = ''"
+            >
+              <AppIcon name="close" class="w-3 h-3" />
+            </button>
           </div>
         </div>
 
@@ -99,9 +109,9 @@
           <table class="w-full text-left text-xs border-collapse">
             <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-10">
               <tr>
-                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Task Name</th>
-                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Room / Location</th>
-                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">Classification</th>
+                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">{{ t('tasks.colTaskName') }}</th>
+                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">{{ t('tasks.colRoomLocation') }}</th>
+                <th class="p-2.5 font-bold text-gray-700 dark:text-gray-300">{{ t('tasks.colClassification') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900/50">
@@ -111,7 +121,7 @@
                 class="hover:bg-blue-50/40 dark:hover:bg-gray-800/60 transition-colors"
               >
                 <td class="p-2.5 font-semibold text-gray-900 dark:text-gray-100">
-                  {{ task.name }}
+                  {{ tTask(task.name) }}
                 </td>
                 <td class="p-2.5 text-gray-600 dark:text-gray-400">
                   <div class="flex flex-wrap gap-1">
@@ -121,7 +131,7 @@
                       class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
                     >
                       <AppIcon name="pin" class="w-3 h-3 text-red-500/80 shrink-0" />
-                      <span>{{ loc }}</span>
+                      <span>{{ tLocation(loc) }}</span>
                     </span>
                   </div>
                 </td>
@@ -141,7 +151,7 @@
               </tr>
               <tr v-if="filteredTasks.length === 0">
                 <td colspan="3" class="p-6 text-center text-gray-400 dark:text-gray-500">
-                  No tasks found matching your filter.
+                  {{ t('tasks.noTasksFound') }}
                 </td>
               </tr>
             </tbody>
@@ -158,17 +168,18 @@ const emit = defineEmits<{ close: [] }>();
 const tasksStore = useTasksStore();
 const mapsStore = useMapsStore();
 const impostorStore = useImpostorStore();
+const { t, tTask, tLocation } = useI18n();
 
 const activeFilter = ref("all");
 const searchQuery = ref("");
 
-const filterOptions = [
-  { id: "all", label: "All", icon: "" },
-  { id: "visual", label: "Visual", icon: "eye" },
-  { id: "common", label: "Common", icon: "key" },
-  { id: "short", label: "Short", icon: "zap" },
-  { id: "long", label: "Long", icon: "timer" },
-];
+const filterOptions = computed(() => [
+  { id: "all", label: t("tasks.filterAll"), icon: "" },
+  { id: "visual", label: t("tasks.filterVisual"), icon: "eye" },
+  { id: "common", label: t("tasks.filterCommon"), icon: "key" },
+  { id: "short", label: t("tasks.filterShort"), icon: "zap" },
+  { id: "long", label: t("tasks.filterLong"), icon: "timer" },
+]);
 
 const currentMapTasks = computed(() => {
   const list = tasksStore.tasks[mapsStore.selectedMap] ?? [];
@@ -207,9 +218,10 @@ const filteredTasks = computed(() => {
 
     if (searchQuery.value.trim()) {
       const q = searchQuery.value.toLowerCase().trim();
-      const matchName = task.name.toLowerCase().includes(q);
+      const localizedName = tTask(task.name).toLowerCase();
+      const matchName = task.name.toLowerCase().includes(q) || localizedName.includes(q);
       const matchLocation = task.locations.some((loc) =>
-        loc.toLowerCase().includes(q)
+        loc.toLowerCase().includes(q) || tLocation(loc).toLowerCase().includes(q)
       );
       return matchName || matchLocation;
     }
@@ -235,10 +247,10 @@ function getTaskBadgeStyle(type: string): string {
 }
 
 function getTaskTypeInfo(type: string): { label: string; icon: string } {
-  if (type.includes("Visual")) return { label: "Visual", icon: "eye" };
-  if (type.includes("Common")) return { label: "Common", icon: "key" };
-  if (type.includes("Long")) return { label: "Long", icon: "timer" };
-  if (type.includes("Short")) return { label: "Short", icon: "zap" };
+  if (type.includes("Visual")) return { label: t("tasks.typeVisual"), icon: "eye" };
+  if (type.includes("Common")) return { label: t("tasks.typeCommon"), icon: "key" };
+  if (type.includes("Long")) return { label: t("tasks.typeLong"), icon: "timer" };
+  if (type.includes("Short")) return { label: t("tasks.typeShort"), icon: "zap" };
   return { label: type, icon: "" };
 }
 </script>

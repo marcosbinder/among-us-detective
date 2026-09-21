@@ -1,6 +1,7 @@
 import { computed, onMounted } from 'vue';
 import { useSettingsStore } from '~/stores/settings';
 import { translations, SUPPORTED_LOCALES, type SupportedLocale, type LocaleInfo } from '~/utils/translations';
+import { getTranslatedTaskName, getTranslatedLocation } from '~/utils/taskTranslations';
 
 export function useI18n() {
   const settingsStore = useSettingsStore();
@@ -55,6 +56,14 @@ export function useI18n() {
     return t(`color.${color.toLowerCase()}`);
   }
 
+  function tTask(name: string): string {
+    return getTranslatedTaskName(name, locale.value);
+  }
+
+  function tLocation(location: string): string {
+    return getTranslatedLocation(location, locale.value);
+  }
+
   function setLocale(loc: 'auto' | SupportedLocale) {
     settingsStore.setUiLanguage(loc);
   }
@@ -62,6 +71,8 @@ export function useI18n() {
   return {
     t,
     tColor,
+    tTask,
+    tLocation,
     locale,
     setLocale,
     availableLocales: SUPPORTED_LOCALES,

@@ -367,7 +367,7 @@ export const useCrewStore = defineStore("crew", () => {
             ...m,
             role: null,
             roleConfirmed: false,
-            isImposter: m.status === 'impostor',
+            isImposter: false,
           };
         }
         const isRoleConfirmedByColumn = !m.isDead && (

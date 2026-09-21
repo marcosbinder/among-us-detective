@@ -27,7 +27,7 @@
               <input
                 type="text"
                 class="flex-1 px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                :placeholder="color"
+                :placeholder="tColor(color)"
                 :value="getPlayerName(color)"
                 @input="
                   (e: Event) =>

@@ -96,6 +96,8 @@ export function buildTextHighlighterRules(
       namesToMatch.add('cinza')
       namesToMatch.add('grey')
     } else if (color === 'tan') {
+      namesToMatch.add('cáqui')
+      namesToMatch.add('caqui')
       namesToMatch.add('bege')
       namesToMatch.add('canela')
       namesToMatch.add('tan')
