@@ -248,9 +248,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': 'Reduces motion and improves performance',
 
     // Cookies & Privacy
-    'cookie.message': 'By using this site, you agree to our use of cookies and anonymous analytics to improve the game experience.',
-    'cookie.accept': 'Accept Cookies',
-    'cookie.decline': 'Decline',
+    'cookie.message': 'By using this site, you agree to our use of essential local storage and anonymous telemetry to save your game and improve performance.',
+    'cookie.accept': 'Got it',
+    'cookie.dismiss': 'Got it',
     'cookie.disclaimerLink': 'Fair Play & Privacy Disclaimer',
 
     // Roadmap & Feedback Phase
@@ -614,9 +614,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': 'Reduz travamentos e melhora o desempenho',
 
     // Cookies & Privacy
-    'cookie.message': 'Ao usar este site, você concorda com o uso de cookies e envio de dados anônimos de telemetria para ajudar no desenvolvimento.',
-    'cookie.accept': 'Concordo e Aceitar',
-    'cookie.decline': 'Recusar',
+    'cookie.message': 'Este site utiliza armazenamento local para salvar suas partidas e dados anônimos de telemetria para ajudar no desenvolvimento.',
+    'cookie.accept': 'Entendi',
+    'cookie.dismiss': 'Entendi',
     'cookie.disclaimerLink': 'Aviso Legal & Termos de Uso',
 
     // Roadmap & Feedback Phase
@@ -980,9 +980,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': 'Reduce el retraso y mejora el rendimiento',
 
     // Cookies & Privacy
-    'cookie.message': 'Al utilizar este sitio, aceptas el uso de cookies y análisis anónimos para mejorar la experiencia de juego.',
-    'cookie.accept': 'Aceptar Cookies',
-    'cookie.decline': 'Rechazar',
+    'cookie.message': 'Al utilizar este sitio, aceptas el uso de almacenamiento local para guardar tus partidas y análisis anónimos para mejorar el rendimiento.',
+    'cookie.accept': 'Entendido',
+    'cookie.dismiss': 'Entendido',
     'cookie.disclaimerLink': 'Aviso Legal y Privacidad',
 
     // Roadmap & Feedback Phase
@@ -1346,9 +1346,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': 'Réduit les ralentissements et améliore les performances',
 
     // Cookies & Privacy
-    'cookie.message': 'En utilisant ce site, vous acceptez l’utilisation de cookies et de données anonymes pour améliorer le jeu.',
-    'cookie.accept': 'Accepter les Cookies',
-    'cookie.decline': 'Refuser',
+    'cookie.message': 'En utilisant ce site, vous acceptez l’utilisation du stockage local pour sauvegarder vos parties et de données anonymes pour améliorer les performances.',
+    'cookie.accept': 'Compris',
+    'cookie.dismiss': 'Compris',
     'cookie.disclaimerLink': 'Mentions Légales & Confidentialité',
 
     // Roadmap & Feedback Phase
@@ -1712,9 +1712,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': 'Reduziert Ruckler und verbessert die Leistung',
 
     // Cookies & Privacy
-    'cookie.message': 'Durch die Nutzung dieser Website stimmst du der Verwendung von Cookies und anonymen Analysen zu.',
-    'cookie.accept': 'Cookies akzeptieren',
-    'cookie.decline': 'Ablehnen',
+    'cookie.message': 'Durch die Nutzung dieser Website stimmst du der Verwendung von lokalem Speicher zum Speichern deiner Partien und anonymen Analysen zu.',
+    'cookie.accept': 'Verstanden',
+    'cookie.dismiss': 'Verstanden',
     'cookie.disclaimerLink': 'Datenschutz & Disclaimer',
 
     // Roadmap & Feedback Phase
@@ -2078,9 +2078,9 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'settings.disableAnimationsSub': '버벅임을 줄이고 성능을 향상시킵니다',
 
     // Cookies & Privacy
-    'cookie.message': '이 웹사이트를 이용함으로써 게임 개선을 위한 쿠키 사용 및 익명 분석 데이터 전송에 동의하게 됩니다.',
-    'cookie.accept': '쿠키 허용',
-    'cookie.decline': '거부',
+    'cookie.message': '이 웹사이트를 이용함으로써 게임 저장을 위한 로컬 스토리지 사용 및 익명 분석 데이터 전송에 동의하게 됩니다.',
+    'cookie.accept': '확인',
+    'cookie.dismiss': '확인',
     'cookie.disclaimerLink': '이용 약관 및 개인정보 처리방침',
 
     // Roadmap & Feedback Phase

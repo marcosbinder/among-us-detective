@@ -26,23 +26,15 @@
           </p>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-center sm:justify-end">
+        <!-- Action Button -->
+        <div class="flex items-center shrink-0 w-full sm:w-auto justify-center sm:justify-end">
           <button
             type="button"
-            class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-300 dark:border-gray-700 cursor-pointer"
-            data-test="cookie-decline-btn"
-            @click="declineCookies"
-          >
-            {{ t('cookie.decline') }}
-          </button>
-          <button
-            type="button"
-            class="flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 active:scale-95 shadow-sm transition-all cursor-pointer"
-            data-test="cookie-accept-btn"
+            class="w-full sm:w-auto px-5 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:scale-95 shadow-sm transition-all cursor-pointer"
+            data-test="cookie-dismiss-btn"
             @click="acceptCookies"
           >
-            {{ t('cookie.accept') }}
+            {{ t('cookie.dismiss') || t('cookie.accept') }}
           </button>
         </div>
       </div>
@@ -67,13 +59,6 @@ onMounted(() => {
 function acceptCookies() {
   try {
     localStorage.setItem('acceptedCookies', 'true')
-  } catch {}
-  isVisible.value = false
-}
-
-function declineCookies() {
-  try {
-    localStorage.setItem('acceptedCookies', 'declined')
   } catch {}
   isVisible.value = false
 }
