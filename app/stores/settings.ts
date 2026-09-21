@@ -3,9 +3,6 @@ export const useSettingsStore = defineStore(
   () => {
     const highlightColorNames = ref(false);
     const highlightNotesColors = ref(true);
-    const showImposterCheckbox = ref(true);
-    const showTasksCheckbox = ref(true);
-    const showMeetingsCount = ref(true);
     const showPlayerNames = ref(false);
     const showMapColorNames = ref(false);
     const settingsModalOpenState = ref(false);
@@ -45,15 +42,6 @@ export const useSettingsStore = defineStore(
     function setHighlightNotesColors(value: boolean) {
       highlightNotesColors.value = value;
     }
-    function setShowImposterCheckbox(value: boolean) {
-      showImposterCheckbox.value = value;
-    }
-    function setShowTasksCheckbox(value: boolean) {
-      showTasksCheckbox.value = value;
-    }
-    function setShowMeetingsCount(value: boolean) {
-      showMeetingsCount.value = value;
-    }
     function setShowPlayerNames(value: boolean) {
       showPlayerNames.value = value;
     }
@@ -79,9 +67,6 @@ export const useSettingsStore = defineStore(
     return {
       highlightColorNames,
       highlightNotesColors,
-      showImposterCheckbox,
-      showTasksCheckbox,
-      showMeetingsCount,
       showPlayerNames,
       showMapColorNames,
       settingsModalOpenState,
@@ -96,9 +81,6 @@ export const useSettingsStore = defineStore(
       hasAutoDetectedLanguage,
       setHighlightColorNames,
       setHighlightNotesColors,
-      setShowImposterCheckbox,
-      setShowTasksCheckbox,
-      setShowMeetingsCount,
       setShowPlayerNames,
       setShowMapColorNames,
       setSettingsModalOpenState,
