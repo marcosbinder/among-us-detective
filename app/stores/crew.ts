@@ -203,14 +203,12 @@ export const useCrewStore = defineStore("crew", () => {
           status: 'dead' as ColumnStatus,
           diedInRound: m.diedInRound || (roundsStore.currentRoundNumber - 1) || 1,
           mapPosition: null,
-          totalMeetingsHeld: m.totalMeetingsHeld + 1,
         };
       }
       // All deductions, roles, and claims persist seamlessly into the next round
       return {
         ...m,
         mapPosition: null,
-        totalMeetingsHeld: m.totalMeetingsHeld + 1,
       };
     });
   }
@@ -463,14 +461,52 @@ export const useCrewStore = defineStore("crew", () => {
   }
 
   function setPresetPlayerCount(count: number) {
-    crewMembers.value = crewMembers.value.map((m, idx) => {
-      // ME is active unless count is 0
-      const isActive = count === 0 ? false : (m.color === playerColor.value || idx < count);
+    if (count <= 0) {
+      crewMembers.value = crewMembers.value.map((m) => ({
+        ...m,
+        isActive: false,
+      }));
+      return;
+    }
+
+    if (count >= crewMembers.value.length) {
+      crewMembers.value = crewMembers.value.map((m) => {
+        const wasActive = m.isActive;
+        return {
+          ...m,
+          isActive: true,
+          status: !wasActive
+            ? ('unknown' as ColumnStatus)
+            : (m.status || ('unknown' as ColumnStatus)),
+        };
+      });
+      return;
+    }
+
+    // Determine the exact set of colors to activate (exactly `count` members, guaranteeing ME is included)
+    const targetColors = new Set<string>();
+
+    // 1. Ensure ME is included if a player color is selected
+    const meMember = crewMembers.value.find((m) => m.color === playerColor.value);
+    if (meMember) {
+      targetColors.add(meMember.color);
+    }
+
+    // 2. Fill the remaining slots in standard roster order until we reach `count`
+    for (const m of crewMembers.value) {
+      if (targetColors.size >= count) break;
+      targetColors.add(m.color);
+    }
+
+    // 3. Update crewMembers
+    crewMembers.value = crewMembers.value.map((m) => {
+      const isActive = targetColors.has(m.color);
       return {
         ...m,
         isActive,
-        // If reactivated or newly active without status, set to 'unknown'
-        status: isActive && !m.isActive ? ('unknown' as ColumnStatus) : (isActive && (!m.status || m.status === 'unknown') ? 'unknown' as ColumnStatus : m.status),
+        status: isActive && !m.isActive
+          ? ('unknown' as ColumnStatus)
+          : (isActive && (!m.status || m.status === 'unknown') ? ('unknown' as ColumnStatus) : m.status),
       };
     });
   }
