@@ -92,11 +92,11 @@
           </button>
         </div>
 
-        <!-- Color Highlighting Toggle -->
+        <!-- Color Highlighting Toggle (Desktop only; configured in Settings on mobile) -->
         <button
           type="button"
           data-test="toggle-notepad-highlight"
-          class="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold border transition-all cursor-pointer shadow-sm select-none"
+          class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold border transition-all cursor-pointer shadow-sm select-none"
           :class="settingsStore.highlightNotesColors
             ? 'bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border-indigo-500/40'
             : 'bg-gray-800 hover:bg-gray-700 text-gray-400 border-gray-700/50'"
@@ -123,7 +123,7 @@
             aria-label="Idioma do reconhecimento de voz"
             @click="isVoiceLangMenuOpen = !isVoiceLangMenuOpen"
           >
-            <span>🌐</span>
+            <AppIcon name="mic" class="w-3.5 h-3.5 text-blue-400 shrink-0" />
             <span>{{ speechLanguageButtonLabel }}</span>
             <AppIcon
               name="chevron-down"

@@ -86,33 +86,32 @@
       >
         <div
           ref="colorPickerEl"
-          class="fixed bg-gray-900 border border-yellow-400/50 rounded-lg shadow-2xl p-3 w-[280px] text-left"
+          class="fixed bg-gray-900 border border-yellow-400/50 rounded-lg shadow-2xl p-2.5 sm:p-3 w-[280px] max-w-[calc(100vw-24px)] text-left"
           :style="colorPickerStyle"
           @click.stop
         >
           <div class="text-[10px] font-bold uppercase tracking-wider text-yellow-400 mb-2">
             {{ t('roster.chooseColor') }}
           </div>
-          <div class="grid grid-cols-5 gap-1.5">
+          <div class="grid grid-cols-5 gap-1 sm:gap-1.5">
             <button
               v-for="color in allColors"
               :key="color"
               type="button"
               :data-test="`player-color-${color}`"
-              class="flex flex-col items-center justify-center p-1 rounded transition-all cursor-pointer"
+              class="w-full min-w-0 min-h-[48px] sm:min-h-[54px] flex flex-col items-center justify-center p-1 rounded transition-all cursor-pointer"
               :class="[
                 isPlayerColor(color)
-                  ? 'ring-2 ring-yellow-400 bg-yellow-400/20 scale-110 shadow-lg'
+                  ? 'ring-2 ring-yellow-400 bg-yellow-400/20 scale-105 sm:scale-110 shadow-lg'
                   : 'bg-gray-800/80 hover:bg-gray-700 border border-gray-700/60 hover:border-gray-500'
               ]"
-              style="width: 48px; min-height: 54px;"
               :title="tColor(color)"
               @click="pickColor(color)"
             >
               <div class="w-5 h-5 flex items-center justify-center pointer-events-none">
                 <CrewIcon :color="color" :is-player="isPlayerColor(color)" class="w-full h-full" />
               </div>
-              <span class="text-[7px] font-bold capitalize text-gray-300 mt-0.5 leading-[8px] break-words w-full text-center">{{ tColor(color) }}</span>
+              <span class="text-[7px] font-bold capitalize text-gray-300 mt-0.5 leading-[8px] break-words w-full text-center truncate">{{ tColor(color) }}</span>
             </button>
           </div>
         </div>
@@ -226,21 +225,23 @@ const activeCount = computed(() => {
 // Position the color picker below the ME badge
 const colorPickerStyle = computed(() => {
   const btn = document.querySelector('[data-test="player-selector-btn"]')
-  if (!btn) return { top: '80px', left: '16px' }
+  if (!btn) return { top: '80px', left: '12px' }
   const rect = btn.getBoundingClientRect()
-  const pickerWidth = 280
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 360
+  const pickerWidth = Math.min(280, Math.max(200, viewportWidth - 24))
   let left = rect.left
   const top = rect.bottom + 6
 
   // Prevent overflow right
-  if (left + pickerWidth > window.innerWidth - 8) {
-    left = window.innerWidth - pickerWidth - 8
+  if (left + pickerWidth > viewportWidth - 12) {
+    left = viewportWidth - pickerWidth - 12
   }
-  if (left < 8) left = 8
+  if (left < 12) left = 12
 
   return {
     top: `${top}px`,
     left: `${left}px`,
+    maxWidth: 'calc(100vw - 24px)',
   }
 })
 
