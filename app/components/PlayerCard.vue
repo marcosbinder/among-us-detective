@@ -621,8 +621,12 @@ function selectRole(role: string) {
     if (props.member.role === role) {
       crewStore.setPlayerRole(props.member.color, null, false)
       impostorStore.setFellowImpostorRole(props.member.color, null)
+      if (props.member.status === 'impostor') {
+        crewStore.setPlayerStatus(props.member.color, 'unknown')
+      }
     } else {
       crewStore.setPlayerRole(props.member.color, role, true)
+      crewStore.setPlayerStatus(props.member.color, 'impostor')
       impostorStore.setFellowImpostorRole(props.member.color, role)
     }
     closeMenu()
@@ -639,11 +643,21 @@ function selectRole(role: string) {
 
 function clearRole() {
   crewStore.setPlayerRole(props.member.color, null, false)
+  if (impostorStore.isImpostorModeActive) {
+    impostorStore.setFellowImpostorRole(props.member.color, null)
+  }
   closeMenu()
 }
 
 function toggleRoleConfirmed() {
   crewStore.toggleRoleConfirmed(props.member.color)
+  if (impostorStore.isImpostorModeActive) {
+    if (!props.member.roleConfirmed && isImpostorRole.value) {
+      impostorStore.setFellowImpostorRole(props.member.color, props.member.role)
+    } else if (props.member.roleConfirmed) {
+      impostorStore.setFellowImpostorRole(props.member.color, null)
+    }
+  }
   closeMenu()
 }
 
