@@ -344,6 +344,7 @@
 <script setup lang="ts">
 import type { CrewMember } from '~/stores/crew'
 import { useImpostorStore } from '~/stores/impostor'
+import { touchMatchActivity } from '~/utils/sessionManager'
 
 const crewStore = useCrewStore()
 const settingsStore = useSettingsStore()
@@ -468,9 +469,7 @@ let keydownListener: ((e: KeyboardEvent) => void) | null = null
 let zoomListener: (() => void) | null = null
 
 onMounted(() => {
-  if (roundsStore.roundHistory.length === 0) {
-    initNewMatch()
-  }
+  touchMatchActivity()
   if (JSON.parse(localStorage.getItem('returningPlayer') ?? 'false') !== true) {
     isHelpModalOpen.value = true
     localStorage.setItem('returningPlayer', JSON.stringify(true))
@@ -564,6 +563,7 @@ function initNewMatch() {
   tasksStore.resetAllTasks()
   if (settingsStore.resetNotesOnNewGame) notesStore.clearGameNotes()
   notesStore.clearRoundNotes()
+  touchMatchActivity()
   gtag('event', 'init_new_match', { event_category: 'global_stats' })
 }
 
@@ -572,6 +572,7 @@ function initNewRound() {
   roundsStore.archiveCurrentRound(crewStore.crewMembers, notesStore.roundNotes)
   crewStore.resetActiveCrew()
   tasksStore.resetAllTasks()
+  touchMatchActivity()
   // Retain notesStore.roundNotes so Round 2 inherits the notes draft from Round 1
   gtag('event', 'init_new_round', { event_category: 'global_stats' })
 }
