@@ -470,9 +470,14 @@ let zoomListener: (() => void) | null = null
 
 onMounted(() => {
   touchMatchActivity()
-  if (JSON.parse(localStorage.getItem('returningPlayer') ?? 'false') !== true) {
-    isHelpModalOpen.value = true
-    localStorage.setItem('returningPlayer', JSON.stringify(true))
+  try {
+    const storedReturning = localStorage.getItem('returningPlayer')
+    if (!storedReturning || JSON.parse(storedReturning) !== true) {
+      isHelpModalOpen.value = true
+      localStorage.setItem('returningPlayer', JSON.stringify(true))
+    }
+  } catch {
+    // Graceful fallback if localStorage is restricted or corrupted
   }
   try {
     isZoomNoticeDismissed.value = sessionStorage.getItem('dismissed_zoom_notice') === 'true'

@@ -86,7 +86,14 @@ onMounted(() => {
     { deep: true }
   )
 
-  const hasDismissed = JSON.parse(localStorage.getItem('appInstallationDismissed') ?? 'false')
+  let hasDismissed = false
+  try {
+    const stored = localStorage.getItem('appInstallationDismissed')
+    hasDismissed = stored ? JSON.parse(stored) === true : false
+  } catch {
+    hasDismissed = false
+  }
+
   if (!hasDismissed) {
     window.addEventListener('beforeinstallprompt', handleBeforeAppInstallPrompt)
     window.addEventListener('appinstalled', () => {
