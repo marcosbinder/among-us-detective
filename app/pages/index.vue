@@ -563,6 +563,8 @@ function initNewMatch() {
   tasksStore.resetAllTasks()
   if (settingsStore.resetNotesOnNewGame) notesStore.clearGameNotes()
   notesStore.clearRoundNotes()
+  impostorStore.setImpostorMode(false)
+  impostorStore.clearFellowImpostors()
   touchMatchActivity()
   gtag('event', 'init_new_match', { event_category: 'global_stats' })
 }
