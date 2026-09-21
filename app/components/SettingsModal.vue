@@ -54,14 +54,19 @@
             >
               <div class="flex flex-col">
                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.interfaceLanguage') }}</span>
-                <span class="text-[11px] text-gray-500 dark:text-gray-400">Auto: {{ locale }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">
+                  {{ settingsStore.uiLanguage === 'auto' ? `Auto: ${detectedLocaleInfo.name}` : locale }}
+                </span>
               </div>
               <select
-                :value="locale"
+                :value="settingsStore.uiLanguage"
                 class="px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
                 data-test="select-ui-language"
                 @change="(e: Event) => setLocale((e.target as HTMLSelectElement).value as any)"
               >
+                <option value="auto">
+                  🌐 Auto ({{ detectedLocaleInfo.name }})
+                </option>
                 <option v-for="l in availableLocales" :key="l.code" :value="l.code">
                   {{ l.flag }} {{ l.name }}
                 </option>
@@ -246,20 +251,22 @@
             >
               <div class="flex flex-col">
                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ t('settings.voiceLanguage') }}</span>
-                <span class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('settings.voiceDictationSub') }}</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400">
+                  {{ settingsStore.speechLanguage === 'auto' ? `Auto: ${detectedLocaleInfo.name}` : getLocaleName(settingsStore.speechLanguage) }}
+                </span>
               </div>
               <select
                 :value="settingsStore.speechLanguage"
-                class="px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                class="px-2 py-1 text-xs rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium cursor-pointer"
+                data-test="select-speech-language"
                 @change="(e: Event) => settingsStore.setSpeechLanguage((e.target as HTMLSelectElement).value as any)"
               >
-                <option value="auto">Auto (Browser)</option>
-                <option value="pt-BR">Português (Brasil)</option>
-                <option value="en-US">English (US)</option>
-                <option value="es-ES">Español</option>
-                <option value="ko-KR">한국어 (Korean)</option>
-                <option value="fr-FR">Français</option>
-                <option value="de-DE">Deutsch</option>
+                <option value="auto">
+                  🌐 Auto ({{ detectedLocaleInfo.name }})
+                </option>
+                <option v-for="l in availableLocales" :key="l.code" :value="l.code">
+                  {{ l.flag }} {{ l.name }}
+                </option>
               </select>
             </div>
 
@@ -324,7 +331,7 @@ const settingsStore = useSettingsStore();
 const darkModeStore = useDarkModeStore();
 const crewStore = useCrewStore();
 const { gtag } = useGtag();
-const { t, tColor, locale, setLocale, availableLocales } = useI18n();
+const { t, tColor, locale, setLocale, availableLocales, detectedLocaleInfo } = useI18n();
 
 const isEditingPlayerNames = ref(false);
 const { micPermissionState, requestMicrophonePermission } = useMicrophone();
@@ -335,6 +342,11 @@ async function requestMicPermission() {
 
 function getPlayerName(color: string): string {
   return crewStore.crewMembers.find((m) => m.color === color)?.playerName ?? "";
+}
+
+function getLocaleName(code: string): string {
+  const found = availableLocales.find((l) => l.code === code);
+  return found ? `${found.flag} ${found.name}` : code;
 }
 
 function handleCloseEvent() {

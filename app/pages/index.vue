@@ -354,7 +354,7 @@ const mapsStore = useMapsStore()
 const impostorStore = useImpostorStore()
 const { gtag } = useGtag()
 const { t } = useI18n()
-const { micPermissionState, requestMicrophonePermission, initMicrophonePrompt } = useMicrophone()
+const { micPermissionState, requestMicrophonePermission } = useMicrophone()
 
 const notepadRef = ref<any>(null)
 const rosterSelectorRef = ref<any>(null)
@@ -468,7 +468,6 @@ let keydownListener: ((e: KeyboardEvent) => void) | null = null
 let zoomListener: (() => void) | null = null
 
 onMounted(() => {
-  initMicrophonePrompt()
   if (roundsStore.roundHistory.length === 0) {
     initNewMatch()
   }

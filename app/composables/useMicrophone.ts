@@ -74,32 +74,6 @@ export function useMicrophone() {
     }
   }
 
-  function initMicrophonePrompt() {
-    if (typeof window === 'undefined' || isInitialized) return
-    isInitialized = true
-
-    checkPermission().then(() => {
-      if (micPermissionState.value !== 'granted' && micPermissionState.value !== 'denied') {
-        // Try requesting immediately on load
-        requestMicrophonePermission().catch(() => {})
-
-        // In case the browser enforces user gesture before getUserMedia, attach one-time interaction triggers
-        const triggerOnUserGesture = () => {
-          if (micPermissionState.value !== 'granted' && micPermissionState.value !== 'denied') {
-            requestMicrophonePermission().catch(() => {})
-          }
-          window.removeEventListener('click', triggerOnUserGesture, true)
-          window.removeEventListener('keydown', triggerOnUserGesture, true)
-          window.removeEventListener('touchstart', triggerOnUserGesture, true)
-        }
-
-        window.addEventListener('click', triggerOnUserGesture, { capture: true, once: true })
-        window.addEventListener('keydown', triggerOnUserGesture, { capture: true, once: true })
-        window.addEventListener('touchstart', triggerOnUserGesture, { capture: true, once: true })
-      }
-    })
-  }
-
   return {
     micPermissionState,
     micErrorMessage,
@@ -108,6 +82,5 @@ export function useMicrophone() {
     isSecure,
     checkPermission,
     requestMicrophonePermission,
-    initMicrophonePrompt,
   }
 }

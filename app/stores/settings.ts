@@ -16,7 +16,7 @@ export const useSettingsStore = defineStore(
     const boardZoom = ref<'compact' | 'normal' | 'large' | 'extra-large'>('normal');
     const disableAnimations = ref(false);
     const speechLanguage = ref<'auto' | 'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('auto');
-    const uiLanguage = ref<'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('en-US');
+    const uiLanguage = ref<'auto' | 'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('auto');
     const hasAutoDetectedLanguage = ref(false);
 
     function setDisableAnimations(value: boolean) {
@@ -31,7 +31,7 @@ export const useSettingsStore = defineStore(
       speechLanguage.value = value;
     }
 
-    function setUiLanguage(value: 'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE') {
+    function setUiLanguage(value: 'auto' | 'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE') {
       uiLanguage.value = value;
     }
 

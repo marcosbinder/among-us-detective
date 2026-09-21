@@ -16,10 +16,14 @@ export function useI18n() {
     return 'en-US';
   }
 
+  const detectedBrowserLocale = computed<SupportedLocale>(() => detectBrowserLocale());
+
+  const detectedLocaleInfo = computed<LocaleInfo>(() => {
+    return SUPPORTED_LOCALES.find(l => l.code === detectedBrowserLocale.value) || SUPPORTED_LOCALES[0];
+  });
+
   function initLocale() {
     if (!settingsStore.hasAutoDetectedLanguage) {
-      const detected = detectBrowserLocale();
-      settingsStore.setUiLanguage(detected);
       settingsStore.setHasAutoDetectedLanguage(true);
     }
   }
@@ -28,7 +32,12 @@ export function useI18n() {
     initLocale();
   });
 
-  const locale = computed<SupportedLocale>(() => settingsStore.uiLanguage || 'en-US');
+  const locale = computed<SupportedLocale>(() => {
+    if (!settingsStore.uiLanguage || settingsStore.uiLanguage === 'auto') {
+      return detectedBrowserLocale.value;
+    }
+    return settingsStore.uiLanguage;
+  });
 
   function t(key: string, params?: Record<string, string | number>): string {
     const currentLoc = locale.value;
@@ -46,7 +55,7 @@ export function useI18n() {
     return t(`color.${color.toLowerCase()}`);
   }
 
-  function setLocale(loc: SupportedLocale) {
+  function setLocale(loc: 'auto' | SupportedLocale) {
     settingsStore.setUiLanguage(loc);
   }
 
@@ -56,6 +65,8 @@ export function useI18n() {
     locale,
     setLocale,
     availableLocales: SUPPORTED_LOCALES,
+    detectedBrowserLocale,
+    detectedLocaleInfo,
     initLocale,
   };
 }

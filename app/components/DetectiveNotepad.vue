@@ -9,7 +9,7 @@
   >
     <!-- Notepad Header Bar (Clean, Compact & Perfectly Aligned) -->
     <header
-      class="flex flex-wrap sm:flex-nowrap items-center justify-between px-2.5 py-1.5 sm:px-3 sm:py-1.5 gap-2 border-b transition-colors w-full max-w-full overflow-hidden"
+      class="relative z-20 flex flex-wrap sm:flex-nowrap items-center justify-between px-2.5 py-1.5 sm:px-3 sm:py-1.5 gap-2 border-b transition-colors w-full max-w-full"
       :class="impostorStore.isImpostorModeActive
         ? 'border-rose-900/40 bg-rose-950/40'
         : 'border-gray-800/80 bg-gray-900/60'"
@@ -85,6 +85,7 @@
             type="button"
             class="underline font-bold hover:text-amber-200 cursor-pointer"
             data-test="mic-allow-btn"
+            :title="t('notes.micPrivacyNotice')"
             @click="requestMicrophonePermission"
           >
             {{ t('notes.allowMic') }}
@@ -111,6 +112,60 @@
             {{ settingsStore.highlightNotesColors ? t('notepad.on') : t('notepad.off') }}
           </span>
         </button>
+
+        <!-- Voice Language Selector Dropdown -->
+        <div class="relative">
+          <button
+            type="button"
+            data-test="notepad-voice-language-btn"
+            class="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold border transition-all cursor-pointer shadow-sm select-none bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700/50"
+            :title="`Reconhecimento de Voz: ${effectiveLanguageLabel}`"
+            aria-label="Idioma do reconhecimento de voz"
+            @click="isVoiceLangMenuOpen = !isVoiceLangMenuOpen"
+          >
+            <span>🌐</span>
+            <span>{{ speechLanguageButtonLabel }}</span>
+            <AppIcon
+              name="chevron-down"
+              class="w-3 h-3 text-gray-400 transition-transform duration-150"
+              :class="isVoiceLangMenuOpen ? 'rotate-180 text-blue-400' : ''"
+            />
+          </button>
+
+          <!-- Backdrop to close on click outside -->
+          <div
+            v-if="isVoiceLangMenuOpen"
+            class="fixed inset-0 z-40"
+            @click="isVoiceLangMenuOpen = false"
+          />
+
+          <!-- Dropdown Options Menu -->
+          <div
+            v-if="isVoiceLangMenuOpen"
+            class="absolute right-0 top-full mt-1.5 z-50 min-w-[140px] py-1 rounded-lg bg-gray-900 border border-gray-700 shadow-xl backdrop-blur-md"
+          >
+            <button
+              v-for="opt in voiceLanguageOptions"
+              :key="opt.value"
+              type="button"
+              class="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-medium text-left transition-colors cursor-pointer"
+              :class="settingsStore.speechLanguage === opt.value
+                ? 'bg-blue-600/20 text-blue-300 font-bold border-l-2 border-blue-500'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'"
+              @click="selectSpeechLanguage(opt.value)"
+            >
+              <span class="flex items-center gap-2">
+                <span>{{ opt.flag }}</span>
+                <span>{{ opt.label }}</span>
+              </span>
+              <AppIcon
+                v-if="settingsStore.speechLanguage === opt.value"
+                name="check"
+                class="w-3 h-3 text-blue-400"
+              />
+            </button>
+          </div>
+        </div>
 
         <span
           class="hidden sm:inline-flex text-[9px] px-1.5 py-0.5 rounded bg-black/40 text-gray-400 border border-gray-700/40 font-mono"
@@ -365,13 +420,68 @@ const gameNotes = computed({
   },
 })
 
-function getEffectiveSpeechLanguage(): string {
+function detectBrowserSpeechLanguage(): 'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE' {
+  if (typeof navigator === 'undefined') return 'en-US'
+  const navLang = (navigator.language || (navigator as any).userLanguage || '').toLowerCase()
+  if (navLang.startsWith('pt')) return 'pt-BR'
+  if (navLang.startsWith('es')) return 'es-ES'
+  if (navLang.startsWith('fr')) return 'fr-FR'
+  if (navLang.startsWith('de')) return 'de-DE'
+  if (navLang.startsWith('ko')) return 'ko-KR'
+  return 'en-US'
+}
+
+const browserLanguageCode = computed(() => detectBrowserSpeechLanguage())
+
+const autoLanguageShort = computed(() => {
+  const browserCode = browserLanguageCode.value
+  return browserCode.substring(0, 2).toUpperCase()
+})
+
+const isVoiceLangMenuOpen = ref(false)
+
+const voiceLanguageOptions = computed(() => [
+  { value: 'auto' as const, flag: '🌐', label: `Auto (${autoLanguageShort.value})` },
+  { value: 'pt-BR' as const, flag: '🇧🇷', label: 'Português' },
+  { value: 'en-US' as const, flag: '🇺🇸', label: 'English' },
+  { value: 'es-ES' as const, flag: '🇪🇸', label: 'Español' },
+  { value: 'fr-FR' as const, flag: '🇫🇷', label: 'Français' },
+  { value: 'de-DE' as const, flag: '🇩🇪', label: 'Deutsch' },
+  { value: 'ko-KR' as const, flag: '🇰🇷', label: '한국어' },
+])
+
+const speechLanguageButtonLabel = computed(() => {
   if (settingsStore.speechLanguage === 'auto') {
-    return typeof navigator !== 'undefined' && navigator.language
-      ? navigator.language
-      : 'en-US'
+    return `Auto (${autoLanguageShort.value})`
   }
-  return settingsStore.speechLanguage
+  return settingsStore.speechLanguage.substring(0, 2).toUpperCase()
+})
+
+function selectSpeechLanguage(val: any) {
+  settingsStore.setSpeechLanguage(val)
+  isVoiceLangMenuOpen.value = false
+}
+
+const effectiveSpeechLanguage = computed<'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>(() => {
+  if (settingsStore.speechLanguage && settingsStore.speechLanguage !== 'auto') {
+    return settingsStore.speechLanguage
+  }
+  return browserLanguageCode.value
+})
+
+const effectiveLanguageLabel = computed(() => {
+  const lang = effectiveSpeechLanguage.value
+  if (lang.startsWith('pt')) return 'Português (Brasil)'
+  if (lang.startsWith('en')) return 'English (US)'
+  if (lang.startsWith('es')) return 'Español'
+  if (lang.startsWith('fr')) return 'Français'
+  if (lang.startsWith('de')) return 'Deutsch'
+  if (lang.startsWith('ko')) return '한국어'
+  return lang
+})
+
+function getEffectiveSpeechLanguage(): string {
+  return effectiveSpeechLanguage.value
 }
 
 function clearRecordingTimeout() {

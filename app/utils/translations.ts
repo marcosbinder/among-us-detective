@@ -7,10 +7,10 @@ export interface LocaleInfo {
 }
 
 export const SUPPORTED_LOCALES: LocaleInfo[] = [
-  { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
-  { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
+  { code: 'en-US', name: 'English', flag: '🇺🇸' },
+  { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
   { code: 'es-ES', name: 'Español', flag: '🇪🇸' },
-  { code: 'ko-KR', name: '한국어 (Korean)', flag: '🇰🇷' },
+  { code: 'ko-KR', name: '한국어', flag: '🇰🇷' },
   { code: 'fr-FR', name: 'Français', flag: '🇫🇷' },
   { code: 'de-DE', name: 'Deutsch', flag: '🇩🇪' },
 ];
@@ -112,6 +112,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': 'Stop',
     'notes.micPermissionNeeded': 'Microphone permission needed',
     'notes.allowMic': 'Allow Mic',
+    'notes.micPrivacyNotice': 'Voice input is processed locally by your browser speech engine only while active.',
 
     // Notepad Header & Controls
     'notepad.title': 'Detective Notes',
@@ -478,6 +479,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': 'Parar',
     'notes.micPermissionNeeded': 'Falta autorizar microfone',
     'notes.allowMic': 'Autorizar Microfone',
+    'notes.micPrivacyNotice': 'A voz é processada localmente pelo reconhecimento do navegador apenas enquanto ativo.',
 
     // Notepad Header & Controls
     'notepad.title': 'Bloco do Detetive',
@@ -844,6 +846,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': 'Detener',
     'notes.micPermissionNeeded': 'Falta autorizar el micrófono',
     'notes.allowMic': 'Permitir Micrófono',
+    'notes.micPrivacyNotice': 'La voz se procesa localmente en el navegador solo mientras está activa.',
 
     // Notepad Header & Controls
     'notepad.title': 'Bloc de Notas del Detective',
@@ -1210,6 +1213,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': 'Arrêter',
     'notes.micPermissionNeeded': 'Autorisation micro requise',
     'notes.allowMic': 'Autoriser le Micro',
+    'notes.micPrivacyNotice': 'La voix est traitée localement par le navigateur uniquement lorsqu\'elle est active.',
 
     // Notepad Header & Controls
     'notepad.title': 'Carnet de Détective',
@@ -1576,6 +1580,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': 'Stoppen',
     'notes.micPermissionNeeded': 'Mikrofonzugriff erforderlich',
     'notes.allowMic': 'Mikrofon erlauben',
+    'notes.micPrivacyNotice': 'Die Spracheingabe wird nur bei Aktivierung lokal im Browser verarbeitet.',
 
     // Notepad Header & Controls
     'notepad.title': 'Detektiv-Notizen',
@@ -1942,6 +1947,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'notes.stopVoice': '중지',
     'notes.micPermissionNeeded': '마이크 권한 필요',
     'notes.allowMic': '마이크 허용',
+    'notes.micPrivacyNotice': '음성 입력은 활성화된 동안 브라우저에서 로컬로만 처리됩니다.',
 
     // Notepad Header & Controls
     'notepad.title': '탐정 메모장',
