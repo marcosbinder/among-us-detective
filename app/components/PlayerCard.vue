@@ -1,7 +1,8 @@
 <template>
   <div
-    class="player-card relative flex flex-col items-center justify-start gap-0 p-0.5 sm:p-1 rounded transition-all duration-200 select-none cursor-grab active:cursor-grabbing group"
+    class="player-card relative flex flex-col items-center justify-start gap-0 p-0.5 sm:p-1 rounded transition-all duration-200 select-none group"
     :class="[
+      isEffectiveReadOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing',
       isPlayer ? 'ring-2 ring-yellow-400 bg-yellow-400/10 shadow' : 'shadow-sm',
       isFellowImpostor ? 'ring-2 ring-rose-500 bg-rose-950/20 shadow' : '',
       member.isDead
@@ -10,7 +11,9 @@
       cardSizeClasses
     ]"
     :aria-label="`${(showPlayerNames && member.playerName) ? member.playerName : tColor(member.color)}${member.role ? `, ${member.role}, ${member.roleConfirmed ? 'Verified' : 'Claimed'}` : ''}`"
-    :title="`${(showPlayerNames && member.playerName) ? member.playerName : tColor(member.color)}${member.role ? ' (' + member.role + (member.roleConfirmed ? ' - Verified' : ' - Claimed') + ')' : ''}. ${t('card.clickForOptions')}`"
+    :title="isEffectiveReadOnly
+      ? `${(showPlayerNames && member.playerName) ? member.playerName : tColor(member.color)}${member.role ? ' (' + member.role + ')' : ''} [${t('notes.readOnlySnapshot')}]`
+      : `${(showPlayerNames && member.playerName) ? member.playerName : tColor(member.color)}${member.role ? ' (' + member.role + (member.roleConfirmed ? ' - Verified' : ' - Claimed') + ')' : ''}. ${t('card.clickForOptions')}`"
     @touchstart.passive="handleTouchStart"
     @touchmove.passive="handleTouchMove"
     @click.stop="handleCardClick"
@@ -378,6 +381,7 @@ const props = defineProps<{
   highlightColorNames?: boolean
   showPlayerNames?: boolean
   isPlayer?: boolean
+  isReadOnly?: boolean
 }>()
 
 const crewStore = useCrewStore()
@@ -385,6 +389,8 @@ const settingsStore = useSettingsStore()
 const roundsStore = useRoundsStore()
 const impostorStore = useImpostorStore()
 const { t, tColor } = useI18n()
+
+const isEffectiveReadOnly = computed(() => props.isReadOnly === true || roundsStore.isViewingHistory)
 
 const isFellowImpostor = computed(() => impostorStore.isFellowImpostor(props.member.color))
 
@@ -549,6 +555,7 @@ function handleTouchMove(e: TouchEvent) {
 }
 
 function handleCardClick(e: MouseEvent) {
+  if (isEffectiveReadOnly.value) return
   if (isTouchDragging) {
     isTouchDragging = false
     return
@@ -557,6 +564,7 @@ function handleCardClick(e: MouseEvent) {
 }
 
 function openMenu(event?: MouseEvent) {
+  if (isEffectiveReadOnly.value) return
   if (event) {
     const target = (event.currentTarget as HTMLElement) || (event.target as HTMLElement)
     if (target && target.getBoundingClientRect) {

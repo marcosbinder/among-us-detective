@@ -4,6 +4,7 @@
       v-model="crewMembersInPool"
       group="crewMembers"
       item-key="color"
+      :disabled="isReadOnly"
       :animation="150"
       :delay="160"
       :delay-on-touch-only="true"
@@ -22,6 +23,7 @@
           :highlight-color-names="highlightColorNames === true"
           :show-player-names="showPlayerNames === true"
           :is-player="member.isPlayer"
+          :is-read-only="isReadOnly"
           :data-test="`crew-member-${member.color}`"
         />
       </template>
@@ -32,6 +34,7 @@
 <script setup lang="ts">
 import Draggable from 'vuedraggable';
 import type { CrewMember } from '~/stores/crew';
+import { useRoundsStore } from '~/stores/rounds';
 
 const props = defineProps<{
   crewMembers: CrewMember[]
@@ -43,9 +46,15 @@ const emit = defineEmits<{
   changed: [value: CrewMember[]]
 }>()
 
+const roundsStore = useRoundsStore();
+const isReadOnly = computed(() => roundsStore.isViewingHistory);
+
 const crewMembersInPool = computed({
   get: () => props.crewMembers,
-  set: (value: CrewMember[]) => emit('changed', value),
+  set: (value: CrewMember[]) => {
+    if (isReadOnly.value) return;
+    emit('changed', value);
+  },
 })
 </script>
 
