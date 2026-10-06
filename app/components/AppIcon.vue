@@ -169,11 +169,18 @@
       <polyline points="20 6 9 17 4 12" />
     </g>
 
-    <!-- Skull / Dead Player / Impostor -->
+    <!-- Skull / Dead Player -->
     <g v-else-if="name === 'dead' || name === 'dead-body' || name === 'skull'">
       <circle cx="9" cy="12" r="1.2" fill="currentColor" />
       <circle cx="15" cy="12" r="1.2" fill="currentColor" />
       <path d="M8 20v2h8v-2M10 17v3M14 17v3M12 4a7 7 0 0 0-7 7c0 2.2 1 4 2.5 5.2V18a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1.8c1.5-1.2 2.5-3 2.5-5.2a7 7 0 0 0-7-7z" />
+    </g>
+
+    <!-- Knife / Impostor Weapon -->
+    <g v-else-if="name === 'knife' || name === 'impostor'">
+      <path d="M3 21l3.5-3.5" />
+      <path d="M6 18l1.5-1.5" />
+      <path d="M8 16l8.5-8.5a3 3 0 0 1 4.24 4.24L12.24 20.24a2 2 0 0 1-1.41.59H6v-3z" />
     </g>
 
     <!-- Ghost (Among Us Dead Player Ghost) -->
@@ -235,6 +242,13 @@
       <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
       <line x1="12" y1="19" x2="12" y2="23" />
       <line x1="8" y1="23" x2="16" y2="23" />
+    </g>
+
+    <!-- Download / Install -->
+    <g v-else-if="name === 'download' || name === 'install'">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
     </g>
   </svg>
 </template>
