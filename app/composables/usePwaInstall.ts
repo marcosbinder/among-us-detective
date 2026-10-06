@@ -26,22 +26,38 @@ export function usePwaInstall() {
     )
     isStandalone.value = isStandaloneMode
 
+    // Clean up any stale legacy flag from localStorage
     try {
-      const storedInstalled = localStorage.getItem('isAppInstalled') === 'true'
-      const storedDismissed = localStorage.getItem('appInstallationDismissed') === 'true'
-
-      isAppInstalled.value = isStandaloneMode || storedInstalled
-      hasDismissed.value = storedDismissed
+      localStorage.removeItem('isAppInstalled')
+      hasDismissed.value = localStorage.getItem('appInstallationDismissed') === 'true'
     } catch {
       // Graceful fallback
+    }
+
+    // In standalone mode, the app is actively running as an installed PWA.
+    // In normal browser tabs, default to false unless verified by getInstalledRelatedApps.
+    isAppInstalled.value = isStandaloneMode
+
+    if (!isStandaloneMode && typeof navigator !== 'undefined' && 'getInstalledRelatedApps' in navigator) {
+      try {
+        (navigator as any).getInstalledRelatedApps().then((relatedApps: any[]) => {
+          if (Array.isArray(relatedApps) && relatedApps.length > 0) {
+            isAppInstalled.value = true
+          } else if (!isStandalone.value) {
+            isAppInstalled.value = false
+          }
+        }).catch(() => {})
+      } catch {}
     }
 
     window.addEventListener('beforeinstallprompt', (event: Event) => {
       event.preventDefault()
       pwaInstallEvent = event
+      // When beforeinstallprompt fires, the app is definitely not installed
+      isAppInstalled.value = false
 
-      // Only show automatically on first visit if user hasn't dismissed and not installed
-      if (!hasDismissed.value && !isAppInstalled.value && !isStandalone.value) {
+      // Only show banner automatically on first visit if user hasn't dismissed and not in standalone
+      if (!hasDismissed.value && !isStandalone.value) {
         isInstallPromptVisible.value = true
       }
     })
@@ -51,7 +67,6 @@ export function usePwaInstall() {
       isInstallPromptVisible.value = false
       pwaInstallEvent = null
       try {
-        localStorage.setItem('isAppInstalled', 'true')
         localStorage.setItem('appInstallationDismissed', 'true')
       } catch {}
       if (typeof (window as any).gtag === 'function') {
@@ -73,7 +88,6 @@ export function usePwaInstall() {
           if (choiceResult?.outcome === 'accepted') {
             isAppInstalled.value = true
             try {
-              localStorage.setItem('isAppInstalled', 'true')
               localStorage.setItem('appInstallationDismissed', 'true')
             } catch {}
             if (typeof (window as any).gtag === 'function') {
