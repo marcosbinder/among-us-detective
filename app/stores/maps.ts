@@ -1,3 +1,5 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import allMaps from "~/utils/maps.js";
 
 export const useMapsStore = defineStore("maps", () => {

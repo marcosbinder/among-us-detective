@@ -1,3 +1,8 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
+
+export type QuorumHudMode = 'all' | 'tactical' | 'critical' | 'off';
+
 export const useSettingsStore = defineStore(
   "settings",
   () => {
@@ -17,6 +22,27 @@ export const useSettingsStore = defineStore(
     const speechLanguage = ref<'auto' | 'pt-BR' | 'en-US' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('auto');
     const uiLanguage = ref<'auto' | 'en-US' | 'pt-BR' | 'es-ES' | 'ko-KR' | 'fr-FR' | 'de-DE'>('auto');
     const hasAutoDetectedLanguage = ref(false);
+    const matchImpostorsCount = ref<1 | 2 | 3>(3);
+    const showQuorumAlert = ref(true);
+    const quorumHudMode = ref<QuorumHudMode>('all');
+
+    function setShowQuorumAlert(value: boolean) {
+      showQuorumAlert.value = value;
+      if (!value) {
+        quorumHudMode.value = 'off';
+      } else if (quorumHudMode.value === 'off') {
+        quorumHudMode.value = 'all';
+      }
+    }
+
+    function setQuorumHudMode(mode: QuorumHudMode) {
+      quorumHudMode.value = mode;
+      showQuorumAlert.value = mode !== 'off';
+    }
+
+    function setMatchImpostorsCount(count: 1 | 2 | 3) {
+      matchImpostorsCount.value = count;
+    }
 
     function setDisableAnimations(value: boolean) {
       disableAnimations.value = value;
@@ -81,6 +107,9 @@ export const useSettingsStore = defineStore(
       speechLanguage,
       uiLanguage,
       hasAutoDetectedLanguage,
+      matchImpostorsCount,
+      showQuorumAlert,
+      quorumHudMode,
       setHighlightColorNames,
       setHighlightNotesColors,
       setShowPlayerNames,
@@ -95,6 +124,9 @@ export const useSettingsStore = defineStore(
       setSpeechLanguage,
       setUiLanguage,
       setHasAutoDetectedLanguage,
+      setMatchImpostorsCount,
+      setShowQuorumAlert,
+      setQuorumHudMode,
     };
   },
   { persist: true }

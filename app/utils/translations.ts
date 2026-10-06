@@ -213,6 +213,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': 'All 18',
     'roster.presetClear': 'Clear',
     'roster.chooseColor': 'Choose your color',
+    'roster.impostors': 'Impostors',
 
     // Map
     'map.show': 'Show map',
@@ -629,6 +630,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': 'Todos (18)',
     'roster.presetClear': 'Limpar',
     'roster.chooseColor': 'Escolha sua cor',
+    'roster.impostors': 'Impostores',
 
     // Map
     'map.show': 'Mostrar mapa',
@@ -1045,6 +1047,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': 'Todos (18)',
     'roster.presetClear': 'Limpiar',
     'roster.chooseColor': 'Elige tu color',
+    'roster.impostors': 'Impostores',
 
     // Map
     'map.show': 'Mostrar mapa',
@@ -1461,6 +1464,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': 'Tous (18)',
     'roster.presetClear': 'Effacer',
     'roster.chooseColor': 'Choisissez votre couleur',
+    'roster.impostors': 'Imposteurs',
 
     // Map
     'map.show': 'Afficher la carte',
@@ -1877,6 +1881,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': 'Alle (18)',
     'roster.presetClear': 'Zurücksetzen',
     'roster.chooseColor': 'Wähle deine Farbe',
+    'roster.impostors': 'Impostoren',
 
     // Map
     'map.show': 'Karte anzeigen',
@@ -2293,6 +2298,7 @@ export const translations: Record<SupportedLocale, Record<string, string>> = {
     'roster.presetAll': '전원 (18인)',
     'roster.presetClear': '초기화',
     'roster.chooseColor': '자신의 색상 선택',
+    'roster.impostors': '임포스터',
 
     // Map
     'map.show': '지도 표시',
