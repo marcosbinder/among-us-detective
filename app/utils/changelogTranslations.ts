@@ -15,6 +15,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   'en-US': {
     entries: [
       {
+        date: '2026-10-04',
+        title: 'v2.4 — Critical vote alerts, impostor settings, and usability updates',
+        changes: [
+          '<b>🚨 Critical vote alerts:</b> Real-time reminders during meetings when the crew is at risk of a double kill, at match point, or when skipping vote is mathematically safe.',
+          '<b>👾 Match impostor selector:</b> Quickly set the number of impostors for the match (1, 2, or 3) directly in the lobby bar, defaulting to 3.',
+          '<b>📲 App installation prompt:</b> Discreet card to install the app with a friendly 3-day reminder cooldown if dismissed.',
+          '<b>🗺️ Interface and map controls:</b> Close hints naturally on outside click or Esc, confirmation before resetting map pins, and flexible color label toggles.',
+        ],
+      },
+      {
         date: '2026-09-21',
         title: 'v2.2 — Investigation hardening and usability polish',
         changes: [
@@ -44,6 +54,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   },
   'pt-BR': {
     entries: [
+      {
+        date: '2026-10-04',
+        title: 'v2.4 — Alertas de votação crítica, ajuste de impostores e usabilidade',
+        changes: [
+          '<b>🚨 Alertas de votação crítica:</b> Avisos em tempo real durante reuniões quando a tripulação corre risco de double kill, em ponto decisivo ou quando pular o voto é seguro.',
+          '<b>👾 Seletor de impostores:</b> Escolha rápida da quantidade de impostores na partida (1, 2 ou 3) direto na barra do lobby, com padrão em 3.',
+          '<b>📲 Instalação do app (PWA):</b> Notificação discreta para instalar o aplicativo, com lembrete a cada 3 dias se fechada.',
+          '<b>🗺️ Controles de interface e mapa:</b> Fechamento de avisos ao clicar fora ou apertar Esc, confirmação para resetar posições no mapa e opção para ocultar nomes das cores.',
+        ],
+      },
       {
         date: '2026-09-21',
         title: 'v2.2 — Melhorias de robustez e usabilidade',
@@ -75,6 +95,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   'es-ES': {
     entries: [
       {
+        date: '2026-10-04',
+        title: 'v2.4 — Alertas de votación crítica, ajuste de impostores y usabilidad',
+        changes: [
+          '<b>🚨 Alertas de votación crítica:</b> Avisos en tiempo real durante reuniones cuando la tripulación está en riesgo de double kill, punto decisivo o cuando saltar el voto es seguro.',
+          '<b>👾 Selector de impostores:</b> Configuración rápida de la cantidad de impostores (1, 2 o 3) directamente en el lobby, con valor inicial en 3.',
+          '<b>📲 Instalación de la app:</b> Aviso discreto para instalar la aplicación con recordatorio cada 3 días si se descarta.',
+          '<b>🗺️ Controles de interfaz y mapa:</b> Cierre de ventanas al hacer clic fuera o pulsar Esc, confirmación para reiniciar posiciones en el mapa y ajuste de etiquetas de color.',
+        ],
+      },
+      {
         date: '2026-09-21',
         title: 'v2.2 — Mejoras de robustez y uso',
         changes: [
@@ -104,6 +134,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   },
   'fr-FR': {
     entries: [
+      {
+        date: '2026-10-04',
+        title: 'v2.4 — Alertes de vote critique, réglage des imposteurs et confort de jeu',
+        changes: [
+          '<b>🚨 Alertes de vote critique :</b> Rappels en direct pendant les réunions en cas de risque de double kill, de manche décisive ou lorsque passer le vote est mathématiquement sûr.',
+          '<b>👾 Sélecteur d’imposteurs :</b> Choix rapide du nombre d’imposteurs (1, 2 ou 3) directement dans la barre du lobby, réglé par défaut sur 3.',
+          '<b>📲 Installation de l’application :</b> Notification discrète d’installation avec un rappel tous les 3 jours en cas de fermeture.',
+          '<b>🗺️ Commandes d’interface et carte :</b> Fermeture facile des bulles en cliquant dehors ou avec Échap, confirmation avant réinitialisation de la carte et gestion des noms de couleurs.',
+        ],
+      },
       {
         date: '2026-09-21',
         title: 'v2.2 — Fiabilité et confort d’utilisation',
@@ -135,6 +175,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   'de-DE': {
     entries: [
       {
+        date: '2026-10-04',
+        title: 'v2.4 — Kritische Abstimmungshinweise, Impostor-Auswahl und Bedienung',
+        changes: [
+          '<b>🚨 Kritische Abstimmungshinweise:</b> Echtzeit-Warnungen bei Besprechungen bei Gefahr eines Double Kills, am Match Point oder wenn ein Skip mathematisch sicher ist.',
+          '<b>👾 Impostor-Auswahl:</b> Schnelle Einstellung der Impostor-Anzahl (1, 2 oder 3) direkt in der Lobby-Leiste, standardmäßig auf 3 gesetzt.',
+          '<b>📲 App-Installation:</b> Dezenter Hinweis zur Installation als App mit einer 3-Tage-Erinnerung bei Schließen.',
+          '<b>🗺️ Oberflächen- und Kartensteuerung:</b> Hinweise schließen bei Klick außerhalb oder Esc, Bestätigung vor dem Zurücksetzen der Kartenpins und anpassbare Farbnamen.',
+        ],
+      },
+      {
         date: '2026-09-21',
         title: 'v2.2 — Mehr Stabilität und bessere Bedienung',
         changes: [
@@ -164,6 +214,16 @@ export const changelogTranslations: Record<SupportedLocale, LocalizedChangelogCo
   },
   'ko-KR': {
     entries: [
+      {
+        date: '2026-10-04',
+        title: 'v2.4 — 위험 투표 알림, 임포스터 수 설정 및 사용성 개선',
+        changes: [
+          '<b>🚨 위험 투표 알림:</b> 회의 중 더블킬 위험, 최종 결정전, 또는 안전하게 스킵할 수 있는 상황을 실시간으로 알려줍니다.',
+          '<b>👾 임포스터 인원 설정:</b> 로비 바에서 게임의 임포스터 수(1, 2, 3명)를 빠르게 선택할 수 있으며 기본값은 3명입니다.',
+          '<b>📲 앱 설치 안내:</b> 부담 없는 앱 설치 안내 창과 닫았을 때 3일 후 다시 알림 기능을 제공합니다.',
+          '<b>🗺️ 인터페이스 및 지도 개선:</b> 외부 클릭이나 Esc로 안내창 닫기, 지도 핀 초기화 전 확인 절차, 색상 이름 표시 설정이 추가되었습니다.',
+        ],
+      },
       {
         date: '2026-09-21',
         title: 'v2.2 — 조사 기록 안정성과 사용성 개선',

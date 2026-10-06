@@ -3,6 +3,28 @@ All notable changes to **Among Us Detective** are documented in this file.
 
 ---
 
+## [2.4.0] - 2026-10-04 (Critical Vote Quorum, Impostor Count & PWA Ergonomics)
+
+### Added & Improved
+- **Critical Vote Quorum HUD**: Real-time mathematical alerts during emergency meetings warning of critical threshold states:
+  - Double Kill danger (6 alive vs 2 impostors) and Match Point danger (5 alive vs 2 impostors).
+  - Triple Kill danger (9 or 8 alive vs 3 impostors).
+  - Decisive final vote (3 alive vs 1 impostor).
+  - Safe skip cushion notices (7 alive vs 2 impostors, 4 alive vs 1 impostor) preserving voting margin.
+  - Interactive "Why?" toggle revealing detailed arithmetic breakdown, with per-round dismissal.
+- **Configurable Match Impostor Count**: Added a direct 1, 2, or 3 impostor selector in the Match Roster header bar (defaulting to 3 impostors).
+- **PWA Installation Ergonomics**:
+  - Non-intrusive floating install card with clear title, dismissal controls, and install confirmation.
+  - 3-day reminder cooldown when dismissed by the user to prevent prompt fatigue while keeping app discoverability.
+  - Permanent dismissal once installed or when running in standalone PWA mode.
+- **Consolidated Upstream V2 Refinements**:
+  - Next Round info popover now closes automatically on outside pointer clicks and `Escape` key.
+  - Added safety confirmation (`Confirm` / `Cancel`) before resetting map pin positions to prevent accidental loss of tactical notes.
+  - "Show color names" setting unified under Players, allowing users to hide color names on both map pins and deduction board cards while preserving custom nicknames.
+  - Tracker role localization parity across all 6 supported languages.
+
+---
+
 ## [2.3.0] - 2026-09-23 (Light Mode & Visual Refinements)
 
 ### Added & Improved

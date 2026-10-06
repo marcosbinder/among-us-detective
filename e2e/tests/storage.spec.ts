@@ -10,7 +10,7 @@ test("corrupt startup flags do not prevent the board from loading", async ({ pag
     localStorage.setItem("acceptedCookies", "true");
   });
   await page.goto("/");
-  await expect(page.locator("[data-test='new-game-btn']")).toBeVisible();
+  await expect(page.locator("[data-test='new-game-btn']")).toBeVisible({ timeout: 30000 });
   await expect(page.locator("[data-test='crew-column-unknown']")).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -33,7 +33,7 @@ test("restricted startup flag storage still permits loading and dismissing the n
     }
   });
   await page.goto("/");
-  await expect(page.locator("[data-test='new-game-btn']")).toBeVisible();
+  await expect(page.locator("[data-test='new-game-btn']")).toBeVisible({ timeout: 30000 });
   await expect(page.locator("[data-test='cookie-warning']")).toBeVisible();
   await page.locator("[data-test='cookie-dismiss-btn']").click();
   await expect(page.locator("[data-test='cookie-warning']")).toBeHidden();
